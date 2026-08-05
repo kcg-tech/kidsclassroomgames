@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="style.css">
+
+</head>
+<header>
+    <div class="main">
+        <h1>Tornado Game</h1>
+        <p>Choose how many teams will play.
+        <br>type your own questions and answers on the board.
+        <br> Start the game!
+        </p>
+    </div>
+</header>
+
+<body>
+    <div class="main">
+
+
+
+        <div id="setup">
+
+            <h2>Teams</h2>
+
+            <select id="team-count">
+            <option value="1">1 Team</option>
+            <option value="2">2 Teams</option>
+            <option value="3">3 Teams</option>
+            </select>
+
+
+            <div id="preset-container">
+                <h2>Select a Category</h2>
+                <div>
+                    <select id="preset">
+                        <option value="select">select</option>
+                        <option value="countries">Countries</option>
+                        <option value="animals">Animals</option>
+                        <option value=""></option>
+                        <option value=""></option>
+                    </select>
+                </div>
+                <p>Create your own questions</p>
+                <button id="create-btn" class="btn">Create Board</button>    
+            </div>
+        </div>
+
+        <form id="user-inputs" class="hidden">
+            <h2>Input the contents here:</h2>
+        
+            <div id="column-container">
+
+                
+            </div>
+
+            <button id="submit" type="submit" class="btn">Submit</button> 
+        </form>
+
+        <button id="start-btn" class="btn">
+        Start Game
+        </button>
+
+
+        <div id="scoreboard"></div>
+
+
+        <div id="board-container">
+        
+            <div id="board"></div>
+            <div id="question-modal" class="hidden">
+                <div id="question-content"></div>
+            </div>
+        </div>
+
+
+        <script src="js/config.js"></script>
+        <script src="utils.js"></script>
+        <script src="js/supabase.js"></script>
+        <script src="storage.js"></script>
+        <script src="js/database.js"></script>
+
+        <script src="script.js"></script>
+    </div>
+</body>
+
+</html>
+

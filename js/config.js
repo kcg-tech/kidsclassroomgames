@@ -1,0 +1,5 @@
+const SUPABASE_URL =
+"https://blmlqhwjrntvszmpplse.supabase.co";
+
+const SUPABASE_ANON_KEY = 
+"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJsbWxxaHdqcm50dnN6bXBwbHNlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM4OTExNzEsImV4cCI6MjA5OTQ2NzE3MX0.glXHXRB3Hw0flVV3f8uWLZgyOLZPWeSF8-6XN7m7-CA";

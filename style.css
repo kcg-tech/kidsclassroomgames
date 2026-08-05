@@ -1,0 +1,176 @@
+/* COLORS */
+.orange { background: #ff8c42; }
+.blue { background: #4aa3ff; }
+.yellow { background: #f9c74f; color: #333; }
+.green { background: #4caf50; }
+
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+
+/* NAV */
+header {
+  display: flex;
+  justify-content: space-between;
+  padding: 15px 30px;
+  position: sticky;
+  top: 0;
+  background-color: rgba(255, 255, 255, 0.747);
+ 
+}
+.logo {
+    display: flex;
+    justify-content: flex-start;
+    
+}
+
+.logo img {
+    width: 50px;
+    height: 40px;
+    margin: 0;
+    padding:0;
+}
+.logo-name {
+    font-weight: bold;
+    font-size: 25px;
+    color: green;
+    margin:0;
+    padding: 0;
+    text-align: center;
+    justify-content: center;
+
+}
+
+nav {
+  display: flex;
+  gap: 10px;
+  
+  
+}
+
+nav a {
+  display: block;
+  padding: 10px 15px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  color: black;
+}
+
+nav a:hover {
+  background-color: #4aa3ff;
+  color: white;
+  transform: translateY(-2px); /* subtle lift */
+}
+
+
+
+/* HERO */
+.hero {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  height: 300px;
+  text-align: center;            
+  background-image: url("images/home/headerImg.png");
+  background-size: cover;       /* makes it fill the section */
+  background-position: center;  /* keeps it centered */
+  background-repeat: no-repeat; /* prevents tiling */
+}
+.hero h1{
+    margin: 0;
+    color: rgb(0, 21, 249);
+
+  /* Modern browsers */
+  -webkit-text-stroke: 1px rgb(60, 188, 247);
+
+  /* Fallback */
+  text-shadow:
+    -1x -1px 0 rgb(39, 38, 38),
+     1px -1px 0 rgb(39, 38, 38),
+    -1px  1px 0 rgb(39, 38, 38),
+     1px  1px 0 rgb(39, 38, 38);
+}
+.hero p{
+    margin: 0;
+    color: rgb(10, 10, 10);
+  
+}
+
+.categories {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-content: center;
+
+}
+
+
+.card {
+  padding: 20px;
+  border-radius: 10px;
+  color: white;
+  margin: 10px;
+  
+
+}
+
+.card li {
+    list-style: none;
+    font-size: 20px;
+}
+
+.card h2 {
+  margin-top: 0;
+  color: white;
+}
+
+.card ul {
+  padding-left: 20px;
+}
+.card li a {
+    text-decoration: none;
+    color: white;
+}
+
+.card li a:hover {
+    text-decoration: underline;
+    color: black;
+}
+
+.footer {
+  border-top: rgb(20, 135, 250) solid 2px;
+  background-color: #f7f7f8;
+  color: rgb(23, 23, 23);
+  padding: 10px 5px 5px;
+  margin-top: 0px;
+}
+
+.footer-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
+  
+}
+.footer-inner {
+  display: flex;
+  margin-bottom: 0px;
+}
+
+.footer-section {
+  flex: 1;
+  min-width: 200px;
+}
+
+.footer-bottom {
+  text-align: center;
+  border-top: 1px solid rgb(150, 148, 148);
+  font-size: 10px;
+}
+
+

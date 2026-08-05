@@ -1,0 +1,185 @@
+body {
+    background-image: url("../../images/home/kcgbackground.png");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-color: beige;
+}
+
+.main {
+    background-color: white;
+    border: 5px solid rgba(205, 202, 202, 0.647);
+    margin: 15px;
+    padding:10px;
+    border-radius: 2%;
+
+}
+
+h1 {
+    text-align: center;
+    font: 30px bold 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+h2 {
+    font-family: "Comic Sans MS", "Comic Sans", cursive;
+    margin: 5px;
+}
+
+#user-inputs.hidden{
+    display: none;
+}
+
+
+#user-inputs {
+    display: flex;
+    flex-direction: column;
+    margin: 5px;
+    
+}
+#column-container{
+    display: flex;
+    gap: 10px;
+}
+
+.column {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    margin: 5px;
+}
+.one{
+    color: rgb(3, 75, 51);
+}
+ .two {
+    color: rgb(17, 17, 164);
+ }
+ .three {
+    color: rgb(199, 17, 62);
+ }
+
+.four {
+    color: rgb(200, 218, 10);
+ }
+
+.five {
+    color: rgb(111, 17, 199);
+    
+ }
+
+#board-container{
+    position: relative;
+    width:fit-content;
+    margin: auto;
+}
+
+#board{
+
+display:grid;
+
+grid-template-columns:
+repeat(5,1fr);
+
+gap:5px;
+
+}
+
+.category-cell{
+    background:navy;
+    color:white;
+    padding:15px;
+    text-align:center;
+    font-weight:bold;
+}
+
+.quiz-cell{
+    background:blue;
+    color:gold;
+    padding:20px;
+    text-align:center;
+    cursor:pointer;
+    font-size:24px;
+}
+
+.reward-container{
+    background:white;
+    border: 2px solid gray;
+    padding:20px;
+    text-align:center;
+    cursor:pointer;
+    font-size:24px;
+}
+
+.reward-img{
+    padding:20px;
+    text-align:center;
+    cursor:pointer;
+    
+}
+
+.reward-text {
+    text-align: center;
+}
+
+#question-modal.hidden{
+    display: none;
+}
+
+#question-modal{
+    position: absolute;
+    inset: 0;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background: rgba(0,0,128,0.95);
+    color:white;
+
+    font-size: 3rem;
+    font-weight: bold;
+    text-align: center;
+
+    padding: 40px;
+    box-sizing: border-box;
+
+    z-index: 100;
+}
+
+#question-content{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:20px;
+    height:100%;
+}
+
+#question-content img{
+    max-width:80%;
+    max-height:300px;
+    object-fit:contain;
+}
+#question-content p{
+    font-size:2rem;
+    text-align:center;
+    margin:0;
+}
+
+.btn{
+    border: 2px solid gray;
+    padding: 10px;
+    width: 25%;
+    height: 100%;
+    border-radius: 5%;
+}
+#create-btn{
+    background-color: rgb(222, 222, 76);
+}
+
+#start-btn{
+    background-color: rgb(47, 138, 47);
+   
+}
+
+#submit{
+    background-color: rgb(164, 40, 40);
+}

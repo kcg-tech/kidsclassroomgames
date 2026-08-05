@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+  <title>Fun Games</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/png" href="images/home/kcgfavicon.png">
+</head>
+<body>
+   <header>
+        <h1>Guess the images</h1>
+        <p>Select which category you like
+        <br> choose the number of items.
+        </p>
+   </header>
+
+   <div class="controls">
+    
+        <div>
+            <label>Choose Categories:</label>
+            <select id="presetSelect"></select>
+        </div>
+        <div>
+            <h3>Filter by tags.</h3>
+            <div id="tagsContainer"></div>
+        </div>
+       <!--
+        <div>
+            <label>Upload Images</label>
+            <input type="file" 
+                id="image-upload"
+                accept="image/*"
+                multiple
+            >
+        </div> 
+       -->
+        <div>
+            <label>Language:</label>
+            <select id="languageSelect"></select>
+        </div>
+
+        <div class="mode-buttons">
+            <h3>Select image reveal mode:</h3>
+            <button id="auto-btn">Auto Reveal</button>
+            <button id="manual-btn">Manual Reveal</button>
+        </div>
+        <div>
+            <label>Number of items:</label>
+            <select id="item-count"></select>
+        </div>
+
+   </div>
+
+   <div id="selectedItemsContainer">
+
+        <h3>
+            Selected Items
+            (<span id="selectedItemsCount">0</span>)
+        </h3>
+
+        <div id="selectedItemsList">
+        </div>
+
+    </div>
+
+   <div class="btn-container">
+        <button id="start-btn">START</button>
+        <button id="reset-btn">RESET</button>
+   </div>
+
+    
+
+    <div id="game-area" class="hidden">
+
+        <div id="image-wrapper">
+
+            <img id="quiz-image">
+
+            <div id="cover-grid"></div>
+
+        </div>   
+
+        <div id="answer-buttons">
+            <button class="answer-btn"></button>
+            <button class="answer-btn"></button>
+            <button class="answer-btn"></button>
+        </div>
+
+        <p id="score-display">
+        Score: 0
+        </p>
+
+    </div>
+   
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script src="../../js/config.js"></script>
+    <script src="../../js/utils.js"></script>
+    <script src="../../js/supabase.js"></script>
+    <script src="../../js/storage.js"></script>
+    <script src="../../js/database.js"></script>
+
+    <script src="../../js/gameUtils.js"></script>
+    <script src="../../js/filters.js"></script>
+    <script src="../../js/preview.js"></script>
+
+   <script src="script.js"></script>
+
+</body>
+</html>

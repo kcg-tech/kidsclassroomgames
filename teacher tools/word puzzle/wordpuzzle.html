@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Word Puzzle</title>
+  <link rel="icon" type="image/png" href="../../images/home/kcgfavicon.png">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Word Puzzle</h1>
+        <p>Write the words you would like to add.
+        <br>Put a comma ',', or enter to separate the items.
+        <br> You can put a maximum of 15 words.
+        </p>
+        
+    </header>
+    <div class="controls">
+        <div class="select-container">
+            <div class="select-puzzle">
+                <label>Choose word puzzle type</label>
+                <select name="puzzle-type" id="puzzle-type">
+                    <option value="select">select</option>
+                    <option value="word-search">word search</option>
+                    <option value="word-scramble">word scramble</option>
+                </select>
+            </div>
+            <div class="case-select-container">
+                <label for="uplow-case">Choose if uppercase or lowercase</label>
+                <select name="case-select" id="case-select">
+                    <option value="upper">uppercase</option>
+                    <option value="lower">lowercase</option>
+                </select>
+            </div>
+        </div>
+        <div class="input-items">
+            <label for="puzzle-items">Enter the words below.</label>
+            <textarea rows="10" id="puzzle-items"></textarea>
+        </div>
+        
+    </div>
+    <div class="button-container">
+            <button id="generate-btn" class="btn generate">Generate Puzzle</button>
+            <button id="download-btn" class="btn download">Download PDF</button>
+        </div>
+    <div id="puzzle-container">
+
+    </div>
+
+
+    <script src="js/config.js"></script>
+    <script src="utils.js"></script>
+    <script src="js/supabase.js"></script>
+    <script src="storage.js"></script>
+    <script src="js/database.js"></script>
+
+    <script src="script.js"></script>
+</body>
+</html>

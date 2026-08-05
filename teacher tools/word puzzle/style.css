@@ -1,0 +1,104 @@
+h1 {
+   font-family: "Comic Sans MS", "Comic Sans", cursive;
+   text-align: center;
+}
+
+p {
+    font: 15px  Arial, Helvetica, sans-serif;
+    font-family: Arial, Helvetica, sans-serif;
+    text-align: center;
+}
+
+.controls {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-around;
+    border: 2px double black;
+    padding: 10px;
+}
+
+.select-container{
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.select-puzzle{
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.case-select-container {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.input-items{
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    
+}
+
+.button-container {
+    display: flex;
+    justify-content: space-around;
+}
+
+.btn{
+    margin-top: 20px;
+    margin-bottom: 30px;
+    font: 30px bold Arial, Helvetica, sans-serif;
+    border: 2px solid gray;
+    height: 90%;
+    width: 30%;
+}
+
+.generate{
+    background-color: green;
+    color: antiquewhite;
+}
+
+.download{
+    background-color: red;
+    color: antiquewhite;
+}
+
+#puzzle-container{
+    display: grid;
+    padding: 10px;
+    width:fit-content;
+    border: none;
+    margin: 20px auto;
+    padding: 10px auto;
+}
+
+.cell{
+    font-family: "Comic Sans MS", "Comic Sans", cursive;
+}
+
+
+.scramble-row {
+
+    display:flex;
+    justify-content:space-between;
+    padding:12px;
+    border-bottom:1px solid lightgray;
+    font-size:25px;
+    font-family: "Comic Sans MS", "Comic Sans", cursive;
+}
+
+.scrambled {
+    width:40%;
+    font-weight:bold;
+    font-family: "Comic Sans MS", "Comic Sans", cursive;
+}
+
+.answer {
+    font-family: "Comic Sans MS", "Comic Sans", cursive;
+    width:50%;
+    letter-spacing:8px;
+}

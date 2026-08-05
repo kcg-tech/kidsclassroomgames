@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Category Clash</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/png" href="../../images/home/kcgfavicon.png">
+</head>
+
+
+<body>
+<div>
+    <h1>Category Clash!</h1>
+    <p>Choose how many teams will play.
+    <br>type your own questions and answers on the board.
+    <br> Start the game!
+    </p>
+</div>
+
+
+
+<div id="setup">
+
+    <h2>Teams</h2>
+
+    <select id="team-count">
+    <option value="1">1 Team</option>
+    <option value="2">2 Teams</option>
+    <option value="3">3 Teams</option>
+    </select>
+
+
+    <div id="preset-container">
+        <h2>Select a Category</h2>
+        <div>
+            <select id="preset">
+                <option value="select">select</option>
+                <option value="countries">Countries</option>
+                <option value="animals">Animals</option>
+                <option value=""></option>
+                <option value=""></option>
+            </select>
+        </div>
+        <p>Create your own questions</p>
+        <button id="create-btn">Create Board</button>    
+    </div>
+</div>
+
+
+<form id="user-inputs" class="hidden">
+    <h2>Input the contents here:</h2>
+   
+    <div id="column-container">
+
+        
+    </div>
+
+    <button id="submit" type="submit">Submit</button> 
+</form>
+
+<button id="start-btn">
+Start Game
+</button>
+
+
+<div id="scoreboard"></div>
+
+
+<div id="board-container">
+   
+    <div id="board"></div>
+    <div id="question-modal" class="hidden"></div>
+        <div id="question-content" >
+        </div>
+</div>
+
+
+
+
+<p id="popup-answer"></p>
+
+<div id="award-points"></div>
+
+
+
+<script src="js/config.js"></script>
+<script src="utils.js"></script>
+<script src="js/supabase.js"></script>
+<script src="storage.js"></script>
+<script src="js/database.js"></script>
+
+<script src="script.js"></script>
+
+</body>

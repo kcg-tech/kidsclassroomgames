@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>KCG Admin</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script src="../js/config.js"></script>
+    <script src="../js/supabase.js"></script>
+    <script src="../js/database.js"></script>
+    <script src="../js/storage.js"></script>
+    <script src="../js/utils.js"></script>
+
+    <script src="admin.js" defer></script>
+
+    <link rel="stylesheet" href="admin.css">
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>KCG Admin Panel</h1>
+
+        <div class="form-group">
+
+            <label for="categorySelect">Category</label>
+
+            <select id="categorySelect"></select>
+
+        </div>
+       
+
+        <div id="dropZone">
+            <div class="icon">
+                📷
+            </div>
+
+            <p>Drag and drop image here</p>
+            <p class="small">
+                or click to choose a file
+            </p>
+
+            <input
+                type="file"
+                id="imageInput"
+                accept="image/*"
+                hidden
+            >
+
+        </div>
+
+        <div class="preview">
+            <img id="imagePreview">
+        </div>
+
+        <h3>Games</h3>
+        <div id="gamesContainer"></div>
+
+        <h3>Tags</h3>
+        <div id="tagsContainer"></div>
+        
+
+        <div class="form-group">
+
+            <label for="english">
+                English
+            </label>
+
+            <input
+                type="text"
+                id="english">
+
+            <label for="japanese">
+                Japanese
+            </label>
+            <input 
+                type="text"
+                id="japanese">
+
+        </div>
+
+
+        <div class="form-group">
+            <button id="saveBtn">
+                Save Item
+            </button>
+
+        </div>
+
+
+    </div>
+
+    
+    <div class="container">
+        <h2>Save Items</h2>
+
+        <input
+            type="text"
+            id="searchInput"
+            placeholder="Search items..."
+        >
+        <br>
+        <select id="filterCategory">
+            <option value="">
+                All Categories
+            </option>
+        </select>
+
+        <div class="border">
+            <div id="itemsContainer" class="grid"></div>
+        </div>
+    </div>
+        
+    
+
+
+
+    
+</body>
+
+</html>

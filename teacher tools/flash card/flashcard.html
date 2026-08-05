@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0">
+  <title>Flash Card Generator</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/png" href="images/home/kcgfavicon.png">
+</head>
+
+<body>
+   <header>
+        <h1>FLASH CARD GENERATOR</h1>
+        <p>Select a category, choose filters 
+        <br> and generate your flashcards
+        </p>
+   </header>
+
+   <div class="controls">
+    
+        <div>
+
+            <label for="categorySelect">Choose Categories:</label>
+              <select id="categorySelect"></select>
+
+        </div>
+
+        <div>
+
+            <h3>Filter by tags</h3>
+            <div id="tagsContainer"></div>
+
+        </div>
+     
+        <div>
+            <label for="languageSelect"> 
+                Choose a language (front page):
+            </label>
+            <select id="languageSelect"></select>
+        </div>
+
+        <div>
+
+            <label for="cardsPerPage">
+                Cards per Page
+            </label>
+
+            <select id="cardsPerPage">
+
+                <option value="1">
+                    1 Card
+                </option>
+
+                <option value="2">
+                    2 Cards
+                </option>
+
+                <option value="4">
+                    4 Cards
+                </option>
+
+                <option value="8">
+                    8 Cards
+                </option>
+
+                <option value="16">
+                    16 Cards
+                </option>
+
+            </select>
+
+        </div>
+
+        <div>
+            <label for="orientation">
+                    Orientation
+                </label>
+
+                <select id="orientation">
+
+                    <option value="portrait">
+                        Portrait
+                    </option>
+
+                    <option value="landscape">
+                        Landscape
+                    </option>
+
+                </select>
+
+        </div>
+
+        <div>
+            <label for="cardSides">
+                Card Sides:
+            </label>
+
+            <select id="cardSides">
+                <option value="one-sided">
+                    One-sided
+                </option>
+
+                <option value="two-sided">
+                    Two-sided
+                </option>
+            </select>
+        </div>
+
+        <div>
+
+            <label for="displayMode">
+                Front Page Layout:
+            </label>
+
+            <select id="displayMode">
+
+                <option value="image-text">
+                    Image + Word
+                </option>
+
+                <option value="image">
+                    Image Only
+                </option>
+
+                <option value="text">
+                    Word Only
+                </option>
+
+            </select>
+
+        </div>
+
+        <div id="backLanguageControl" class="hidden">
+            <label for="backLanguageSelect">
+                Back Page Language:
+            </label>
+
+            <select id="backLanguageSelect"></select>
+        </div>       
+
+    </div>
+
+
+
+    <div id="selectedItemsContainer">
+
+        <h3>
+            Selected Items
+            (<span id="selectedItemsCount">0</span>)
+        </h3>
+
+        <div id="selectedItemsList">
+        </div>
+
+    </div>
+
+   <div class="btn-container">
+
+        <button type="button" class="btn" id="generateBtn">GENERATE CARDS</button>
+        <button type="button" class="btn" id="resetBtn">RESET</button>
+
+   </div>
+   
+    
+   <div id="generatedCardsContainer">
+    
+      <h3>Generated Cards</h3>
+       <button type="button"
+      id="downloadPdfBtn"
+      class="hidden btn"
+      >
+      DOWNLOAD PDF
+      </button>
+      
+      <div id="previewPages"></div>
+      
+   </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script src="../../js/config.js"></script>
+    <script src="../../js/utils.js"></script>
+    <script src="../../js/supabase.js"></script>
+    <script src="../../js/storage.js"></script>
+    <script src="../../js/database.js"></script>
+
+    <script src="../../js/gameUtils.js"></script>
+    <script src="../../js/filters.js"></script>
+    <script src="../../js/preview.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+   <script src="flashcard.js"></script>
+
+</body>
+</html>
