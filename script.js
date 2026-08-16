@@ -1,79 +1,223 @@
-const categories = [
+const categorySections = [
   {
     title: "Teacher Tools",
+    description:
+      "Create printable materials and activities for lessons, review, and vocabulary practice.",
     color: "orange",
     id: "generators",
-    items: [{name:"Bingo Generator", url: "teacher tools/bingo/bingo.html"},
-         {name:"Word Puzzle", url: "teacher tools/word puzzle/wordpuzzle.html"}, {name:"Flash Card", url: "teacher tools/flash card/flashcard.html"}]
+    section: "teacher-tools"
   },
   {
     title: "Fun Games",
+    description:
+      "Play interactive classroom games that make review sessions more engaging.",
     color: "blue",
     id: "games",
-    items: [{name:"Tornado Game", url: "fun games/Tornado Game/tornado.html"}, {name:"Guess the Image", url: "fun games/guess the image/guess.html"},
-      {name:"Category Clash", url: "fun games/Category Clash/categoryclash.html"}]
+    section: "fun-games"
   },
   {
     title: "Random Pickers",
+    description:
+      "Make quick random classroom selections for names, numbers, and activities.",
     color: "yellow",
     id: "pickers",
-    items: [{name:"Name Picker", url: "insert url"}, {name:"Number Picker", url: "insert url"}]
-  },
-  {
-    title: "Classroom Tools",
-    color: "green",
-    id: "tools",
-    items: [{name:"Timer", url: "insert url"}, {name:"Score Tracker", url: "insert url"}] 
+    section: "random-pickers"
   }
 ];
 
-function renderCategories() {
-  const container = document.getElementById("categories");
+function addResourceContent(
+  container,
+  resource
+) {
+  const name =
+    document.createElement("strong");
 
-  categories.forEach(category => {
-    const card = document.createElement("div");
-    card.id = `${category.id}`
-    card.className = `card ${category.color}`;
+  name.className =
+    "resource-name";
 
-    const title = document.createElement("h2");
-    title.textContent = category.title;
+  name.textContent =
+    resource.name;
 
-    const list = document.createElement("ul");
+  const description =
+    document.createElement("span");
 
-    category.items.forEach(item => {
-      const li = document.createElement("li");
-      const a = document.createElement("a");
-      a.target = '_blank';
-      a.rel ="noopener noreferrer"//prevents newpage access
-      a.textContent = item.name;
-      a.href = item.url;
+  description.className =
+    "resource-description";
 
-      li.appendChild(a);
-      list.appendChild(li);
-      
-    });
+  description.textContent =
+    resource.description;
+
+  container.appendChild(name);
+  container.appendChild(description);
+}
+
+async function renderCategories() {
+  const container =
+    document.getElementById(
+      "categories"
+    );
+
+  container.innerHTML = "";
+
+  const resources =
+    await dbGetSiteResources();
+
+  categorySections.forEach(category => {
+    const card =
+      document.createElement("article");
+
+    card.id = category.id;
+
+    card.className =
+      `card ${category.color}`;
+
+    const title =
+      document.createElement("h2");
+
+    title.textContent =
+      category.title;
+
+    const categoryDescription =
+      document.createElement("p");
+
+    categoryDescription.className =
+      "category-description";
+
+    categoryDescription.textContent =
+      category.description;
+
+    const list =
+      document.createElement("ul");
+
+    const sectionResources =
+      resources.filter(
+        resource =>
+          resource.section ===
+            category.section
+      );
+
+    sectionResources.forEach(
+      resource => {
+        const listItem =
+          document.createElement("li");
+
+        if (
+          resource.status ===
+          "available"
+        ) {
+          const link =
+            document.createElement("a");
+
+          link.className =
+            "resource-link";
+
+          link.href =
+            resource.url;
+
+          if (resource.open_new_tab) {
+            link.target = "_blank";
+            link.rel =
+              "noopener noreferrer";
+          }
+
+          addResourceContent(
+            link,
+            resource
+          );
+
+          listItem.appendChild(
+            link
+          );
+        } else {
+          const comingSoon =
+            document.createElement("div");
+
+          comingSoon.className =
+            "resource-link coming-soon-resource";
+
+          comingSoon.setAttribute(
+            "aria-disabled",
+            "true"
+          );
+
+          addResourceContent(
+            comingSoon,
+            resource
+          );
+
+          const badge =
+            document.createElement("span");
+
+          badge.className =
+            "coming-soon-badge";
+
+          badge.textContent =
+            "Coming Soon";
+
+          comingSoon.appendChild(
+            badge
+          );
+
+          listItem.appendChild(
+            comingSoon
+          );
+        }
+
+        list.appendChild(
+          listItem
+        );
+      }
+    );
 
     card.appendChild(title);
+    card.appendChild(
+      categoryDescription
+    );
     card.appendChild(list);
+
     container.appendChild(card);
   });
 }
 
 renderCategories();
 
-async function testConnection() {
+const accountNavLink =
+  document.getElementById(
+    "accountNavLink"
+  );
 
-    const { data, error } = await db
-        .from("categories")
-        .select("*");
+async function updateAccountNavigation() {
+  const { data, error } =
+    await db.auth.getSession();
 
-    if (error) {
-        console.error(error);
-        return;
-    }
+  if (error) {
+    console.error(
+      "Could not check login status:",
+      error
+    );
 
-    console.log(data);
-    console.log(error);
+    return;
+  }
+
+  accountNavLink.textContent =
+    data.session
+      ? "My Account"
+      : "Log In";
 }
 
-testConnection();
+db.auth.onAuthStateChange(
+  () => {
+    setTimeout(
+      updateAccountNavigation,
+      0
+    );
+  }
+);
+
+window.addEventListener(
+  "focus",
+  updateAccountNavigation
+);
+
+updateAccountNavigation();
+

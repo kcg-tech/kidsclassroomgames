@@ -1,3 +1,7 @@
+.hidden {
+    display: none !important;
+}
+
 body {
     background-image: url("../../images/home/kcgbackground.png");
     background-position: center;
@@ -99,25 +103,42 @@ gap:5px;
     font-size:24px;
 }
 
-.reward-container{
-    background:white;
+.reward-container {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: clamp(10px, 2vw, 24px);
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+
+    box-sizing: border-box;
+
+    background: white;
     border: 2px solid gray;
-    padding:20px;
-    text-align:center;
-    cursor:pointer;
-    font-size:24px;
+    color: #172554;
+    text-align: center;
 }
 
-.reward-img{
-    padding:20px;
-    text-align:center;
-    cursor:pointer;
-    
+.reward-img {
+    width: 100%;
+    height: 0;
+    min-height: 0;
+    flex: 1;
+
+    display: block;
+    object-fit: contain;
 }
 
 .reward-text {
+    margin: 0;
+    flex-shrink: 0;
     text-align: center;
 }
+
 
 #question-modal.hidden{
     display: none;
@@ -182,4 +203,979 @@ gap:5px;
 
 #submit{
     background-color: rgb(164, 40, 40);
+}
+
+/* Tornado board editor */
+
+#user-inputs {
+    width: min(1100px, calc(100% - 32px));
+    margin: 24px auto;
+    padding: 24px;
+    box-sizing: border-box;
+
+    background: rgba(255, 255, 255, 0.96);
+    border-radius: 20px;
+    box-shadow:
+        0 10px 25px
+        rgba(30, 58, 138, 0.15);
+}
+
+#user-inputs h2 {
+    margin-top: 0;
+    text-align: center;
+    color: #1d4ed8;
+}
+
+#column-container {
+    display: grid;
+    grid-template-columns:
+        repeat(
+            auto-fit,
+            minmax(220px, 1fr)
+        );
+
+    gap: 16px;
+
+    max-height: 75vh;
+    overflow-y: auto;
+
+    padding: 12px;
+    box-sizing: border-box;
+}
+
+.question-editor {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    padding: 16px;
+
+    background: #eff6ff;
+    border: 2px solid #bfdbfe;
+    border-radius: 16px;
+}
+
+.question-editor h3 {
+    margin: 0 0 8px;
+    text-align: center;
+    color: #1e3a8a;
+}
+
+.question-editor label {
+    margin-top: 6px;
+    color: #1e3a8a;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.question-editor textarea,
+.question-editor select {
+    width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+
+    border: 2px solid #bfdbfe;
+    border-radius: 8px;
+
+    font-family: inherit;
+    font-size: 15px;
+}
+
+.question-editor textarea {
+    resize: vertical;
+}
+
+/* Image picker */
+
+#image-picker-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 24px;
+    box-sizing: border-box;
+
+    background:
+        rgba(15, 23, 42, 0.72);
+}
+
+.image-picker-panel {
+    width: min(950px, 100%);
+    max-height: 90vh;
+
+    display: flex;
+    flex-direction: column;
+
+    padding: 22px;
+    box-sizing: border-box;
+
+    background: white;
+    border-radius: 20px;
+    box-shadow:
+        0 20px 50px
+        rgba(0, 0, 0, 0.3);
+}
+
+.image-picker-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.image-picker-header h2 {
+    margin: 0;
+    color: #1d4ed8;
+}
+
+#close-image-picker {
+    width: 44px;
+    min-height: 44px;
+    padding: 0;
+
+    flex-shrink: 0;
+
+    border: none;
+    border-radius: 50%;
+
+    background: #e2e8f0;
+    color: #334155;
+
+    font-size: 30px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.image-picker-filters {
+    margin: 18px 0;
+
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 12px;
+}
+
+.image-picker-filters input,
+.image-picker-filters select {
+    width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+
+    border: 2px solid #bfdbfe;
+    border-radius: 10px;
+
+    font-size: 16px;
+}
+
+#image-picker-grid {
+    min-height: 180px;
+
+    display: grid;
+    grid-template-columns:
+        repeat(
+            auto-fill,
+            minmax(120px, 1fr)
+        );
+
+    gap: 12px;
+    overflow-y: auto;
+    padding: 4px;
+}
+
+.image-picker-item {
+    padding: 9px;
+
+    border: 2px solid #dbeafe;
+    border-radius: 12px;
+
+    background: white;
+    color: #172554;
+
+    cursor: pointer;
+}
+
+.image-picker-item:hover {
+    border-color: #2563eb;
+    background: #eff6ff;
+}
+
+.image-picker-item img {
+    width: 100%;
+    height: 90px;
+
+    display: block;
+    object-fit: contain;
+}
+
+.image-picker-item span {
+    display: block;
+
+    margin-top: 7px;
+
+    text-align: center;
+    font-size: 14px;
+    overflow-wrap: anywhere;
+}
+
+/* Selected image inside the editor */
+
+.selected-image-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.choose-image-btn {
+    min-height: 40px;
+
+    border: none;
+    border-radius: 8px;
+
+    background: #2563eb;
+    color: white;
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+.selected-image-name {
+    padding: 8px;
+
+    color: #166534;
+    background: #dcfce7;
+
+    border-radius: 8px;
+
+    text-align: center;
+    font-size: 14px;
+    font-weight: bold;
+    overflow-wrap: anywhere;
+}
+
+.remove-image-btn {
+    min-height: 40px;
+
+    border: none;
+    border-radius: 8px;
+
+    background: #dc2626;
+    color: white;
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+.remove-image-btn:hover {
+    background: #b91c1c;
+}
+
+/* Full-screen play page */
+
+body.play-mode {
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+}
+
+body.play-mode > header {
+    display: none;
+}
+
+body.play-mode .main {
+    width: 100vw;
+    height: 100vh;
+
+    margin: 0;
+    padding: 2vh 2.5vw;
+
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+
+    box-sizing: border-box;
+
+    background: transparent;
+    border: none;
+    border-radius: 0;
+}
+
+body.play-mode #setup,
+body.play-mode #user-inputs,
+body.play-mode #start-btn,
+body.play-mode #image-picker-modal {
+    display: none;
+}
+
+body.play-mode #scoreboard {
+    width: 95vw;
+    margin: 0 auto;
+
+    display: flex;
+    justify-content: center;
+    gap: clamp(8px, 1.5vw, 20px);
+
+    flex-shrink: 0;
+}
+
+body.play-mode #board-container {
+    position: relative;
+
+    width: 95vw;
+    flex: 1;
+    min-height: 0;
+
+    margin: 0 auto;
+}
+
+body.play-mode #board {
+    width: 100%;
+    height: 100%;
+
+    display: grid;
+    grid-template-columns:
+        repeat(5, minmax(0, 1fr));
+    grid-template-rows:
+        repeat(5, minmax(0, 1fr));
+
+    gap: clamp(4px, 0.7vw, 10px);
+}
+
+body.play-mode .quiz-cell {
+    min-width: 0;
+    min-height: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: clamp(6px, 1.5vh, 18px);
+    box-sizing: border-box;
+
+    border: none;
+    border-radius: 8px;
+
+    background: #2563eb;
+    color: #fef08a;
+
+    font-size: clamp(22px, 3vw, 44px);
+    font-weight: bold;
+
+    cursor: pointer;
+    overflow: hidden;
+}
+
+body.play-mode .quiz-cell:hover {
+    background: #1d4ed8;
+}
+
+body.play-mode .quiz-cell.used {
+    background: #dbeafe;
+    color: #1e3a8a;
+    font-size: clamp(12px, 1.6vw, 24px);
+}
+
+body.play-mode #question-content {
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    gap: clamp(12px, 2vh, 24px);
+}
+
+body.play-mode #question-content img {
+    width: 90%;
+    height: 70%;
+
+    max-width: 90%;
+    max-height: 70%;
+
+    min-height: 0;
+    object-fit: contain;
+}
+
+body.play-mode #question-content p {
+    max-width: 95%;
+    margin: 0;
+
+    flex-shrink: 0;
+
+    font-size: clamp(
+        28px,
+        4vw,
+        64px
+    );
+
+    line-height: 1.1;
+    overflow-wrap: anywhere;
+}
+
+/* Tornado game toolbar */
+
+body:not(.play-mode) #game-toolbar {
+    display: none;
+}
+
+body.play-mode #game-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+
+    flex-shrink: 0;
+
+    color: #1e3a8a;
+    font-size: clamp(16px, 1.5vw, 22px);
+    font-weight: bold;
+}
+
+body.play-mode #game-toolbar select {
+    min-height: 42px;
+    padding: 6px 12px;
+
+    border: 2px solid #2563eb;
+    border-radius: 10px;
+
+    background: white;
+    font-size: 16px;
+}
+
+/* Team score cards */
+
+body.play-mode #scoreboard {
+    width: 95vw;
+
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+
+    gap: clamp(6px, 1vw, 16px);
+
+    flex-wrap: nowrap;
+    flex-shrink: 0;
+}
+
+body.play-mode .team-score {
+    min-width: 0;
+    max-width: 280px;
+    flex: 1 1 0;
+
+    height: clamp(100px, 14vh, 135px);
+    padding: clamp(6px, 1vh, 12px);
+
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1fr)
+        minmax(60px, 0.8fr);
+
+    grid-template-rows:
+        auto minmax(0, 1fr);
+
+    grid-template-areas:
+        "team tornado"
+        "controls controls";
+
+    align-items: center;
+    gap: clamp(4px, 0.7vh, 8px);
+
+    box-sizing: border-box;
+
+    background:
+        rgba(255, 255, 255, 0.96);
+
+    border: 3px solid #2563eb;
+    border-radius: 18px;
+
+    overflow: hidden;
+}
+
+body.play-mode .team-score h3 {
+    margin: 0;
+
+    color: #1e3a8a;
+    text-align: center;
+    font-size: clamp(15px, 1.6vw, 24px);
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+body.play-mode .team-score-controls {
+    min-width: 0;
+
+    display: grid;
+    grid-template-columns:
+        clamp(34px, 3.5vw, 52px)
+        minmax(45px, 1fr)
+        clamp(34px, 3.5vw, 52px);
+
+    align-items: center;
+    gap: clamp(3px, 0.5vw, 7px);
+}
+
+body.play-mode .team-score button {
+    width: 100%;
+    min-width: 0;
+    min-height: 34px;
+
+    padding: 3px;
+
+    border: none;
+    border-radius: 9px;
+
+    color: white;
+    font-size: clamp(18px, 2vw, 28px);
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+body.play-mode .team-score .minus {
+    background: #ef4444;
+}
+
+body.play-mode .team-score .plus {
+    background: #22c55e;
+}
+
+body.play-mode .team-score-value {
+    width: 100%;
+    min-width: 0;
+    height: 100%;
+
+    padding: 2px;
+
+    box-sizing: border-box;
+
+    border: 2px solid #bfdbfe;
+    border-radius: 8px;
+
+    background: white;
+    color: #0f172a;
+
+    text-align: center;
+    font-size: clamp(20px, 3vw, 44px);
+    font-weight: bold;
+
+    appearance: textfield;
+}
+
+body.play-mode .team-score-value::-webkit-inner-spin-button,
+body.play-mode .team-score-value::-webkit-outer-spin-button {
+    appearance: none;
+    margin: 0;
+}
+
+body.play-mode .team-tornado-btn {
+    background: #7c3aed;
+    font-size: clamp(13px, 1.3vw, 18px);
+}
+
+/* Compact score cards for five or six teams */
+
+body.play-mode
+#scoreboard[data-team-count="5"]
+.team-score,
+body.play-mode
+#scoreboard[data-team-count="6"]
+.team-score {
+    height: clamp(90px, 13vh, 120px);
+    padding: 6px;
+
+    border-width: 2px;
+    border-radius: 12px;
+}
+
+body.play-mode
+#scoreboard[data-team-count="5"]
+.team-score h3 {
+    font-size: 16px;
+}
+
+body.play-mode
+#scoreboard[data-team-count="6"]
+.team-score h3 {
+    font-size: 14px;
+}
+
+body.play-mode
+#scoreboard[data-team-count="5"]
+.team-score-value {
+    font-size: 25px;
+}
+
+body.play-mode
+#scoreboard[data-team-count="6"]
+.team-score-value {
+    font-size: 21px;
+}
+
+body.play-mode
+#scoreboard[data-team-count="5"]
+.team-score button,
+body.play-mode
+#scoreboard[data-team-count="6"]
+.team-score button {
+    min-height: 29px;
+}
+
+body.play-mode .team-score-controls {
+    flex: 0 0 auto;
+}
+
+body.play-mode .team-score-value {
+    height: clamp(42px, 6vh, 62px);
+}
+
+body.play-mode .team-score .minus,
+body.play-mode .team-score .plus {
+    height: clamp(42px, 6vh, 62px);
+}
+
+body.play-mode .team-tornado-btn {
+    height: clamp(32px, 4.5vh, 42px);
+    flex-shrink: 0;
+}
+
+body.play-mode .team-score h3 {
+    min-height: 1.2em;
+    flex-shrink: 0;
+    line-height: 1.2;
+}
+
+@media (max-height: 750px) {
+    body.play-mode
+    #scoreboard[data-team-count="5"]
+    .team-score,
+    body.play-mode
+    #scoreboard[data-team-count="6"]
+    .team-score {
+        height: 125px;
+    }
+
+    body.play-mode
+    #scoreboard[data-team-count="5"]
+    .team-score-value,
+    body.play-mode
+    #scoreboard[data-team-count="6"]
+    .team-score-value,
+    body.play-mode
+    #scoreboard[data-team-count="5"]
+    .minus,
+    body.play-mode
+    #scoreboard[data-team-count="5"]
+    .plus,
+    body.play-mode
+    #scoreboard[data-team-count="6"]
+    .minus,
+    body.play-mode
+    #scoreboard[data-team-count="6"]
+    .plus {
+        height: 38px;
+    }
+
+    body.play-mode
+    #scoreboard[data-team-count="5"]
+    .team-tornado-btn,
+    body.play-mode
+    #scoreboard[data-team-count="6"]
+    .team-tornado-btn {
+        height: 30px;
+    }
+}
+
+body.play-mode .team-score h3 {
+    grid-area: team;
+
+    min-width: 0;
+    min-height: 0;
+    margin: 0;
+
+    text-align: center;
+    line-height: 1.1;
+}
+
+body.play-mode .team-score-controls {
+    grid-area: controls;
+    width: 100%;
+}
+
+body.play-mode .team-tornado-btn {
+    grid-area: tornado;
+
+    width: 100%;
+    height: clamp(32px, 4.5vh, 42px);
+
+    padding: 2px 5px;
+    font-size: clamp(13px, 1.3vw, 18px);
+}
+
+@media (max-width: 600px) {
+    #image-picker-modal {
+        padding: 10px;
+    }
+
+    .image-picker-panel {
+        max-height: 95vh;
+        padding: 15px;
+    }
+
+    .image-picker-filters {
+        grid-template-columns: 1fr;
+    }
+
+    #image-picker-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+    #user-inputs {
+        width: calc(100% - 20px);
+        padding: 14px;
+    }
+
+    #column-container {
+        grid-template-columns: 1fr;
+        max-height: 70vh;
+        padding: 6px;
+    }
+}
+
+/* Small phones, including iPhone SE */
+
+@media (
+    max-width: 390px
+),
+(
+    max-height: 670px
+) {
+    body.play-mode .main {
+        padding: 6px;
+        gap: 6px;
+    }
+
+    body.play-mode #game-toolbar {
+        gap: 6px;
+        font-size: 13px;
+    }
+
+    body.play-mode #game-toolbar select {
+        min-height: 32px;
+        padding: 3px 6px;
+        font-size: 13px;
+    }
+
+    body.play-mode #scoreboard {
+        width: 100%;
+        gap: 3px;
+    }
+
+    body.play-mode .team-score,
+    body.play-mode
+    #scoreboard[data-team-count="5"]
+    .team-score,
+    body.play-mode
+    #scoreboard[data-team-count="6"]
+    .team-score {
+        height: 82px;
+        padding: 3px;
+
+        gap: 2px;
+
+        grid-template-columns:
+            minmax(0, 1fr)
+            minmax(40px, 0.75fr);
+
+        border-width: 1px;
+        border-radius: 8px;
+    }
+
+    body.play-mode .team-score h3,
+    body.play-mode
+    #scoreboard[data-team-count="5"]
+    .team-score h3,
+    body.play-mode
+    #scoreboard[data-team-count="6"]
+    .team-score h3 {
+        font-size: 11px;
+    }
+
+    body.play-mode .team-score-controls {
+        grid-template-columns:
+            minmax(25px, 0.7fr)
+            minmax(34px, 1fr)
+            minmax(25px, 0.7fr);
+
+        gap: 2px;
+    }
+
+    body.play-mode .team-score-value,
+    body.play-mode
+    #scoreboard[data-team-count="5"]
+    .team-score-value,
+    body.play-mode
+    #scoreboard[data-team-count="6"]
+    .team-score-value {
+        height: 32px;
+        padding: 1px;
+        font-size: 16px;
+    }
+
+    body.play-mode .team-score .minus,
+    body.play-mode .team-score .plus {
+        height: 32px;
+        min-height: 32px;
+
+        padding: 1px;
+        border-radius: 5px;
+
+        font-size: 16px;
+    }
+
+    body.play-mode .team-tornado-btn,
+    body.play-mode
+    #scoreboard[data-team-count="5"]
+    .team-tornado-btn,
+    body.play-mode
+    #scoreboard[data-team-count="6"]
+    .team-tornado-btn {
+        height: 25px;
+        min-height: 25px;
+
+        padding: 1px 2px;
+
+        font-size: 10px;
+        border-radius: 5px;
+    }
+
+    body.play-mode #board-container {
+        width: 100%;
+    }
+
+    body.play-mode #board {
+        gap: 3px;
+    }
+
+    body.play-mode .quiz-cell {
+        padding: 2px;
+        border-radius: 5px;
+        font-size: clamp(16px, 5vw, 24px);
+    }
+
+    body.play-mode .quiz-cell.used {
+        font-size: clamp(9px, 3vw, 14px);
+    }
+}
+
+#play-again-controls:not(.hidden) {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: clamp(12px, 2vw, 24px);
+    padding: 18px;
+    box-sizing: border-box;
+}
+
+#play-again-controls .btn {
+    width: clamp(300px, 40vw, 460px);
+    height: auto;
+    padding: 18px 30px;
+    border: none;
+    border-radius: 18px;
+    color: white;
+    font-size: clamp(19px, 1.8vw, 25px); /* adjusted */
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.22);
+    transition:
+        transform 0.2s,
+        box-shadow 0.2s;
+}
+
+#play-again-btn {
+    background-color: #7b9de6;
+}
+
+#play-again-shuffle-btn {
+    background-color: #f97316;
+}
+
+#play-again-controls .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.28);
+}
+
+#play-again-controls .btn:active {
+    transform: translateY(0);
+}
+
+#share-board-controls:not(.hidden) {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+}
+
+#board-management-buttons {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 14px;
+}
+
+#share-link-container:not(.hidden) {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+#share-link {
+    width: min(450px, 90%);
+    padding: 10px;
+    border: 2px solid #2563eb;
+    border-radius: 10px;
+}
+
+#share-board-controls button {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#share-board-btn {
+    background-color: #2563eb;
+}
+
+#copy-share-link-btn {
+    background-color: #16a34a;
+}
+
+#edit-board-btn {
+    background-color: #f97316;
+}
+
+#delete-board-btn {
+    background-color: #dc2626;
+}
+
+#share-board-controls button:hover {
+    filter: brightness(1.1);
 }

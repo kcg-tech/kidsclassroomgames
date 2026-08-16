@@ -2,64 +2,211 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+  >
+  <meta
+  name="description"
+  content="Free classroom games, printable learning tools, flashcards, bingo activities, and interactive resources for teachers and young learners."
+  >
   <title>Kids Classroom Games</title>
   <link rel="stylesheet" href="style.css">
   <link rel="icon" type="image/png" href="images/home/kcgfavicon.png">
 </head>
+
 <body>
 
-<header>
-  <div class="logo" id="home">
-    <img src="images/home/kcglogo.png" alt="kcg logo">
-    <div class="logo-name"> Kids Classroom Games</div>
-  </div>
-  
-  <nav>
-    <a href="#generators">Generators</a>
-    <a href="#tools">Tools</a>
-    <a href="#pickers">Pickers</a>
-    <a href="#games">Games</a>
+  <header>
+
+    <a
+      class="logo"
+      id="home"
+      href="index.html"
+      aria-label="Kids Classroom Games home"
+    >
+
+      <img src="images/home/kcglogo.png" alt="kcg logo">
+      <div class="logo-name"> Kids Classroom Games</div>
+      <img src="images/home/kcglogo.png" alt="kcg logo">
+
+    </a>
     
-  </nav>
-</header>
+    <nav aria-label="Main navigation">
+      <a href="#generators">
+        Teacher Tools
+      </a>
 
-<section class="hero">
-  <h1>Fun & Educational Games for the Classroom</h1>
-  <p>Engaging activities to make learning fun for kids!</p>
-</section>
+      <a href="#games">
+        Fun Games
+      </a>
 
-<!-- DYNAMIC CATEGORY SECTION -->
-<section class="categories" id="categories"></section>
+      <a href="#pickers">
+        Random Pickers
+      </a>
 
-<footer class="footer">
-  <div class="footer-container">
-    <div class="footer-inner">
-      <div class="footer-section">
-        <h3>Kids Classroom Games</h3>
-        <p>Fun and interactive tools for teachers and students.</p>
-      </div>
-        
-      <div class="footer-section">
-        <h4>Contact</h4>
-        <p>If you have any suggestions, feel free to send a message.</p>
-        <p>Email: kidsclassroomgames@gmail.com</p>
-          
-      </div>
+      <a
+        href="account.html"
+        id="accountNavLink"
+        class="account-nav-link"
+      >
+        Log In
+      </a>
+    </nav>
+
+  </header>
+
+  <section class="hero">
+
+    <div class="hero-content">
+
+      <p class="hero-label">
+        Made for teachers and young learners
+      </p>
+
+      <h1>
+        Fun and Educational Classroom Games
+      </h1>
+
+      <p class="hero-description">
+        Create printable learning materials and play interactive games
+        that make classroom lessons more engaging.
+      </p>
+
     </div>
 
-    <div class="footer-bottom">
-      <p>© 2026 KCG. All rights reserved.</p>
-    </div>
-  </div>  
+  </section>
 
-  
-</footer>
+  <section class="resources-intro">
+ 
+    <h2>
+      Choose What You Want to Create or Play
+    </h2>
+
+    <p>
+      Select a teacher tool, classroom game, or random picker
+      to get started.
+    </p>
+  </section>
+
+  <section class="categories" id="categories"></section>
+
+  <section class="why-kcg">
+
+    <div class="why-kcg-heading">
+      <h2>
+        Why Kids Classroom Games?
+      </h2>
+
+      <p>
+        Simple, flexible classroom resources designed to help teachers
+        create engaging learning experiences.
+      </p>
+    </div>
+
+    <div class="why-kcg-grid">
+
+      <article class="why-kcg-card">
+        <h3>Easy to Use</h3>
+
+        <p>
+          Quickly create activities and start classroom games
+          without complicated setup.
+        </p>
+      </article>
+
+      <article class="why-kcg-card">
+        <h3>Made for Learning</h3>
+
+        <p>
+          Turn vocabulary, review questions, and lesson content
+          into activities students can enjoy.
+        </p>
+      </article>
+
+      <article class="why-kcg-card">
+        <h3>Flexible for Teachers</h3>
+
+        <p>
+          Use ready-made resources or create and save boards
+          that match your own lessons.
+        </p>
+      </article>
+
+    </div>
+
+  </section>
+
+  <footer class="footer">
+    <div class="footer-container">
+
+      <div class="footer-inner">
+
+        <section class="footer-section">
+          <h3>Kids Classroom Games</h3>
+
+          <p>
+            Fun classroom games and printable learning tools
+            for teachers and young learners.
+          </p>
+        </section>
+
+        <section class="footer-section">
+          <h3>Quick Links</h3>
+
+          <div class="footer-links">
+            <a href="#generators">
+              Teacher Tools
+            </a>
+
+            <a href="#games">
+              Fun Games
+            </a>
+
+            <a href="#pickers">
+              Random Pickers
+            </a>
+
+            <a href="account.html">
+              My Account
+            </a>
+          </div>
+        </section>
+
+        <section class="footer-section">
+          <h3>Contact</h3>
+
+          <p>
+            Have a suggestion or found a problem?
+            We would be happy to hear from you.
+          </p>
+
+          <a
+            class="footer-email"
+            href="mailto:kidsclassroomgames@gmail.com"
+          >
+            kidsclassroomgames@gmail.com
+          </a>
+        </section>
+
+      </div>
+
+      <div class="footer-bottom">
+        <p>
+          © 2026 Kids Classroom Games. All rights reserved.
+        </p>
+      </div>
+
+    </div>
+  </footer>
+
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script src="js/config.js"></script>
-<script src="utils.js"></script>
+<script src="js/utils.js"></script>
 <script src="js/supabase.js"></script>
-<script src="storage.js"></script>
+<script src="js/storage.js"></script>
 <script src="js/database.js"></script>
 
 <script src="script.js"></script>

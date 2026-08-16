@@ -4,7 +4,6 @@ item tags are NOT validated
 
 */
 
-
 const categorySelect = 
     document.getElementById("categorySelect");
 const english =
@@ -14,6 +13,7 @@ const japanese =
 
 const gamesContainer =
     document.getElementById("gamesContainer");
+
 const tagsContainer =
     document.getElementById(
         "tagsContainer"
@@ -21,27 +21,177 @@ const tagsContainer =
 
 const imageInput =
     document.getElementById("imageInput");
+
 const imagePreview =
     document.getElementById("imagePreview");
-const dropZone = document.getElementById("dropZone");
-const saveBtn = document.getElementById("saveBtn");
+
+const dropZone = 
+    document.getElementById("dropZone");
+
+const saveBtn = 
+    document.getElementById("saveBtn");
 
 const searchInput =
     document.getElementById(
         "searchInput"
     );
+
 const itemsContainer =
-document.getElementById("itemsContainer");
-console.log("itemsContainer", itemsContainer)
+    document.getElementById(
+        "itemsContainer"
+    );
+
 const filterCategory =
     document.getElementById(
         "filterCategory"
     );
 
+const filterTagsContainer =
+    document.getElementById(
+        "filterTagsContainer"
+    );
 
+const itemFilterMessage =
+    document.getElementById(
+        "itemFilterMessage"
+    );
 
+const categoryClashDrafts =
+    document.getElementById(
+        "categoryClashDrafts"
+    );
 
+const categoryClashPresets =
+    document.getElementById(
+        "categoryClashPresets"
+    );
 
+const refreshCategoryClashBtn =
+    document.getElementById(
+        "refreshCategoryClashBtn"
+    );
+
+const categoryClashAdminMessage =
+    document.getElementById(
+        "categoryClashAdminMessage"
+    );
+
+const adminNavButtons =
+    document.querySelectorAll(
+        ".admin-nav-btn"
+    );
+
+const itemAdminSections =
+    document.querySelectorAll(
+        ".item-admin-section"
+    );
+
+const categoryClashAdminSection =
+    document.querySelector(
+        ".category-clash-admin-section"
+    );
+
+const tornadoDrafts =
+    document.getElementById(
+        "tornadoDrafts"
+    );
+
+const tornadoPresets =
+    document.getElementById(
+        "tornadoPresets"
+    );
+
+const refreshTornadoBtn =
+    document.getElementById(
+        "refreshTornadoBtn"
+    );
+
+const tornadoAdminMessage =
+    document.getElementById(
+        "tornadoAdminMessage"
+    );
+
+const tornadoAdminSection =
+    document.querySelector(
+        ".tornado-admin-section"
+    );    
+
+const homepageResourcesAdminSection =
+    document.querySelector(
+        ".homepage-resources-admin-section"
+    );
+
+const homepageResourceForm =
+    document.getElementById(
+        "homepageResourceForm"
+    );
+
+const homepageResourceId =
+    document.getElementById(
+        "homepageResourceId"
+    );
+
+const homepageResourceName =
+    document.getElementById(
+        "homepageResourceName"
+    );
+
+const homepageResourceDescription =
+    document.getElementById(
+        "homepageResourceDescription"
+    );
+
+const homepageResourceSection =
+    document.getElementById(
+        "homepageResourceSection"
+    );
+
+const homepageResourceUrl =
+    document.getElementById(
+        "homepageResourceUrl"
+    );
+
+const homepageResourceStatus =
+    document.getElementById(
+        "homepageResourceStatus"
+    );
+
+const homepageResourceOrder =
+    document.getElementById(
+        "homepageResourceOrder"
+    );
+
+const homepageResourceActive =
+    document.getElementById(
+        "homepageResourceActive"
+    );
+
+const homepageResourceNewTab =
+    document.getElementById(
+        "homepageResourceNewTab"
+    );
+
+const saveHomepageResourceBtn =
+    document.getElementById(
+        "saveHomepageResourceBtn"
+    );
+
+const cancelHomepageResourceEditBtn =
+    document.getElementById(
+        "cancelHomepageResourceEditBtn"
+    );
+
+const homepageResourceMessage =
+    document.getElementById(
+        "homepageResourceMessage"
+    );
+
+const homepageResourcesList =
+    document.getElementById(
+        "homepageResourcesList"
+    );
+
+let homepageResources = [];
 const formData = {
 
     item: {
@@ -66,7 +216,6 @@ const formData = {
     editingItemId: null
 
 };
-
 
 async function loadCategories(){
     
@@ -97,7 +246,7 @@ async function loadGames(){
         label.appendChild(checkbox);
         label.append(" "+ game.name);
         gamesContainer.appendChild(label);
-        gamesContainer.appendChild(document.createElement("br"))
+        
     });
 
 }
@@ -258,8 +407,112 @@ searchInput.addEventListener(
 
 filterCategory.addEventListener(
     "change",
+    async () => {
+        await updateSavedItemTagFilters();
+        await loadItems();
+    }
+);
+
+filterTagsContainer.addEventListener(
+    "change",
     loadItems
 );
+
+async function updateSavedItemTagFilters() {
+    filterTagsContainer.innerHTML = "";
+
+    const selectedCategory =
+        filterCategory.value;
+
+    if (!selectedCategory) {
+        return;
+    }
+
+    const results =
+        await Promise.all([
+            dbGetTags(),
+            dbGetItemTags(),
+            dbGetAllItems()
+        ]);
+
+    const tags =
+        results[0];
+
+    const itemTags =
+        results[1];
+
+    const items =
+        results[2];
+
+    const matchingItemIds =
+        new Set(
+            items
+                .filter(
+                    item =>
+                        selectedCategory ===
+                            "browse-by-tag" ||
+                        String(
+                            item.category_id
+                        ) === selectedCategory
+                )
+                .map(
+                    item =>
+                        item.id
+                )
+        );
+
+    const availableTagIds =
+        new Set(
+            itemTags
+                .filter(
+                    itemTag =>
+                        matchingItemIds.has(
+                            itemTag.item_id
+                        )
+                )
+                .map(
+                    itemTag =>
+                        itemTag.tag_id
+                )
+        );
+
+    tags
+        .filter(
+            tag =>
+                availableTagIds.has(
+                    tag.id
+                )
+        )
+        .forEach(tag => {
+            const label =
+                document.createElement(
+                    "label"
+                );
+
+            const checkbox =
+                document.createElement(
+                    "input"
+                );
+
+            checkbox.type =
+                "checkbox";
+
+            checkbox.value =
+                tag.id;
+
+            label.appendChild(
+                checkbox
+            );
+
+            label.append(
+                ` ${tag.name}`
+            );
+
+            filterTagsContainer.appendChild(
+                label
+            );
+        });
+}
 
 async function loadCategoryFilter() {
 
@@ -269,7 +522,11 @@ async function loadCategoryFilter() {
     filterCategory.innerHTML =
         `
         <option value="">
-            All Categories
+            Choose a Category or Browse by Tag
+        </option>
+
+        <option value="browse-by-tag">
+            Browse by Tag (All Categories)
         </option>
         `;
 
@@ -675,14 +932,10 @@ function updateFormData() {
 async function loadItems() {
 
     const items =
-        await dbGetItems();
-
-    console.log(items);
+        await dbGetAllItems();
 
     const translations =
         await dbGetTranslations();
-
-    console.log(translations);
 
     const itemGames =
         await dbGetItemGames();
@@ -692,44 +945,104 @@ async function loadItems() {
 
     const searchText =
         searchInput.value
-        .toLowerCase();
+            .trim()
+            .toLowerCase();
 
     const selectedCategory =
         filterCategory.value;
 
-    searchInput.addEventListener(
-        "input",
-        loadItems
-    );
+    const selectedTagIds =
+        Array.from(
+            filterTagsContainer.querySelectorAll(
+                'input[type="checkbox"]:checked'
+            )
+        )
+        .map(
+            checkbox =>
+                Number(
+                    checkbox.value
+                )
+        );
+
+    const browsingByTag =
+        selectedCategory ===
+            "browse-by-tag";
 
     itemsContainer.innerHTML = "";
 
+    if (!selectedCategory) {
+        itemFilterMessage.textContent =
+            "Choose a category or browse by tag to view saved items.";
+
+        return;
+    }
+
+    if (
+        browsingByTag &&
+        selectedTagIds.length === 0
+    ) {
+        itemFilterMessage.textContent =
+            "Select at least one tag to view saved items from all categories.";
+
+        return;
+    }
+
+    itemFilterMessage.textContent = "";
+
     items
-    .filter(item => {
+        .filter(item => {
+            const englishTranslation =
+                translations.find(
+                    translation =>
+                        translation.item_id ===
+                            item.id &&
+                        translation.language_id ===
+                            1
+                );
 
-        const englishTranslation =
-            translations.find(
-                translation =>
-                    translation.item_id === item.id &&
-                    translation.language_id === 1
+            const englishName =
+                englishTranslation?.text || "";
+
+            const searchMatch =
+                englishName
+                    .toLowerCase()
+                    .includes(
+                        searchText
+                    );
+
+            const categoryMatch =
+                browsingByTag ||
+                String(
+                    item.category_id
+                ) === selectedCategory;
+
+            const itemTagIds =
+                itemTags
+                    .filter(
+                        itemTag =>
+                            itemTag.item_id ===
+                                item.id
+                    )
+                    .map(
+                        itemTag =>
+                            itemTag.tag_id
+                    );
+
+            const tagsMatch =
+                selectedTagIds.every(
+                    tagId =>
+                        itemTagIds.includes(
+                            tagId
+                        )
+                );
+
+            return (
+                searchMatch &&
+                categoryMatch &&
+                tagsMatch
             );
-
-        const searchMatch =
-                englishTranslation?.text
-                    ?.toLowerCase()
-                    .includes(searchText);
-
-        const categoryMatch =
-            !selectedCategory ||
-            item.category_id ==
-            selectedCategory;
-
-        return (
-            searchMatch &&
-            categoryMatch
-        );
-
-    }).forEach(item => {
+        })
+        .forEach(item => {
 
             const div =
                 document.createElement("div");
@@ -1014,6 +1327,903 @@ async function deleteItem(item) {
 
 }
 
+function renderAdminBoardList(
+    container,
+    boards,
+    actionText,
+    actionClass
+) {
+    container.innerHTML = "";
+
+    if (boards.length === 0) {
+        container.textContent =
+            "No boards found.";
+
+        return;
+    }
+
+    boards.forEach(board => {
+        const row =
+            document.createElement(
+                "div"
+            );
+
+        row.className =
+            "category-clash-admin-row";
+
+        const name =
+            document.createElement(
+                "strong"
+            );
+
+        name.textContent =
+            board.name;
+
+        const button =
+            document.createElement(
+                "button"
+            );
+
+        button.type = "button";
+        button.textContent =
+            actionText;
+        button.className =
+            actionClass;
+        button.dataset.boardId =
+            board.id;
+        button.dataset.boardName =
+            board.name;
+
+        row.appendChild(name);
+        row.appendChild(button);
+
+        container.appendChild(row);
+    });
+}
+// CATEGORY CLASH
+async function loadAdminCategoryClashBoards() {
+    const { data, error } =
+        await db.auth.getSession();
+
+    if (error || !data.session) {
+        return;
+    }
+
+    const boardLists =
+        await dbGetAdminCategoryClashBoards(
+            data.session.user.id
+        );
+
+    renderAdminBoardList(
+        categoryClashDrafts,
+        boardLists.drafts,
+        "Publish as Preset",
+        "publish-preset-btn"
+    );
+
+    renderAdminBoardList(
+        categoryClashPresets,
+        boardLists.presets,
+        "Remove from Presets",
+        "unpublish-preset-btn"
+    );
+}
+
+refreshCategoryClashBtn.addEventListener(
+    "click",
+    loadAdminCategoryClashBoards
+);
+
+categoryClashDrafts.addEventListener(
+    "click",
+    async event => {
+        const button =
+            event.target.closest(
+                ".publish-preset-btn"
+            );
+
+        if (!button) {
+            return;
+        }
+
+        const confirmed =
+            confirm(
+                `Publish "${button.dataset.boardName}" as an official preset?`
+            );
+
+        if (!confirmed) {
+            return;
+        }
+
+        const { data } =
+            await db.auth.getSession();
+
+        if (!data.session) {
+            return;
+        }
+
+        button.disabled = true;
+        button.textContent =
+            "Publishing...";
+
+        const published =
+            await dbPublishCategoryClashPreset(
+                Number(
+                    button.dataset.boardId
+                ),
+                data.session.user.id
+            );
+
+        if (!published) {
+            button.disabled = false;
+            button.textContent =
+                "Publish as Preset";
+
+            categoryClashAdminMessage.textContent =
+                "The preset could not be published.";
+
+            return;
+        }
+
+        categoryClashAdminMessage.textContent =
+            `"${button.dataset.boardName}" is now an official preset.`;
+
+        await loadAdminCategoryClashBoards();
+    }
+);
+
+categoryClashPresets.addEventListener(
+    "click",
+    async event => {
+        const button =
+            event.target.closest(
+                ".unpublish-preset-btn"
+            );
+
+        if (!button) {
+            return;
+        }
+
+        const confirmed =
+            confirm(
+                `Remove "${button.dataset.boardName}" from official presets?`
+            );
+
+        if (!confirmed) {
+            return;
+        }
+
+        const { data } =
+            await db.auth.getSession();
+
+        if (!data.session) {
+            return;
+        }
+
+        button.disabled = true;
+        button.textContent =
+            "Removing...";
+
+        const unpublished =
+            await dbUnpublishCategoryClashPreset(
+                Number(
+                    button.dataset.boardId
+                ),
+                data.session.user.id
+            );
+
+        if (!unpublished) {
+            button.disabled = false;
+            button.textContent =
+                "Remove from Presets";
+
+            categoryClashAdminMessage.textContent =
+                "The preset could not be removed.";
+
+            return;
+        }
+
+        categoryClashAdminMessage.textContent =
+            `"${button.dataset.boardName}" is now an admin draft.`;
+
+        await loadAdminCategoryClashBoards();
+    }
+);
+
+// TORNADO
+async function loadAdminTornadoBoards() {
+    const { data, error } =
+        await db.auth.getSession();
+
+    if (error || !data.session) {
+        return;
+    }
+
+    const boardLists =
+        await dbGetAdminTornadoBoards(
+            data.session.user.id
+        );
+
+    renderAdminBoardList(
+        tornadoDrafts,
+        boardLists.drafts,
+        "Publish as Preset",
+        "publish-tornado-preset-btn"
+    );
+
+    renderAdminBoardList(
+        tornadoPresets,
+        boardLists.presets,
+        "Remove from Presets",
+        "unpublish-tornado-preset-btn"
+    );
+}
+
+refreshTornadoBtn.addEventListener(
+    "click",
+    loadAdminTornadoBoards
+);
+
+tornadoDrafts.addEventListener(
+    "click",
+    async event => {
+        const button =
+            event.target.closest(
+                ".publish-tornado-preset-btn"
+            );
+
+        if (!button) {
+            return;
+        }
+
+        const confirmed =
+            confirm(
+                `Publish "${button.dataset.boardName}" as an official Tornado preset?`
+            );
+
+        if (!confirmed) {
+            return;
+        }
+
+        const { data } =
+            await db.auth.getSession();
+
+        if (!data.session) {
+            return;
+        }
+
+        button.disabled = true;
+        button.textContent =
+            "Publishing...";
+
+        const published =
+            await dbPublishTornadoPreset(
+                Number(
+                    button.dataset.boardId
+                ),
+                data.session.user.id
+            );
+
+        if (!published) {
+            button.disabled = false;
+            button.textContent =
+                "Publish as Preset";
+
+            tornadoAdminMessage.textContent =
+                "The preset could not be published.";
+
+            return;
+        }
+
+        tornadoAdminMessage.textContent =
+            `"${button.dataset.boardName}" is now an official preset.`;
+
+        await loadAdminTornadoBoards();
+    }
+);
+
+tornadoPresets.addEventListener(
+    "click",
+    async event => {
+        const button =
+            event.target.closest(
+                ".unpublish-tornado-preset-btn"
+            );
+
+        if (!button) {
+            return;
+        }
+
+        const confirmed =
+            confirm(
+                `Remove "${button.dataset.boardName}" from official Tornado presets?`
+            );
+
+        if (!confirmed) {
+            return;
+        }
+
+        const { data } =
+            await db.auth.getSession();
+
+        if (!data.session) {
+            return;
+        }
+
+        button.disabled = true;
+        button.textContent =
+            "Removing...";
+
+        const unpublished =
+            await dbUnpublishTornadoPreset(
+                Number(
+                    button.dataset.boardId
+                ),
+                data.session.user.id
+            );
+
+        if (!unpublished) {
+            button.disabled = false;
+            button.textContent =
+                "Remove from Presets";
+
+            tornadoAdminMessage.textContent =
+                "The preset could not be removed.";
+
+            return;
+        }
+
+        tornadoAdminMessage.textContent =
+            `"${button.dataset.boardName}" is now an admin draft.`;
+
+        await loadAdminTornadoBoards();
+    }
+);
+
+
+//ADMIN
+function getHomepageSectionLabel(
+    section
+) {
+    const labels = {
+        "teacher-tools":
+            "Teacher Tools",
+
+        "fun-games":
+            "Fun Games",
+
+        "random-pickers":
+            "Random Pickers"
+    };
+
+    return labels[section] || section;
+}
+
+function renderHomepageResources() {
+    homepageResourcesList.innerHTML = "";
+
+    if (homepageResources.length === 0) {
+        homepageResourcesList.textContent =
+            "No homepage resources found.";
+
+        return;
+    }
+
+    homepageResources.forEach(
+        resource => {
+            const row =
+                document.createElement(
+                    "div"
+                );
+
+            row.className =
+                "homepage-resource-admin-row";
+
+            const information =
+                document.createElement(
+                    "div"
+                );
+
+            information.className =
+                "homepage-resource-admin-info";
+
+            const name =
+                document.createElement(
+                    "strong"
+                );
+
+            name.textContent =
+                resource.name;
+
+            const details =
+                document.createElement(
+                    "p"
+                );
+
+            details.textContent =
+                `${
+                    getHomepageSectionLabel(
+                        resource.section
+                    )
+                } • ${
+                    resource.status ===
+                        "available"
+                        ? "Available"
+                        : "Coming Soon"
+                } • Order ${
+                    resource.display_order
+                } • ${
+                    resource.active
+                        ? "Visible"
+                        : "Hidden"
+                }`;
+
+            const editButton =
+                document.createElement(
+                    "button"
+                );
+
+            editButton.type = "button";
+
+            editButton.className =
+                "edit-homepage-resource-btn";
+
+            editButton.dataset.resourceId =
+                resource.id;
+
+            editButton.textContent =
+                "Edit";
+
+            const deleteButton =
+                document.createElement(
+                    "button"
+                );
+
+            deleteButton.type = "button";
+
+            deleteButton.className =
+                "delete-homepage-resource-btn";
+
+            deleteButton.dataset.resourceId =
+                resource.id;
+
+            deleteButton.dataset.resourceName =
+                resource.name;
+
+            deleteButton.textContent =
+                "Delete";
+
+            const actions =
+                document.createElement(
+                    "div"
+                );
+
+            actions.className =
+                "homepage-resource-admin-actions";
+
+            actions.appendChild(
+                editButton
+            );
+
+            actions.appendChild(
+                deleteButton
+            );
+
+            information.appendChild(
+                name
+            );
+
+            information.appendChild(
+                details
+            );
+
+            row.appendChild(
+                information
+            );
+
+            row.appendChild(
+                actions
+            );
+
+            homepageResourcesList
+                .appendChild(row);
+        }
+    );
+}
+
+
+async function loadHomepageResources() {
+    homepageResources =
+        await dbGetAllSiteResources();
+
+    renderHomepageResources();
+}
+
+homepageResourcesList.addEventListener(
+    "click",
+    event => {
+        const editButton =
+            event.target.closest(
+                ".edit-homepage-resource-btn"
+            );
+
+        if (!editButton) {
+            return;
+        }
+
+        const resourceId =
+            Number(
+                editButton.dataset.resourceId
+            );
+
+        const resource =
+            homepageResources.find(
+                item =>
+                    item.id === resourceId
+            );
+
+        if (!resource) {
+            return;
+        }
+
+        homepageResourceId.value =
+            resource.id;
+
+        homepageResourceName.value =
+            resource.name;
+
+        homepageResourceDescription.value =
+            resource.description;
+
+        homepageResourceSection.value =
+            resource.section;
+
+        homepageResourceUrl.value =
+            resource.url;
+
+        homepageResourceStatus.value =
+            resource.status;
+
+        homepageResourceOrder.value =
+            resource.display_order;
+
+        homepageResourceActive.checked =
+            resource.active;
+
+        homepageResourceNewTab.checked =
+            resource.open_new_tab;
+
+        saveHomepageResourceBtn.textContent =
+            "Save Changes";
+
+        cancelHomepageResourceEditBtn
+            .classList.remove(
+                "hidden"
+            );
+
+        homepageResourceMessage.textContent =
+            `Editing "${resource.name}".`;
+
+        homepageResourceForm.scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+        });
+
+    }
+);
+
+homepageResourcesList.addEventListener(
+    "click",
+    async event => {
+        const deleteButton =
+            event.target.closest(
+                ".delete-homepage-resource-btn"
+            );
+
+        if (!deleteButton) {
+            return;
+        }
+
+        const resourceId =
+            Number(
+                deleteButton.dataset.resourceId
+            );
+
+        const resourceName =
+            deleteButton.dataset.resourceName;
+
+        const confirmed =
+            confirm(
+                `Permanently delete "${resourceName}" from the homepage resources? This cannot be undone.`
+            );
+
+        if (!confirmed) {
+            return;
+        }
+
+        deleteButton.disabled = true;
+        deleteButton.textContent =
+            "Deleting...";
+
+        const deleted =
+            await dbDeleteSiteResource(
+                resourceId
+            );
+
+        if (!deleted) {
+            deleteButton.disabled = false;
+            deleteButton.textContent =
+                "Delete";
+
+            alert(
+                "The resource could not be deleted."
+            );
+
+            return;
+        }
+
+        if (
+            Number(
+                homepageResourceId.value
+            ) === resourceId
+        ) {
+            resetHomepageResourceForm();
+        }
+
+        await loadHomepageResources();
+
+        alert(
+            `"${resourceName}" was permanently deleted.`
+        );
+    }
+);
+
+cancelHomepageResourceEditBtn
+    .addEventListener(
+        "click",
+        resetHomepageResourceForm
+    );
+
+homepageResourceForm.addEventListener(
+    "submit",
+    async event => {
+        event.preventDefault();
+
+        if (
+            !homepageResourceForm
+                .reportValidity()
+        ) {
+            return;
+        }
+
+        const editingId =
+            homepageResourceId.value
+                ? Number(
+                    homepageResourceId.value
+                )
+                : null;
+
+        const resource = {
+            name:
+                homepageResourceName
+                    .value
+                    .trim(),
+
+            description:
+                homepageResourceDescription
+                    .value
+                    .trim(),
+
+            section:
+                homepageResourceSection
+                    .value,
+
+            url:
+                homepageResourceUrl
+                    .value
+                    .trim(),
+
+            status:
+                homepageResourceStatus
+                    .value,
+
+            active:
+                homepageResourceActive
+                    .checked,
+
+            displayOrder:
+                Number(
+                    homepageResourceOrder
+                        .value
+                ),
+
+            openNewTab:
+                homepageResourceNewTab
+                    .checked
+        };
+
+        const duplicateName =
+            homepageResources.find(
+                item =>
+                    item.id !== editingId &&
+                    item.name
+                        .trim()
+                        .toLowerCase() ===
+                    resource.name
+                        .toLowerCase()
+            );
+
+        if (duplicateName) {
+            alert(
+                "A homepage resource with this name already exists."
+            );
+
+            homepageResourceMessage.textContent =
+                "Please use a different resource name.";
+
+            homepageResourceName.focus();
+            return;
+        }
+
+        const duplicateUrl =
+            homepageResources.find(
+                item =>
+                    item.id !== editingId &&
+                    item.url
+                        .trim()
+                        .toLowerCase() ===
+                    resource.url
+                        .toLowerCase()
+            );
+
+        if (duplicateUrl) {
+            alert(
+                "A homepage resource with this page URL already exists."
+            );
+
+            homepageResourceMessage.textContent =
+                "Please use a different page URL.";
+
+            homepageResourceUrl.focus();
+            return;
+        }
+
+        saveHomepageResourceBtn.disabled =
+            true;
+
+        saveHomepageResourceBtn.textContent =
+            editingId
+                ? "Saving Changes..."
+                : "Adding Resource...";
+
+        let savedResource;
+
+        if (editingId) {
+            savedResource =
+                await dbUpdateSiteResource(
+                    editingId,
+                    resource
+                );
+        } else {
+            savedResource =
+                await dbSaveSiteResource(
+                    resource
+                );
+        }
+
+        saveHomepageResourceBtn.disabled =
+            false;
+
+        if (!savedResource) {
+            saveHomepageResourceBtn.textContent =
+                editingId
+                    ? "Save Changes"
+                    : "Add Resource";
+
+            homepageResourceMessage.textContent =
+                "The resource could not be saved. Check the console for details.";
+
+            return;
+        }
+
+        const successMessage =
+            editingId
+                ? `"${resource.name}" was updated successfully.`
+                : `"${resource.name}" was added successfully.`;
+
+        resetHomepageResourceForm();
+
+        homepageResourceMessage.textContent =
+            successMessage;
+
+        await loadHomepageResources();
+    }
+);
+
+function resetHomepageResourceForm() {
+    homepageResourceForm.reset();
+
+    homepageResourceId.value = "";
+
+    homepageResourceOrder.value = "0";
+
+    homepageResourceActive.checked = true;
+
+    homepageResourceNewTab.checked = true;
+
+    saveHomepageResourceBtn.textContent =
+        "Add Resource";
+
+    cancelHomepageResourceEditBtn
+        .classList.add(
+            "hidden"
+        );
+
+    homepageResourceMessage.textContent =
+        "";
+}
+
+adminNavButtons.forEach(button => {
+    button.addEventListener(
+        "click",
+        () => {
+            const selectedSection =
+                button.dataset.adminSection;
+
+            const showItems =
+                selectedSection ===
+                "items";
+
+            const showHomepageResources =
+                selectedSection ===
+                    "homepage-resources";
+
+            const showCategoryClash =
+                selectedSection ===
+                "category-clash";
+
+            const showTornado =
+                selectedSection ===
+                "tornado";
+
+            itemAdminSections.forEach(
+                section => {
+                    section.classList.toggle(
+                        "hidden",
+                        !showItems
+                    );
+                }
+            );
+
+            homepageResourcesAdminSection
+                .classList.toggle(
+                    "hidden",
+                    !showHomepageResources
+                );
+
+            categoryClashAdminSection
+                .classList.toggle(
+                    "hidden",
+                    !showCategoryClash
+                );
+
+            tornadoAdminSection
+                .classList.toggle(
+                    "hidden",
+                    !showTornado
+                );
+
+            adminNavButtons.forEach(
+                navButton => {
+                    navButton.classList.toggle(
+                        "active",
+                        navButton === button
+                    );
+                }
+            );
+        }
+    );
+});
 
 async function initialize(){
     console.log("initialize")
@@ -1026,6 +2236,70 @@ async function initialize(){
     await loadCategoryFilter();
     console.log("load category filter");
     await loadItems();
+    await loadAdminCategoryClashBoards();
+    await loadAdminTornadoBoards();
+    await loadHomepageResources();
 };
 
-initialize();
+async function checkAdminAccess() {
+    const { data: sessionData } =
+        await db.auth.getSession();
+
+    const session =
+        sessionData.session;
+
+    if (!session) {
+        alert(
+            "Please log in with an administrator account."
+        );
+
+        window.location.href =
+            "../account.html";
+
+        return false;
+    }
+
+    const { data: isAdmin, error } =
+        await db.rpc(
+            "is_site_admin"
+        );
+
+    if (error) {
+        console.error(
+            "Admin check failed:",
+            error
+        );
+
+        alert(
+            "The administrator check failed."
+        );
+
+        return false;
+    }
+
+    if (!isAdmin) {
+        alert(
+            "You do not have permission to view this page."
+        );
+
+        window.location.href =
+            "../index.html";
+
+        return false;
+    }
+
+    return true;
+}
+
+async function startAdminPage() {
+    const isAllowed =
+        await checkAdminAccess();
+
+    if (!isAllowed) {
+        return;
+    }
+
+    await initialize();
+}
+
+startAdminPage();

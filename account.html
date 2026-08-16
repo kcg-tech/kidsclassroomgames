@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Account | Kids Classroom Games</title>
+
+    <link
+        rel="icon"
+        type="image/png"
+        href="images/home/kcgfavicon.png"
+    >
+
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="account.css">
+</head>
+
+<body>
+    <main class="account-page">
+        <h1>My Account</h1>
+
+        <section id="logged-out-section">
+            <div
+                id="login-card"
+                class="account-card"
+            >
+                <h2>Log In</h2>
+
+                <form id="login-form">
+                    <label for="login-email">
+                        Email
+                    </label>
+
+                    <input
+                        id="login-email"
+                        type="email"
+                        autocomplete="email"
+                        required
+                    >
+
+                    <label for="login-password">
+                        Password
+                    </label>
+
+                    <div class="password-field">
+                        <input
+                            id="login-password"
+                            type="password"
+                            autocomplete="current-password"
+                            required
+                        >
+
+                        <button
+                            type="button"
+                            class="password-toggle"
+                            data-target="login-password"
+                            aria-label="Show password"
+                            aria-pressed="false"
+                        >
+                            Show
+                        </button>
+                    </div>
+
+                    <button type="submit">
+                        Log In
+                    </button>
+                </form>
+
+                <p
+                    id="login-message"
+                    aria-live="polite"
+                ></p>
+
+                <div class="account-switch">
+                    <p>
+                        Don’t have an account yet?
+                    </p>
+
+                    <button
+                        id="show-signup-btn"
+                        type="button"
+                        class="secondary-btn"
+                    >
+                        Create Account
+                    </button>
+                </div>
+            </div>
+
+            <div
+                id="signup-card"
+                class="account-card"
+                hidden
+            >
+                <h2>Create Account</h2>
+
+                <form id="signup-form">
+                    <label for="signup-name">
+                        Display Name
+                    </label>
+
+                    <input
+                        id="signup-name"
+                        type="text"
+                        autocomplete="name"
+                        required
+                    >
+
+                    <label for="signup-email">
+                        Email
+                    </label>
+
+                    <input
+                        id="signup-email"
+                        type="email"
+                        autocomplete="email"
+                        required
+                    >
+
+                    <label for="signup-password">
+                        Password
+                    </label>
+
+                    <div class="password-field">
+                        <input
+                            id="signup-password"
+                            type="password"
+                            minlength="8"
+                            autocomplete="new-password"
+                            required
+                        >
+
+                        <button
+                            type="button"
+                            class="password-toggle"
+                            data-target="signup-password"
+                            aria-label="Show password"
+                            aria-pressed="false"
+                        >
+                            Show
+                        </button>
+                    </div>
+
+                    <button type="submit">
+                        Sign Up
+                    </button>
+                </form>
+
+                <p
+                    id="signup-message"
+                    aria-live="polite"
+                ></p>
+
+                <div class="account-switch">
+                    <p>
+                        Already have an account?
+                    </p>
+
+                    <button
+                        id="show-login-btn"
+                        type="button"
+                        class="secondary-btn"
+                    >
+                        Return to Log In
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section
+            id="logged-in-section"
+            hidden
+        >
+            <div class="account-card">
+                <h2>Welcome</h2>
+
+                <p>
+                    Signed in as
+                    <strong id="current-user-email"></strong>
+                </p>
+
+                <button
+                    id="logout-btn"
+                    type="button"
+                >
+                    Log Out
+                </button>
+            </div>
+        </section>
+
+        <p>
+            <a href="index.html">
+                Return to Kids Classroom Games
+            </a>
+        </p>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script src="js/config.js"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/auth.js"></script>
+</body>
+</html>

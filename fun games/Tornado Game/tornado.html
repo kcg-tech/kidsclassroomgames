@@ -1,66 +1,258 @@
 <!DOCTYPE html>
-<html>
-<head>
-    <link rel="stylesheet" href="style.css">
+<html lang="en">
 
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Tornado Game</title>
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
+    <link
+        rel="icon"
+        type="image/png"
+        href="../../images/home/kcgfavicon.png"
+    >
 </head>
-<header>
-    <div class="main">
-        <h1>Tornado Game</h1>
-        <p>Choose how many teams will play.
-        <br>type your own questions and answers on the board.
-        <br> Start the game!
-        </p>
-    </div>
-</header>
 
 <body>
+
+    <header>
+        <div class="main">
+            <h1>Tornado Game</h1>
+
+            <p>
+                Select a board or create your own,
+                <br>
+                then start the game!
+            </p>
+        </div>
+    </header>
+
     <div class="main">
 
 
 
         <div id="setup">
 
-            <h2>Teams</h2>
-
-            <select id="team-count">
-            <option value="1">1 Team</option>
-            <option value="2">2 Teams</option>
-            <option value="3">3 Teams</option>
-            </select>
-
-
             <div id="preset-container">
-                <h2>Select a Category</h2>
+                <h2>Select a Quiz Board</h2>
                 <div>
                     <select id="preset">
-                        <option value="select">select</option>
-                        <option value="countries">Countries</option>
-                        <option value="animals">Animals</option>
-                        <option value=""></option>
-                        <option value=""></option>
+                        <option value="select">
+                            Select a Board
+                        </option>
                     </select>
                 </div>
+
+                <div
+                    id="share-board-controls"
+                    class="hidden"
+                >
+                    <button
+                        id="share-board-btn"
+                        type="button"
+                    >
+                        Create Share Link
+                    </button>
+
+                    <div
+                        id="share-link-container"
+                        class="hidden"
+                    >
+                        <input
+                            type="text"
+                            id="share-link"
+                            readonly
+                            aria-label="Board share link"
+                        >
+
+                        <button
+                            id="copy-share-link-btn"
+                            type="button"
+                        >
+                            Copy Link
+                        </button>
+                    </div>
+
+                    <div id="board-management-buttons">
+                        <button
+                            id="edit-board-btn"
+                            type="button"
+                        >
+                            Edit Board
+                        </button>
+
+                        <button
+                            id="delete-board-btn"
+                            type="button"
+                        >
+                            Delete Board
+                        </button>
+                    </div>
+
+                    <p id="share-board-message"></p>
+                </div>
+
                 <p>Create your own questions</p>
                 <button id="create-btn" class="btn">Create Board</button>    
             </div>
+
         </div>
 
         <form id="user-inputs" class="hidden">
             <h2>Input the contents here:</h2>
-        
-            <div id="column-container">
 
-                
+            <button
+                type="button"
+                id="shuffle-rewards-btn"
+                class="btn"
+            >
+                Shuffle Rewards
+            </button>
+        
+            <div id="column-container"></div>
+
+            <div id="save-board-controls">
+
+                <p
+                    id="login-save-message"
+                    class="hidden"
+                >
+                    Log in to save your board and use it again later.
+                </p>
+
+                <div id="board-name-fields">
+
+                    <label for="board-title">
+                        Board Name
+                    </label>
+
+                    <input
+                        type="text"
+                        id="board-title"
+                        maxlength="100"
+                        placeholder="Example: Summer Review"
+                        required
+                    >
+
+                </div>
+
+                <button
+                    id="submit"
+                    type="submit"
+                    class="btn"
+                >
+                    Save & Use Board
+                </button>
+
+                <p
+                    id="save-board-message"
+                    aria-live="polite"
+                ></p>
+
             </div>
 
-            <button id="submit" type="submit" class="btn">Submit</button> 
         </form>
 
-        <button id="start-btn" class="btn">
-        Start Game
-        </button>
+        <div
+            id="image-picker-modal"
+            class="hidden"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="image-picker-title"
+        >
+            <div class="image-picker-panel">
 
+                <div class="image-picker-header">
+                    <h2 id="image-picker-title">
+                        Choose an Image
+                    </h2>
+
+                    <button
+                        id="close-image-picker"
+                        type="button"
+                        aria-label="Close image picker"
+                    >
+                        ×
+                    </button>
+                </div>
+
+                <div class="image-picker-filters">
+
+                    <input
+                        type="search"
+                        id="image-picker-search"
+                        placeholder="Search images..."
+                    >
+
+                    <select id="image-picker-category">
+                        <option value="">
+                            Choose a Category
+                        </option>
+                    </select>
+
+                    <div
+                        id="image-picker-tags"
+                        class="image-picker-tags"
+                    ></div>
+
+                </div>
+
+                <div id="image-picker-grid"></div>
+
+            </div>
+        </div>        
+
+        <button
+            id="start-btn"
+            class="btn hidden"
+            type="button"
+        >
+            Start Game
+        </button>
+        <p id="start-game-message"></p>
+        <div id="game-toolbar">
+
+            <label for="team-count">
+                Number of Teams:
+            </label>
+
+            <select id="team-count">
+                <option value="1">
+                    1 Team
+                </option>
+
+                <option value="2" selected>
+                    2 Teams
+                </option>
+
+                <option value="3">
+                    3 Teams
+                </option>
+
+                <option value="4">
+                    4 Teams
+                </option>
+
+                <option value="5">
+                    5 Teams
+                </option>
+
+                <option value="6">
+                    6 Teams
+                </option>
+            </select>
+
+        </div>
 
         <div id="scoreboard"></div>
 
@@ -68,17 +260,48 @@
         <div id="board-container">
         
             <div id="board"></div>
-            <div id="question-modal" class="hidden">
+
+            <div
+                id="question-modal"
+                class="hidden"
+                tabindex="0"
+                role="dialog"
+                aria-modal="true"
+            >
                 <div id="question-content"></div>
             </div>
+
+        </div>
+
+        <div
+            id="play-again-controls"
+            class="hidden"
+        >
+            <button
+                type="button"
+                id="play-again-btn"
+                class=" btn"
+            >
+                Play Again – Same Rewards
+            </button>
+
+            <button
+                type="button"
+                id="play-again-shuffle-btn"
+                class=" btn"
+            >
+                Play Again – Shuffle Rewards
+            </button>
         </div>
 
 
-        <script src="js/config.js"></script>
-        <script src="utils.js"></script>
-        <script src="js/supabase.js"></script>
-        <script src="storage.js"></script>
-        <script src="js/database.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+        <script src="../../js/config.js"></script>
+        <script src="../../js/utils.js"></script>
+        <script src="../../js/supabase.js"></script>
+        <script src="../../js/storage.js"></script>
+        <script src="../../js/database.js"></script>
 
         <script src="script.js"></script>
     </div>

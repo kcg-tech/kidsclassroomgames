@@ -20,9 +20,48 @@
 
 <body>
 
-    <div class="container">
-
+    <header class="admin-header">
         <h1>KCG Admin Panel</h1>
+
+        <nav class="admin-navigation">
+            <button
+                type="button"
+                class="admin-nav-btn active"
+                data-admin-section="items"
+            >
+                Upload & Manage Items
+            </button>
+
+            <button
+                type="button"
+                class="admin-nav-btn"
+                data-admin-section="category-clash"
+            >
+                Category Clash
+            </button>
+
+            <button
+                type="button"
+                class="admin-nav-btn"
+                data-admin-section="tornado"
+            >
+                Tornado Game
+            </button>   
+            
+            <button
+                type="button"
+                class="admin-nav-btn"
+                data-admin-section="homepage-resources"
+            >
+                Homepage Resources
+            </button>
+
+        </nav>
+    </header>
+
+    <div class="container item-admin-section">
+
+        <h2>Upload Item</h2>
 
         <div class="form-group">
 
@@ -94,8 +133,8 @@
     </div>
 
     
-    <div class="container">
-        <h2>Save Items</h2>
+    <div class="container item-admin-section">
+        <h2>Saved Items</h2>
 
         <input
             type="text"
@@ -105,18 +144,253 @@
         <br>
         <select id="filterCategory">
             <option value="">
-                All Categories
+                Choose a Category or Browse by Tag
             </option>
         </select>
+
+        <div
+            id="filterTagsContainer"
+            class="saved-item-filter-tags"
+        ></div>
+
+        <p id="itemFilterMessage">
+            Choose a category or browse by tag to view saved items.
+        </p>
 
         <div class="border">
             <div id="itemsContainer" class="grid"></div>
         </div>
     </div>
+
+<!--Homepage --> 
+    <div
+        class="container homepage-resources-admin-section hidden"
+        id="homepageResourcesAdmin"
+    >
+        <h2>Homepage Resources</h2>
+
+        <p>
+            Add, edit, reorder, show, or hide the tools and games
+            displayed on the homepage.
+        </p>
+
+        <form id="homepageResourceForm">
+
+            <input
+                type="hidden"
+                id="homepageResourceId"
+            >
+
+            <div class="form-group">
+                <label for="homepageResourceName">
+                    Resource Name
+                </label>
+
+                <input
+                    type="text"
+                    id="homepageResourceName"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="homepageResourceDescription">
+                    Description
+                </label>
+
+                <textarea
+                    id="homepageResourceDescription"
+                    rows="3"
+                    required
+                ></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="homepageResourceSection">
+                    Section
+                </label>
+
+                <select
+                    id="homepageResourceSection"
+                    required
+                >
+                    <option value="teacher-tools">
+                        Teacher Tools
+                    </option>
+
+                    <option value="fun-games">
+                        Fun Games
+                    </option>
+
+                    <option value="random-pickers">
+                        Random Pickers
+                    </option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="homepageResourceUrl">
+                    Page URL
+                </label>
+
+                <input
+                    type="text"
+                    id="homepageResourceUrl"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="homepageResourceStatus">
+                    Status
+                </label>
+
+                <select
+                    id="homepageResourceStatus"
+                    required
+                >
+                    <option value="available">
+                        Available
+                    </option>
+
+                    <option value="coming-soon">
+                        Coming Soon
+                    </option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="homepageResourceOrder">
+                    Display Order
+                </label>
+
+                <input
+                    type="number"
+                    id="homepageResourceOrder"
+                    min="0"
+                    value="0"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label>
+                    <input
+                        type="checkbox"
+                        id="homepageResourceActive"
+                        checked
+                    >
+                    Show on Homepage
+                </label>
+            </div>
+
+            <div class="form-group">
+                <label>
+                    <input
+                        type="checkbox"
+                        id="homepageResourceNewTab"
+                        checked
+                    >
+                    Open in a New Tab
+                </label>
+            </div>
+
+            <div class="homepage-resource-form-actions">
+                <button
+                    type="submit"
+                    id="saveHomepageResourceBtn"
+                >
+                    Add Resource
+                </button>
+
+                <button
+                    type="button"
+                    id="cancelHomepageResourceEditBtn"
+                    class="hidden"
+                >
+                    Cancel Edit
+                </button>
+            </div>
+
+        </form>
+
+        <p id="homepageResourceMessage"></p>
+
+        <h3>Current Homepage Resources</h3>
+
+        <div id="homepageResourcesList"></div>
+    </div>
+<!-- cat clash-->>
         
-    
+    <div
+        class="container category-clash-admin-section hidden"
+        id="categoryClashAdmin"
+    >
+        <h2>Category Clash Presets</h2>
 
+        <p>
+            Create a board in Category Clash,
+            then publish it here as an official preset.
+        </p>
 
+        <a
+            class="admin-link-button"
+            href="../fun games/Category Clash/categoryclash.html"
+            target="_blank"
+        >
+            Create Category Clash Board
+        </a>
+
+        <button
+            id="refreshCategoryClashBtn"
+            type="button"
+        >
+            Refresh Boards
+        </button>
+
+        <h3>Admin Drafts</h3>
+        <div id="categoryClashDrafts"></div>
+
+        <h3>Published Presets</h3>
+        <div id="categoryClashPresets"></div>
+
+        <p id="categoryClashAdminMessage"></p>
+    </div>    
+
+    <div
+        class="container tornado-admin-section hidden"
+        id="tornadoAdmin"
+    >
+        <h2>Tornado Game Presets</h2>
+
+        <p>
+            Create a board in Tornado Game,
+            then publish it here as an official preset.
+        </p>
+
+        <a
+            class="admin-link-button"
+            href="../fun games/Tornado Game/tornado.html"
+            target="_blank"
+        >
+            Create Tornado Board
+        </a>
+
+        <button
+            id="refreshTornadoBtn"
+            type="button"
+        >
+            Refresh Boards
+        </button>
+
+        <h3>Admin Drafts</h3>
+        <div id="tornadoDrafts"></div>
+
+        <h3>Published Presets</h3>
+        <div id="tornadoPresets"></div>
+
+        <p id="tornadoAdminMessage"></p>
+    </div>
 
     
 </body>

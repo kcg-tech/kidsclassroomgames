@@ -29,7 +29,10 @@ async function loadCategories(categorySelect) {
 
 }
 
-async function loadTags(tagsContainer) {
+async function loadTags(
+    tagsContainer,
+    onChange = null
+) {
 
     const tags =
         await dbGetTags();
@@ -58,11 +61,16 @@ async function loadTags(tagsContainer) {
 
         checkbox.addEventListener(
             "change",
-            () =>
-        updateSelectedItemsPreview(
-            dbGetGuessTheImageItems
-        )
-);
+            () => {
+                if (onChange) {
+                    onChange();
+                } else {
+                    updateSelectedItemsPreview(
+                        dbGetGuessTheImageItems
+                    );
+                }
+            }
+        );
 
         tagsContainer.appendChild(
             label

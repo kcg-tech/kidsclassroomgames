@@ -1,14 +1,10 @@
 
-// ! ! Add image upload function
-
-
 const categorySelect = 
     document.getElementById("presetSelect");
+
 const tagsContainer =
     document.getElementById("tagsContainer");
-/*const imageUpload = 
-    document.getElementById("image-upload");
- */
+
 const itemCount = 
     document.getElementById("item-count");
 const selectedItemsList =
@@ -21,32 +17,228 @@ const selectedItemsCount =
         "selectedItemsCount"
     );
 
+const itemSelectionModeInputs =
+    document.querySelectorAll(
+        'input[name="itemSelectionMode"]'
+    );
+
+const randomItemCountControl =
+    document.getElementById(
+        "random-item-count-control"
+    );
+
+const specificSelectionControls =
+    document.getElementById(
+        "specific-selection-controls"
+    );
+
+const itemListHeading =
+    document.getElementById(
+        "item-list-heading"
+    );
+
+const selectAllItemsBtn =
+    document.getElementById(
+        "select-all-items-btn"
+    );
+
+const clearSelectedItemsBtn =
+    document.getElementById(
+        "clear-selected-items-btn"
+    );
+
+const setupPage =
+    document.getElementById("setup-page");
+
+const startPlayBtn =
+    document.getElementById("start-play-btn");
+
+const closeGameBtn =
+    document.getElementById(
+        "close-game-btn"
+    );
+
 let revealMode = "manual";
-const autoBtn = document.getElementById("auto-btn");
-const manualBtn = document.getElementById("manual-btn");
+let savedGameSetup = null;
+
+const autoBtn = 
+    document.getElementById("auto-btn");
+const manualBtn = 
+    document.getElementById("manual-btn");
 const languageSelect =
     document.getElementById(
         "languageSelect"
     );
-
-
 const gameArea =
     document.getElementById(
         "game-area"
     );
 const startBtn = 
     document.getElementById("start-btn");
-const resetBtn = 
-    document.getElementById("reset-btn");
 
 let availableItems = [];
-
 let quizItems = [];
+let itemSelectionMode = "random";
+
+const selectedSpecificItemIds =
+    new Set();
 let currentIndex = 0;
 let revealInterval = null;
 let score = 0;
 
+function renderGuessItemsPreview() {
+    selectedItemsList.innerHTML = "";
 
+    const displayedCount =
+        itemSelectionMode === "specific"
+            ? selectedSpecificItemIds.size
+            : availableItems.length;
+
+    selectedItemsCount.textContent =
+        displayedCount;
+
+    availableItems.forEach(item => {
+        const card =
+            document.createElement(
+                itemSelectionMode === "specific"
+                    ? "button"
+                    : "div"
+            );
+
+        card.className =
+            "preview-item";
+
+        if (
+            itemSelectionMode ===
+            "specific"
+        ) {
+            card.type = "button";
+
+            card.classList.add(
+                "selectable-preview-item"
+            );
+
+            const isSelected =
+                selectedSpecificItemIds.has(
+                    item.id
+                );
+
+            card.classList.toggle(
+                "selected-item",
+                isSelected
+            );
+
+            card.setAttribute(
+                "aria-pressed",
+                String(isSelected)
+            );
+
+            card.addEventListener(
+                "click",
+                () => {
+                    if (
+                        selectedSpecificItemIds
+                            .has(item.id)
+                    ) {
+                        selectedSpecificItemIds
+                            .delete(item.id);
+                    } else {
+                        selectedSpecificItemIds
+                            .add(item.id);
+                    }
+
+                    renderGuessItemsPreview();
+                }
+            );
+        }
+
+        const image =
+            document.createElement("img");
+
+        image.src = item.url;
+        image.alt = item.name;
+
+        image.addEventListener(
+            "error",
+            () => {
+                image.remove();
+            }
+        );
+
+        const name =
+            document.createElement("div");
+
+        name.textContent =
+            item.name;
+
+        card.appendChild(image);
+        card.appendChild(name);
+
+        selectedItemsList.appendChild(
+            card
+        );
+    });
+}
+
+async function updateGuessItemsPreview() {
+   
+    const selectedCategoryId =
+        categorySelect.value;
+
+    const selectedTagIds =
+        Array.from(
+            document.querySelectorAll(
+                "#tagsContainer input:checked"
+            )
+        )
+        .map(
+            checkbox =>
+                Number(
+                    checkbox.value
+                )
+        );
+
+    const selectedLanguageId =
+        Number(
+            languageSelect.value
+        );
+
+        if (!selectedCategoryId) {
+            availableItems = [];
+            selectedSpecificItemIds.clear();
+
+            selectedItemsCount.textContent = "0";
+            selectedItemsList.innerHTML =
+                "<p>Please choose a category.</p>";
+
+            return;
+        }
+
+        if (
+            selectedCategoryId === "browse-by-tag" &&
+            selectedTagIds.length === 0
+        ) {
+            availableItems = [];
+            selectedSpecificItemIds.clear();
+
+            selectedItemsCount.textContent = "0";
+            selectedItemsList.innerHTML =
+                "<p>Select at least one tag to show items.</p>";
+
+            return;
+        }        
+
+    availableItems =
+        await dbGetGuessTheImageItems(
+            selectedCategoryId,
+            selectedTagIds,
+            selectedLanguageId
+        );
+
+    selectedSpecificItemIds.clear();
+
+    renderGuessItemsPreview();
+}
 
 autoBtn.addEventListener(
     "click",
@@ -86,35 +278,100 @@ manualBtn.addEventListener(
     }
 );
 
-
 startBtn.addEventListener(
-"click",
-startGame
+    "click",
+    openGameWindow
 );
 
-async function startGame(){
-
+function openGameWindow() {
     const selectedCategoryId =
         categorySelect.value;
 
     const selectedLanguageId =
-    Number(
-        languageSelect.value
-    );
+        Number(languageSelect.value);
 
     const selectedTagIds =
         Array.from(
             document.querySelectorAll(
-                '#tagsContainer input:checked'
+                "#tagsContainer input:checked"
             )
         )
-        .map(
-            checkbox =>
-                Number(
-                    checkbox.value
-                )
+        .map(checkbox =>
+            Number(checkbox.value)
         );
 
+    if (!selectedCategoryId) {
+        alert("Please choose a category.");
+        return;
+    }
+
+    if (
+        selectedCategoryId === "browse-by-tag" &&
+        selectedTagIds.length === 0
+    ) {
+        alert("Please select at least one tag.");
+        return;
+    }
+
+    if (availableItems.length < 3) {
+        alert(
+            "At least three items are required to play."
+        );
+        return;
+    }
+
+    if (
+        itemSelectionMode === "specific" &&
+        selectedSpecificItemIds.size < 3
+    ) {
+        alert(
+            "Please select at least three items."
+        );
+        return;
+    }
+
+    const setupId =
+        `guess-image-${Date.now()}`;
+
+    const gameSetup = {
+        categoryId: selectedCategoryId,
+        languageId: selectedLanguageId,
+        tagIds: selectedTagIds,
+        selectionMode: itemSelectionMode,
+        itemCount: Number(itemCount.value),
+        selectedItemIds:
+            Array.from(selectedSpecificItemIds)
+    };
+
+    localStorage.setItem(
+        setupId,
+        JSON.stringify(gameSetup)
+    );
+
+    const gameUrl =
+        `${window.location.pathname}` +
+        `?mode=play&setup=${encodeURIComponent(setupId)}`;
+
+    window.open(gameUrl, "_blank");
+}
+
+async function startGame(){
+
+    if (!savedGameSetup) {
+        alert(
+            "The game setup could not be found."
+        );
+        return;
+    }
+
+    const selectedCategoryId =
+        savedGameSetup.categoryId;
+
+    const selectedLanguageId =
+        Number(savedGameSetup.languageId);
+
+    const selectedTagIds =
+        savedGameSetup.tagIds || [];
 
     score = 0;
     currentIndex = 0;
@@ -155,30 +412,82 @@ async function startGame(){
         <div id="cover-grid"></div>
         `;
 
-    const count=
-    Number(itemCount.value);
+        let playableItems = items;
 
-    quizItems =
-        shuffle(items)
-        .slice(
-            0,
-            Math.min(
-                count,
-                items.length
-            )
-        );
+        if (
+            savedGameSetup.selectionMode ===
+            "specific"
+        ) {
+            const selectedIds =
+                new Set(
+                    savedGameSetup.selectedItemIds.map(
+                        id => String(id)
+                    )
+                );
+
+            playableItems =
+                items.filter(item =>
+                    selectedIds.has(
+                        String(item.id)
+                    )
+                );
+        }
+
+        const uniquePlayableItems =
+            playableItems.filter(
+                (item, index, allItems) => {
+                    if (
+                        !item.name ||
+                        item.name ===
+                            "(No Translation)"
+                    ) {
+                        return false;
+                    }
+
+                    return (
+                        allItems.findIndex(
+                            otherItem =>
+                                otherItem.name ===
+                                item.name
+                        ) === index
+                    );
+                }
+            );
+
+        if (uniquePlayableItems.length < 3) {
+            alert(
+                "This game needs at least three items with different answers."
+            );
+
+            return;
+        }
+
+        const count =
+            savedGameSetup.selectionMode ===
+            "specific"
+                ? uniquePlayableItems.length
+                : Number(savedGameSetup.itemCount);
+
+        quizItems =
+            shuffle(uniquePlayableItems)
+                .slice(
+                    0,
+                    Math.min(
+                        count,
+                        playableItems.length
+                    )
+                );
 
     currentIndex=0;
 
     showQuestion();
 
-    if (
-        revealMode === "auto"
-    ) {
+    startPlayBtn.textContent =
+        "RESET GAME";
 
-        startAutoReveal();
-
-    }
+    startPlayBtn.classList.add(
+        "reset-game"
+    );
 
     score = 0;
 
@@ -191,17 +500,45 @@ async function startGame(){
 
 };
 
-//SHOW QUESTION
 function showQuestion(){
 
     const item =
     quizItems[currentIndex];
 
-    document
-    .getElementById(
-    "quiz-image"
-    )
-    .src = item.url; 
+    const quizImage =
+        document.getElementById(
+            "quiz-image"
+        );
+
+    quizImage.alt =
+        "Image to guess";
+
+    quizImage.addEventListener(
+        "error",
+        () => {
+            clearInterval(revealInterval);
+
+            const imageWrapper =
+                document.getElementById(
+                    "image-wrapper"
+                );
+
+            imageWrapper.innerHTML = `
+                <div class="image-error-message">
+                    <h2>Image unavailable</h2>
+                    <p>
+                        This image could not be loaded.
+                        You may choose an answer or reset the game.
+                    </p>
+                </div>
+            `;
+
+            enableAnswerButtons();
+        },
+        { once: true }
+    );
+
+    quizImage.src = item.url;
 
     buildCoverGrid();
 
@@ -229,7 +566,7 @@ function buildAnswerButtons(correctAnswer){
 
     const wrongAnswers =
     shuffle(
-        availableItems
+        quizItems
         .filter(
             item =>
             item.name !==
@@ -257,6 +594,7 @@ function buildAnswerButtons(correctAnswer){
         "wrong"
         );
 
+        btn.disabled = true;
         btn.textContent =
         choices.pop();
 
@@ -270,92 +608,106 @@ function buildAnswerButtons(correctAnswer){
 
 }
 
-//CHECK ANSWER
 function checkAnswer(
-button,
-correctAnswer
+    button,
+    correctAnswer
 ){
 
-const chosen =
-button.textContent;
+    const chosen =
+    button.textContent;
 
-const allButtons =
-document.querySelectorAll(
-".answer-btn"
-);
+    const allButtons =
+    document.querySelectorAll(
+    ".answer-btn"
+    );
 
-if(
-quizItems.length === 0
-)return;
+    if (button.disabled) {
+        return;
+    }
 
-if(
-chosen === correctAnswer
-){
+    allButtons.forEach(btn => {
+        btn.disabled = true;
+    });
 
-score++;
+    if(
+        quizItems.length === 0
+    )return;
+
+    if(
+        chosen === correctAnswer
+    ){
+
+        score++;
 
 
-document
-.getElementById(
-"score-display"
-)
-.innerHTML =
-`Score: ${score}`;
+        document
+        .getElementById(
+        "score-display"
+        )
+        .innerHTML =
+        `Score: ${score}`;
 
-button.classList
-.add(
-"correct"
-);
+        button.classList
+        .add(
+        "correct"
+        );
 
-}else{
+    } else{
 
-button.classList
-.add(
-"wrong"
-);
+        button.classList
+        .add(
+        "wrong"
+        );
 
-allButtons.forEach(
-btn=>{
+        allButtons.forEach(
+        btn=>{
 
-if(
-btn.textContent
-=== correctAnswer
-){
+            if(
+            btn.textContent
+            === correctAnswer
+            ){
 
-btn.classList
-.add(
-"correct");
+            btn.classList
+            .add(
+            "correct");
+
+            }
+
+        });
+
+    }
+
+
+    setTimeout(()=>{
+
+        currentIndex++;
+
+        if(
+        currentIndex
+        <
+        quizItems.length
+        ){
+
+        showQuestion();
+
+        }else{
+
+        showFinalScore();
+
+        }
+
+    },1000);
 
 }
 
-});
-
+function enableAnswerButtons() {
+    document
+        .querySelectorAll(".answer-btn")
+        .forEach(button => {
+            button.disabled = false;
+        });
 }
 
-
-setTimeout(()=>{
-
-currentIndex++;
-
-if(
-currentIndex
-<
-quizItems.length
-){
-
-showQuestion();
-
-}else{
-
-showFinalScore();
-
-}
-
-},1000);
-
-}
-
-//COVER GRID
 function buildCoverGrid(){
 
     const grid=
@@ -366,14 +718,18 @@ function buildCoverGrid(){
     grid.innerHTML="";
 
     for(
-    let i=0;
-    i<36;
-    i++
+    let i=0; i<36; i++
     ){
 
-        const cell=
-        document.createElement(
-        "div"
+        const cell =
+            document.createElement(
+                "button"
+            );
+
+        cell.type = "button";
+        cell.setAttribute(
+            "aria-label",
+            `Reveal image section ${i + 1}`
         );
 
         cell.className=
@@ -385,15 +741,13 @@ function buildCoverGrid(){
 
             cell.classList
             .add("cover-hidden");
-
+            enableAnswerButtons();
         });
 
         grid.appendChild(cell);
     }
 
 }
-
-//AUTO REVEAL
 
 document
 .getElementById(
@@ -403,7 +757,6 @@ document
 "click",
 startAutoReveal
 );
-
 
 function startAutoReveal(){
 
@@ -418,6 +771,8 @@ function startAutoReveal(){
         document.querySelectorAll(
         ".cover-cell:not(.cover-hidden)"
         );
+
+        enableAnswerButtons()
 
         if(
         cells.length===0
@@ -448,7 +803,6 @@ function startAutoReveal(){
 
 }
 
-//MANUAL BUTTON
 document
 .getElementById(
 "manual-btn"
@@ -463,7 +817,6 @@ revealInterval
 
 });
 
-//FINAL SCORE
 function showFinalScore(){
 
     const wrapper =
@@ -515,115 +868,194 @@ function showFinalScore(){
 
 }
 
-//RESET
-resetBtn.addEventListener(
-"click",
-gameReset
-);
-
-async function playAgain(){
-
-    clearInterval(
-        revealInterval
-    );
+function playAgain() {
+    clearInterval(revealInterval);
 
     score = 0;
     currentIndex = 0;
+    quizItems = [];
 
-    const count =
-        Number(
-            itemCount.value
-        );
+    startPlayBtn.textContent =
+        "START GAME";
 
-    quizItems =
-        shuffle(availableItems)
-        .slice(
-            0,
-            Math.min(
-                count,
-                availableItems.length
-            )
-        );
-
-    document
-    .getElementById(
-        "score-display"
-    )
-    .textContent =
-    "Score: 0";
-
-    document
-    .getElementById(
-        "image-wrapper"
-    ).innerHTML =
-
-    `
-    <img id="quiz-image">
-
-    <div id="cover-grid"></div>
-    `;
-
-    showQuestion();
-
-}
-
-
-function gameReset(){
-
-    clearInterval(
-        revealInterval
+    startPlayBtn.classList.remove(
+        "reset-game"
     );
 
-    score=0;
-    currentIndex=0;
-    quizItems=[];
+    document.getElementById(
+        "score-display"
+    ).textContent = "Score: 0";
 
     document.getElementById(
         "image-wrapper"
-        ).innerHTML =
+    ).innerHTML = `
+        <div class="start-game-message">
+            <h2>Ready to play again?</h2>
+            <p>Click START GAME to begin.</p>
+        </div>
+    `;
 
-        `
-        <img id="quiz-image">
+    document
+        .querySelectorAll(".answer-btn")
+        .forEach(button => {
+            button.textContent = "";
+            button.disabled = true;
 
-        <div id="cover-grid"></div>
-        `;
-
-    document.getElementById(
-        "score-display"
-        ).textContent=
-        "Score: 0";
-
-    document.querySelectorAll(
-        ".answer-btn"
-        ).forEach(btn=>{
-
-        btn.textContent="";
-        btn.onclick=null;
-
-    });
-
-    gameArea.classList.add("hidden");
-
-    };
-
+            button.classList.remove(
+                "correct",
+                "wrong"
+            );
+        });
+}
 
 categorySelect.addEventListener(
     "change",
-    () =>
-        updateSelectedItemsPreview(
-            dbGetGuessTheImageItems
-        )
+    updateGuessItemsPreview
 );
 
 languageSelect.addEventListener(
     "change",
-      () =>
-        updateSelectedItemsPreview(
-            dbGetGuessTheImageItems
-        )
+    updateGuessItemsPreview
 );
 
+itemSelectionModeInputs.forEach(input => {
+    input.addEventListener("change", event => {
+        itemSelectionMode =
+            event.target.value;
+
+        const choosingSpecificItems =
+            itemSelectionMode === "specific";
+
+        randomItemCountControl.classList.toggle(
+            "hidden",
+            choosingSpecificItems
+        );
+
+        specificSelectionControls.classList.toggle(
+            "hidden",
+            !choosingSpecificItems
+        );
+
+        itemListHeading.textContent =
+            choosingSpecificItems
+                ? "Selected Items"
+                : "Available Items";
+
+        selectedSpecificItemIds.clear();
+        renderGuessItemsPreview();
+    });
+});
+
+selectAllItemsBtn.addEventListener(
+    "click",
+    () => {
+        availableItems.forEach(item => {
+            selectedSpecificItemIds.add(item.id);
+        });
+
+        renderGuessItemsPreview();
+    }
+);
+
+clearSelectedItemsBtn.addEventListener(
+    "click",
+    () => {
+        selectedSpecificItemIds.clear();
+        renderGuessItemsPreview();
+    }
+);
+
+startPlayBtn.addEventListener(
+    "click",
+    startGame
+);
+
+closeGameBtn.addEventListener(
+    "click",
+    () => {
+        window.close();
+
+        setTimeout(() => {
+            if (!window.closed) {
+                window.location.href =
+                    window.location.pathname;
+            }
+        }, 200);
+    }
+);
+
+function initializePlayPage() {
+    const params =
+        new URLSearchParams(
+            window.location.search
+        );
+
+    if (params.get("mode") !== "play") {
+        return false;
+    }
+
+    const setupId =
+        params.get("setup");
+
+    const savedSetup =
+        setupId
+            ? localStorage.getItem(setupId)
+            : null;
+
+    if (!savedSetup) {
+        alert(
+            "This game setup could not be found. Please return to the setup page."
+        );
+
+        return true;
+    }
+
+    try {
+        savedGameSetup =
+            JSON.parse(savedSetup);
+    } catch (error) {
+        console.error(
+            "Could not read game setup:",
+            error
+        );
+
+        alert(
+            "This game setup could not be opened."
+        );
+
+        return true;
+    }
+
+    document.body.classList.add("play-mode");
+
+
+    setupPage.classList.add("hidden");
+    gameArea.classList.remove("hidden");
+
+    document.getElementById(
+        "image-wrapper"
+    ).innerHTML = `
+        <div class="start-game-message">
+            <h2>Ready to play?</h2>
+            <p>Select a reveal mode, then click START GAME.</p>
+        </div>
+    `;
+
+    document
+        .querySelectorAll(".answer-btn")
+        .forEach(button => {
+            button.textContent = "";
+            button.disabled = true;
+        });
+
+    return true;
+}
+
 async function initialize() {
+
+    if (initializePlayPage()) {
+        return;
+    }
 
     populateItemCount(
         itemCount
@@ -633,17 +1065,35 @@ async function initialize() {
         categorySelect
     );
 
+    const oldAllCategoriesOption =
+        categorySelect.querySelector(
+            'option[value=""]'
+        );
+
+    if (oldAllCategoriesOption) {
+        oldAllCategoriesOption.remove();
+    }
+
+    categorySelect.innerHTML = `
+        <option value="" selected disabled>
+            Choose a Category
+        </option>
+
+        <option value="browse-by-tag">
+            Browse by Tag (All Categories)
+        </option>
+    ` + categorySelect.innerHTML;
+
     await loadTags(
-        tagsContainer
+        tagsContainer,
+        updateGuessItemsPreview
     );
 
     await loadLanguages(
         languageSelect
     );
 
-    await updateSelectedItemsPreview(
-        dbGetGuessTheImageItems
-    );
+    await updateGuessItemsPreview();
 
 }
 

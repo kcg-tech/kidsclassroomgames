@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="Create and play real-time multiplayer classroom Bingo with customizable images, words, and student cards."
+    >
+
+    <title>Multiplayer Bingo | Kids Classroom Games</title>
+
+    <link
+        rel="icon"
+        type="image/png"
+        href="../../images/home/kcgfavicon.png"
+    >
+
+    <link
+        rel="stylesheet"
+        href="bingo.css"
+    >
+</head>
+
+<body>
+    <header class="page-header">
+        <h1>Multiplayer Bingo</h1>
+
+        <p>
+            Create a classroom game or join
+            with a room code.
+        </p>
+    </header>
+
+    <main>
+        <section
+            id="role-selection-view"
+            class="view-panel"
+        >
+            <h2>How would you like to play?</h2>
+
+            <div class="role-buttons">
+                <button
+                    type="button"
+                    id="create-game-btn"
+                    class="primary-btn"
+                >
+                    Create a Game
+                </button>
+
+                <button
+                    type="button"
+                    id="show-join-btn"
+                    class="secondary-btn"
+                >
+                    Join a Game
+                </button>
+            </div>
+        </section>
+
+
+        <section
+            id="teacher-setup-view"
+            class="view-panel hidden"
+        >
+            <h2>Create a Bingo Game</h2>
+
+            <form id="teacher-setup-form">
+                <div class="setup-control">
+                    <label for="bingo-name-input">
+                        Game Name
+                    </label>
+
+                    <input
+                        type="text"
+                        id="bingo-name-input"
+                        maxlength="100"
+                        placeholder="Example: Summer Bingo"
+                        required
+                    >
+                </div>
+
+
+                <div class="setup-control">
+                    <label for="category-select">
+                        Choose a Category
+                    </label>
+
+                    <select
+                        id="category-select"
+                        required
+                    ></select>
+                </div>
+
+
+                <div class="setup-control">
+                    <h3>Filter by Tags</h3>
+
+                    <div id="tags-container"></div>
+                </div>
+
+
+                <div class="setup-control">
+                    <label for="language-select">
+                        Language
+                    </label>
+
+                    <select
+                        id="language-select"
+                        required
+                    ></select>
+                </div>
+
+
+                <fieldset id="teacher-item-mode">
+                    <legend>Choose the Item Pool</legend>
+
+                    <label for="grid-size-select">
+                        Bingo Card Size
+                    </label>
+
+                    <select id="grid-size-select">
+                        <option value="3"
+                                selected
+                        >
+                            3 × 3
+                        </option>
+
+                        <option value="4">
+                            4 × 4
+                        </option>
+
+                        <option
+                            value="5"
+                        >
+                            5 × 5
+                        </option>
+                    </select>
+
+                    <label>
+                        <input
+                            type="radio"
+                            name="teacherItemMode"
+                            value="random"
+                            checked
+                        >
+                        Random Items
+                    </label>
+
+                    <label>
+                        <input
+                            type="radio"
+                            name="teacherItemMode"
+                            value="specific"
+                        >
+                        Choose Specific Items
+                    </label>
+
+                </fieldset>
+
+
+                <div
+                    id="specific-pool-controls"
+                    class="hidden"
+                >
+                    <p>
+                        Select the items students may use
+                        on their cards.
+                    </p>
+
+                    <div class="selection-buttons">
+                        <button
+                            type="button"
+                            id="select-all-pool-items-btn"
+                            class="secondary-btn"
+                        >
+                            Select All
+                        </button>
+
+                        <button
+                            type="button"
+                            id="clear-pool-items-btn"
+                            class="back-btn"
+                        >
+                            Clear Selection
+                        </button>
+                    </div>
+                </div>
+
+
+                <section id="available-items-section">
+                    <h3>
+                        <span id="available-items-heading">
+                            Available Items
+                        </span>
+
+                        (<span id="available-items-count">0</span>)
+                    </h3>
+
+                    <div id="available-items-list"></div>
+                </section>
+
+
+                <fieldset id="game-settings">
+                    <legend>Game Settings</legend>
+
+                    <label>
+                        <input
+                            type="checkbox"
+                            id="free-center-checkbox"
+                            checked
+                        >
+                        Use a FREE center square
+                    </label>
+
+
+                    <label for="host-display-mode">
+                        Teacher Display
+                    </label>
+
+                    <select id="host-display-mode">
+                        <option value="image-text">
+                            Image + Word
+                        </option>
+
+                        <option value="image">
+                            Image Only
+                        </option>
+
+                        <option value="text">
+                            Word Only
+                        </option>
+                    </select>
+
+
+                    <label for="player-display-mode">
+                        Student Card Display
+                    </label>
+
+                    <select id="player-display-mode">
+                        <option value="image-text">
+                            Image + Word
+                        </option>
+
+                        <option value="image">
+                            Image Only
+                        </option>
+
+                        <option value="text">
+                            Word Only
+                        </option>
+                    </select>
+
+
+                    <label for="max-players-select">
+                        Maximum Players
+                    </label>
+
+                    <select id="max-players-select">
+                        <option value="10">10 Players</option>
+                        <option value="20">20 Players</option>
+
+                        <option
+                            value="30"
+                            selected
+                        >
+                            30 Players
+                        </option>
+
+                        <option value="40">40 Players</option>
+                        <option value="50">50 Players</option>
+                    </select>
+                </fieldset>
+
+
+                <button
+                    type="submit"
+                    id="create-room-btn"
+                    class="primary-btn"
+                >
+                    Create Bingo Room
+                </button>
+            </form>
+
+            <button
+                type="button"
+                id="back-from-setup-btn"
+                class="back-btn"
+            >
+                Back
+            </button>
+        </section>
+
+
+        <section
+            id="join-game-view"
+            class="view-panel hidden"
+        >
+            <h2>Join a Bingo Game</h2>
+
+            <form id="join-game-form">
+                <label for="room-code-input">
+                    Room Code
+                </label>
+
+                <input
+                    type="text"
+                    id="room-code-input"
+                    maxlength="6"
+                    autocomplete="off"
+                    required
+                >
+
+                <label for="player-name-input">
+                    Your Name
+                </label>
+
+                <input
+                    type="text"
+                    id="player-name-input"
+                    maxlength="20"
+                    autocomplete="nickname"
+                    required
+                >
+
+                <button
+                    type="submit"
+                    class="primary-btn"
+                >
+                    Join Game
+                </button>
+            </form>
+
+            <button
+                type="button"
+                id="back-from-join-btn"
+                class="back-btn"
+            >
+                Back
+            </button>
+        </section>
+
+
+        <section
+            id="host-game-view"
+            class="view-panel hidden"
+        >
+            <h2>Teacher Game Room</h2>
+
+            <div id="host-game-content">
+
+                <div
+                    id="host-lobby"
+                    class="host-lobby"
+                >
+                    <h3>Room Code</h3>
+
+                    <p
+                        id="host-room-code"
+                        class="host-room-code"
+                    >
+                        ------
+                    </p>
+
+                    <p>
+                        Share this code with your students.
+                    </p>
+
+                    <div class="host-lobby-status">
+                        <p>
+                            Players:
+                            <strong id="host-player-count">
+                                0
+                            </strong>
+                        </p>
+
+                        <p>
+                            Ready:
+                            <strong id="host-ready-count">
+                                0
+                            </strong>
+                        </p>
+                    </div>
+
+                    <button
+                        type="button"
+                        id="start-bingo-game-btn"
+                        class="primary-btn"
+                    >
+                        Start Game
+                    </button>
+                </div>
+
+                <div
+                    id="teacher-picker"
+                    class="picker hidden"
+                >
+
+                    <div class="picker-heading">
+                        <h3>Game Items</h3>
+
+                        <p>
+                            Click Pick Next to choose a random item.
+                        </p>
+                    </div>
+
+                    <div
+                        id="teacher-picker-items"
+                        class="picker-items"
+                    ></div>
+
+                    <div
+                        id="host-finish-controls"
+                        class="host-finish-controls hidden"
+                    >
+                        <button
+                            type="button"
+                            id="pick-next-item-btn"
+                            class="primary-btn"
+                        >
+                            Pick Next
+                        </button>
+
+                        <button
+                            type="button"
+                            id="finish-bingo-game-btn"
+                            class="danger-btn"
+                        >
+                            Finish Game
+                        </button>
+                    </div>
+
+                    <section
+                        id="host-live-leaders"
+                        class="host-live-leaders hidden"
+                    >
+                        <h3>Top Bingo Players</h3>
+
+                        <div
+                            id="host-live-leaders-list"
+                            class="host-live-leaders-list"
+                        ></div>
+                    </section>
+
+                </div>
+
+                <section
+                    id="host-final-results"
+                    class="host-final-results hidden"
+                >
+                    <h2>Final Bingo Results</h2>
+
+                    <p class="host-final-message">
+                        Great game, everyone!
+                    </p>
+
+                    <div
+                        id="host-final-standings"
+                        class="host-final-standings"
+                    ></div>
+                </section>
+
+                <section
+                    id="host-winners-section"
+                    class="host-winners-section hidden"
+                >
+                    <h3>Bingo Winners</h3>
+
+                    <div id="host-winners-list"></div>
+                </section>
+          
+                <div
+                    id="picker-modal"
+                    class="picker-modal hidden"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="picker-modal-title"
+                >
+                    <div class="picker-modal-content">
+
+                        <button
+                            type="button"
+                            id="close-picker-modal-btn"
+                            class="picker-modal-close"
+                            aria-label="Close selected item"
+                        >
+                            &times;
+                        </button>
+
+                        <div id="picker-modal-item"></div>
+
+                        <h3 
+                            id="picker-modal-title"
+                            class="hidden"
+                        >
+                            Selected Item
+                        </h3>
+
+                    </div>
+                </div>
+
+            </div>
+
+            <div
+                id="host-winner-celebration"
+                class="bingo-celebration hidden"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="host-winner-title"
+            >
+                <div class="bingo-celebration-content">
+
+                    <div class="bingo-stars">
+                        ★ ★ ★
+                    </div>
+
+                    <h2 id="host-winner-title">
+                        BINGO!
+                    </h2>
+
+                    <p id="host-winner-message">
+                        A player completed a Bingo line!
+                    </p>
+
+                    <p>
+                        Click anywhere to continue.
+                    </p>
+
+                </div>
+            </div>
+
+        </section>
+
+
+        <section
+            id="player-game-view"
+            class="view-panel hidden"
+        >
+
+            <div id="player-game-content">
+
+                <p
+                    id="player-room-status"
+                    class="player-room-status"
+                >
+                    Build your card, then select Ready.
+                </p>
+        
+                <section
+                    id="player-card-builder"
+                    class="player-card-builder"
+                >
+                    <div class="player-item-tray-section">
+                        <h3>Choose Your Items</h3>
+
+                        <div
+                            id="player-item-tray"
+                            class="player-item-tray"
+                        ></div>
+                    </div>
+
+                    <div
+                        id="player-bingo-grid"
+                        class="player-bingo-grid"
+                    ></div>
+
+                    <div class="player-ready-controls">
+                        <button
+                            type="button"
+                            id="player-ready-btn"
+                            class="primary-btn"
+                        >
+                            Ready
+                        </button>
+
+                        <button
+                            type="button"
+                            id="player-not-ready-btn"
+                            class="back-btn hidden"
+                        >
+                            Not Ready
+                        </button>
+                    </div>
+                </section>
+            </div>
+
+            <div
+                id="bingo-celebration"
+                class="bingo-celebration hidden"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="bingo-celebration-title"
+            >
+                <div class="bingo-celebration-content">
+
+                    <div class="bingo-stars">
+                        ★ ★ ★
+                    </div>
+
+                    <h2 id="bingo-celebration-title">
+                        BINGO!
+                    </h2>
+
+                    <p id="bingo-celebration-message">
+                        You completed a Bingo line!
+                    </p>
+
+                </div>
+            </div>            
+
+        </section>
+
+        <p
+            id="page-message"
+            class="page-message"
+            role="status"
+            aria-live="polite"
+        ></p>
+    </main>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script src="../../js/config.js"></script>
+    <script src="../../js/utils.js"></script>
+    <script src="../../js/supabase.js"></script>
+    <script src="../../js/storage.js"></script>
+    <script src="../../js/database.js"></script>
+    <script src="../../js/gameUtils.js"></script>
+    <script src="../../js/filters.js"></script>
+    <script src="../../js/preview.js"></script>
+    <script src="../../js/pickerUtils.js"></script>
+
+    <script src="bingo.js"></script>
+</body>
+</html>

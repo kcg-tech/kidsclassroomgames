@@ -1,0 +1,152 @@
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+    margin: 0;
+    padding: 24px;
+    background-color: #f3f7ff;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.account-page {
+    width: min(900px, 100%);
+    margin: 0 auto;
+    text-align: center;
+}
+
+#logged-out-section {
+    display: flex;
+    justify-content: center;
+}
+
+.account-card {
+    padding: 24px;
+    border: 3px solid #2563eb;
+    border-radius: 18px;
+    background: white;
+    box-shadow: 0 8px 20px
+        rgba(30, 64, 175, 0.15);
+    text-align: left;
+}
+
+.account-card h2 {
+    margin-top: 0;
+    text-align: center;
+    color: #1d4ed8;
+}
+
+.account-card form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.account-card label {
+    font-weight: bold;
+}
+
+.account-card input {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #bfdbfe;
+    border-radius: 10px;
+    font-size: 16px;
+}
+
+.account-card button {
+    margin-top: 10px;
+    padding: 12px 18px;
+    border: none;
+    border-radius: 10px;
+    background: #2563eb;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.account-card button:hover {
+    background: #1d4ed8;
+}
+
+#signup-message,
+#login-message {
+    min-height: 24px;
+    margin-bottom: 0;
+    text-align: center;
+}
+
+.message-error {
+    color: #b91c1c;
+}
+
+.message-success {
+    color: #15803d;
+}
+
+[hidden] {
+    display: none !important;
+}
+
+.account-card {
+    width: min(460px, 100%);
+}
+
+.password-field {
+    display: grid;
+    grid-template-columns:
+        minmax(0, 1fr) auto;
+    gap: 8px;
+}
+
+.password-field input {
+    min-width: 0;
+}
+
+.account-card .password-toggle {
+    width: 72px;
+    margin: 0;
+    padding: 8px;
+    border: 2px solid #bfdbfe;
+    background: #eff6ff;
+    color: #1d4ed8;
+    font-size: 14px;
+}
+
+.account-card .password-toggle:hover {
+    background: #dbeafe;
+}
+
+.account-switch {
+    margin-top: 24px;
+    padding-top: 18px;
+    border-top: 1px solid #dbeafe;
+    text-align: center;
+}
+
+.account-switch p {
+    margin: 0 0 10px;
+}
+
+.account-card .secondary-btn {
+    margin: 0;
+    background: white;
+    color: #1d4ed8;
+    border: 2px solid #2563eb;
+}
+
+.account-card .secondary-btn:hover {
+    background: #eff6ff;
+}
+
+
+@media (max-width: 700px) {
+    body {
+        padding: 14px;
+    }
+
+}
