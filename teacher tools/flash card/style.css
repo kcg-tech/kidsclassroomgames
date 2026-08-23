@@ -373,3 +373,24 @@ header {
     color: #555;
 }
 
+#twoSidedLoginMessage {
+    margin: 8px 0 0;
+    padding: 10px 12px;
+    color: #7c2d12;
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+    background: #fff7ed;
+    border: 2px solid #fdba74;
+    border-radius: 10px;
+}
+
+#twoSidedLoginMessage a {
+    color: #1d4ed8;
+    font-weight: bold;
+}
+
+#twoSidedLoginMessage a:hover {
+    text-decoration: none;
+}
+

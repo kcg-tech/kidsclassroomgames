@@ -32,6 +32,10 @@ const modalContent =
     document.getElementById(
         'question-content'
     );
+const questionTimer =
+    document.getElementById(
+        "question-timer"
+    );
 const saveBoardControls =
     document.getElementById(
         "save-board-controls"
@@ -84,6 +88,11 @@ const saveBoardMessage =
 const loginSaveMessage =
     document.getElementById(
         "login-save-message"
+    );
+
+const saveLimitMessage =
+    document.getElementById(
+        "save-limit-message"
     );
 
 const boardNameFields =
@@ -152,11 +161,14 @@ let customBoardReady = false;
 let availableBoards = [];
 let currentUserId = null;
 let editingBoardId = null;
+let questionTimerId = null;
+let questionTimeRemaining = 30;
 
 let imageLibraryItems = [];
 let imageLibraryCategories = [];
 let imageLibraryTags = [];
 const userDataInput = [];
+
 
 createBtn.addEventListener(
     "click",
@@ -796,7 +808,10 @@ userInputs.addEventListener(
 
         saveBoardMessage.textContent = "";
 
-        if (!session) {
+        if (
+            !session ||
+            session.user?.is_anonymous
+        ) {
             saveBoardBtn.textContent =
                 "Preparing...";
 
@@ -905,8 +920,21 @@ userInputs.addEventListener(
                     );
 
                 if (result.error) {
+                    const reachedFreeLimit =
+                        result.error.message?.includes(
+                            "Free accounts can save up to 5"
+                        );
+
                     saveBoardMessage.textContent =
-                        "The board could not be saved.";
+                        reachedFreeLimit
+                            ? "You have reached the free limit of 5 Category Clash boards. Delete one or upgrade to Premium."
+                            : "The board could not be saved.";
+
+                    if (reachedFreeLimit) {
+                        alert(
+                            "You have reached the free limit of 5 Category Clash boards. Delete one or upgrade to Premium."
+                        );
+                    }
 
                     return;
                 }
@@ -1691,10 +1719,12 @@ function renderBoard(boardData){
 
             scoreCell.addEventListener(
                 "click",
-                () => {
+                async () => {
                     if (question.used) {
                         return;
                     }
+
+                    await SoundUtils.prepare();
 
                     currentScoreCell =
                         scoreCell;
@@ -1755,6 +1785,104 @@ function displayModalContent(
     modalContent.appendChild(paragraph);
 }
 
+function updateQuestionTimerDisplay() {
+    questionTimer.classList.remove(
+        "warning",
+        "danger",
+        "finished"
+    );
+
+    if (questionTimeRemaining <= 0) {
+        questionTimer.textContent =
+            "TIME'S UP!";
+
+        questionTimer.classList.add(
+            "finished"
+        );
+
+        return;
+    }
+
+    questionTimer.textContent =
+        String(questionTimeRemaining);
+
+    if (questionTimeRemaining <= 5) {
+        questionTimer.classList.add(
+            "danger"
+        );
+
+    } else if (
+        questionTimeRemaining <= 10
+    ) {
+        questionTimer.classList.add(
+            "warning"
+        );
+    }
+}
+
+function stopQuestionTimer() {
+    if (questionTimerId) {
+        clearInterval(
+            questionTimerId
+        );
+
+        questionTimerId = null;
+    }
+}
+
+function hideQuestionTimer() {
+    stopQuestionTimer();
+
+    questionTimer.classList.add(
+        "hidden"
+    );
+}
+
+function startQuestionTimer() {
+    stopQuestionTimer();
+
+    questionTimeRemaining = 30;
+
+    questionTimer.classList.remove(
+        "hidden"
+    );
+
+    updateQuestionTimerDisplay();
+
+    SoundUtils.playTimerTick({
+        secondsRemaining:
+            questionTimeRemaining,
+
+        totalSeconds:
+            30
+    });
+
+    questionTimerId = setInterval(
+        () => {
+            questionTimeRemaining -= 1;
+
+            updateQuestionTimerDisplay();
+
+            if (
+                questionTimeRemaining > 0
+            ) {
+                SoundUtils.playTimerTick({
+                    secondsRemaining:
+                        questionTimeRemaining,
+
+                    totalSeconds:
+                        30
+                });
+
+            } else {
+                stopQuestionTimer();
+                SoundUtils.playTimeUp();
+            }
+        },
+        1000
+    );
+}
+
 function showQuestion(question) {
     currentQuestion = question;
     showingAnswer = false;
@@ -1766,6 +1894,8 @@ function showQuestion(question) {
         question.question,
         question.questionImg
     );
+
+    startQuestionTimer();
 }
 
 function updateRestartButton() {
@@ -1788,6 +1918,8 @@ modal.addEventListener("click", () => {
     if(!showingAnswer){
 
         showingAnswer = true;
+
+        hideQuestionTimer();
 
         displayModalContent(
             currentQuestion.answer,
@@ -2068,8 +2200,31 @@ async function updateSaveBoardAccess() {
         return;
     }
 
+    const user =
+        data.session?.user;
+
     const isLoggedIn =
-        Boolean(data.session);
+        Boolean(
+            user &&
+            !user.is_anonymous
+        );
+
+    const hasPremium =
+        isLoggedIn
+            ? await dbUserHasPremium()
+            : false;
+
+    saveLimitMessage.classList.toggle(
+        "hidden",
+        !isLoggedIn
+    );
+
+    if (isLoggedIn) {
+        saveLimitMessage.textContent =
+            hasPremium
+                ? "Premium account: Unlimited saved boards."
+                : "Free account: You can save up to 5 Category Clash boards.";
+    }
 
     saveBoardControls.classList.remove(
         "hidden"

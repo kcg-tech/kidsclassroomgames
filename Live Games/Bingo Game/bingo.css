@@ -468,6 +468,12 @@ input[type="checkbox"] {
     text-align: center;
     color: #14275e;
     overflow: hidden;
+
+transition:
+    transform 0.12s ease,
+    border-color 0.12s ease,
+    background-color 0.12s ease,
+    box-shadow 0.12s ease;
 }
 
 .picker-item span {
@@ -1012,4 +1018,182 @@ input[type="checkbox"] {
 .final-standing.no-wins {
     border-color: #8eb2ff;
     background: white;
+}
+
+.host-qr-container {
+    width: fit-content;
+    margin: 14px auto;
+    padding: 10px;
+    border: 3px solid #9dbdff;
+    border-radius: 14px;
+    background: white;
+    cursor: pointer;
+}
+
+#host-room-qr {
+    width: 96px;
+    height: 96px;
+    margin: 0 auto;
+}
+
+#host-room-qr img,
+#host-room-qr canvas {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.host-qr-instruction {
+    margin: 6px 0 0;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.host-qr-container.enlarged {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 20px;
+    border: none;
+    border-radius: 0;
+    background: rgba(255, 255, 255, 0.96);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+.host-qr-container.enlarged #host-room-qr {
+    width: min(70vw, 420px);
+    height: min(70vw, 420px);
+}
+
+.host-qr-container.enlarged .host-qr-instruction {
+    margin-top: 18px;
+    font-size: clamp(16px, 3vw, 24px);
+}
+
+#save-bingo-set-control > label {
+    width: fit-content;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+}
+
+#save-bingo-set-checkbox {
+    width: auto;
+    margin: 0;
+    flex: 0 0 auto;
+}
+
+.delete-bingo-set-btn {
+    width: fit-content;
+    margin-top: 6px;
+    color: white;
+    background: #e53935;
+    border-color: #a91f1c;
+}
+
+.delete-bingo-set-btn.hidden {
+    display: none;
+}
+
+.saved-bingo-set-change-note {
+    margin: 4px 0 0;
+    padding: 12px;
+    border: 2px solid #f0b429;
+    border-radius: 10px;
+    color: #5f4700;
+    background: #fff7d6;
+    font-size: 15px;
+    font-weight: bold;
+}
+
+.saved-bingo-set-change-note.hidden {
+    display: none;
+}
+
+.share-bingo-set-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    margin-top: 6px;
+}
+
+.share-bingo-set-controls.hidden,
+.bingo-share-link-container.hidden {
+    display: none;
+}
+
+.bingo-share-link-container {
+    width: 100%;
+    display: grid;
+    gap: 10px;
+}
+
+#bingo-share-link {
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 14px;
+}
+
+#bingo-share-message {
+    min-height: 1.2em;
+    margin: 0;
+    color: #16843f;
+    font-weight: bold;
+}
+
+.picker-item-active {
+    border-color: #facc15;
+    background: #fef08a !important;
+    box-shadow:
+        0 0 0 4px rgba(250, 204, 21, 0.3);
+    transform: scale(1.04);
+}
+
+.picker-item-selected {
+    border-color: #16a34a;
+    background: #bbf7d0 !important;
+    box-shadow:
+        0 0 0 6px rgba(22, 163, 74, 0.3);
+    animation:
+        picker-selected-bounce 0.4s ease;
+}
+
+@keyframes picker-selected-bounce {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.12);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .picker-item-selected {
+        animation: none;
+    }
+}
+
+#bingo-save-limit-message {
+    margin: 12px 0 0;
+    padding: 10px 14px;
+    color: #1e3a8a;
+    font-weight: bold;
+    text-align: center;
+    background: #eff6ff;
+    border: 2px solid #bfdbfe;
+    border-radius: 10px;
 }

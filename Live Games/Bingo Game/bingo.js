@@ -68,6 +68,56 @@ const teacherSetupForm =
         "teacher-setup-form"
     );
 
+const savedBingoSetsControl =
+    document.getElementById(
+        "saved-bingo-sets-control"
+    );
+
+const deleteBingoSetBtn =
+    document.getElementById(
+        "delete-bingo-set-btn"
+    );
+
+const savedBingoSetChangeNote =
+    document.getElementById(
+        "saved-bingo-set-change-note"
+    );
+
+const shareBingoSetControls =
+    document.getElementById(
+        "share-bingo-set-controls"
+    );
+
+const createBingoShareLinkBtn =
+    document.getElementById(
+        "create-bingo-share-link-btn"
+    );
+
+const bingoShareLinkContainer =
+    document.getElementById(
+        "bingo-share-link-container"
+    );
+
+const bingoShareLinkInput =
+    document.getElementById(
+        "bingo-share-link"
+    );
+
+const copyBingoShareLinkBtn =
+    document.getElementById(
+        "copy-bingo-share-link-btn"
+    );
+
+const bingoShareMessage =
+    document.getElementById(
+        "bingo-share-message"
+    );
+
+const savedBingoSetSelect =
+    document.getElementById(
+        "saved-bingo-set-select"
+    );
+
 const bingoNameInput =
     document.getElementById(
         "bingo-name-input"
@@ -148,6 +198,16 @@ const createRoomBtn =
         "create-room-btn"
     );
 
+const saveBingoSetCheckbox =
+    document.getElementById(
+        "save-bingo-set-checkbox"
+    );
+
+const bingoSaveLimitMessage =
+    document.getElementById(
+        "bingo-save-limit-message"
+    );
+
 const gridSizeSelect =
     document.getElementById(
         "grid-size-select"
@@ -196,6 +256,21 @@ const hostLobby =
 const hostRoomCode =
     document.getElementById(
         "host-room-code"
+    );
+
+const hostQrContainer =
+document.getElementById(
+    "host-qr-container"
+);
+
+const hostRoomQr =
+    document.getElementById(
+        "host-room-qr"
+    );
+
+const hostQrInstruction =
+    hostQrContainer.querySelector(
+        ".host-qr-instruction"
     );
 
 const hostPlayerCount =
@@ -289,6 +364,11 @@ const hostFinalStandings =
         "host-final-standings"
     );
 
+const playBingoAgainBtn =
+    document.getElementById(
+        "play-bingo-again-btn"
+    );
+
 const hostLiveLeaders =
     document.getElementById(
         "host-live-leaders"
@@ -311,6 +391,7 @@ const finishBingoGameBtn =
 
 let teacherItemMode = "random";
 let availableBingoItems = [];
+let savedBingoSets = [];
 let hostPickerItems = [];
 let playerRoomItems = [];
 let playerCardItems = [];
@@ -324,6 +405,16 @@ let playerRoomChannel = null;
 let playerCallsChannel = null;
 let hostWinnersChannel = null;
 let hostWinnerRefreshTimer = null;
+let playerDraftSaveTimer = null;
+let selectedSavedBingoSetId = null;
+
+let playerDraftSaveChain =
+    Promise.resolve();
+
+const supportsPreciseDragging =
+    window.matchMedia(
+        "(pointer: fine)"
+    ).matches;
 
 const seenHostWinIds =
     new Set();
@@ -348,6 +439,14 @@ const allViews = [
     playerGameView
 ];
 
+
+QrUtils.makeExpandable({
+    container:
+        hostQrContainer,
+
+    instructionElement:
+        hostQrInstruction
+});
 
 function showView(viewToShow) {
     allViews.forEach(view => {
@@ -890,6 +989,57 @@ function updatePlayerRoomStatus() {
     renderPlayerBingoGrid();
 }
 
+async function reloadPlayerCardFromDatabase() {
+    if (!currentBingoPlayer) {
+        return;
+    }
+
+    const result =
+        await dbGetBingoPlayerCells(
+            currentBingoPlayer.id
+        );
+
+    if (result.error) {
+        console.error(
+            "Could not reload the Bingo card:",
+            result.error
+        );
+
+        return;
+    }
+
+    savedPlayerCells =
+        result.data || [];
+
+    const gridSize =
+        Number(currentPlayerRoom.grid_size);
+
+    const totalCells =
+        gridSize * gridSize;
+
+    playerCardItems =
+        Array(totalCells).fill(null);
+
+    savedPlayerCells.forEach(cell => {
+        if (
+            !cell.is_free &&
+            cell.item_id !== null
+        ) {
+            playerCardItems[
+                Number(cell.position) - 1
+            ] = Number(cell.item_id);
+        }
+    });
+
+    currentBingoPlayer = {
+        ...currentBingoPlayer,
+        is_ready: true,
+        card_locked: true
+    };
+
+    selectedTrayItemId = null;
+}
+
 function subscribeToPlayerRoom() {
 
     const sessionId =
@@ -920,14 +1070,18 @@ function subscribeToPlayerRoom() {
                     filter:
                         `id=eq.${sessionId}`
                 },
-                payload => {
-                    currentPlayerRoom = {
-                        ...currentPlayerRoom,
-                        ...payload.new
-                    };
+            async payload => {
+                currentPlayerRoom = {
+                    ...currentPlayerRoom,
+                    ...payload.new
+                };
 
-                    updatePlayerRoomStatus();
+                if (payload.new.status === "active") {
+                    await reloadPlayerCardFromDatabase();
                 }
+
+                updatePlayerRoomStatus();
+            }
             )
             .subscribe();
 }
@@ -1035,7 +1189,8 @@ function renderPlayerItemTray() {
 
         itemCard.draggable =
             !itemIsUsed &&
-            !cardIsLocked;
+            !cardIsLocked &&
+            supportsPreciseDragging;
 
         if (itemIsUsed) {
             itemCard.classList.add(
@@ -1281,6 +1436,7 @@ function renderPlayerBingoGrid() {
 
             if (
                 item &&
+                supportsPreciseDragging &&
                 currentPlayerRoom.status ===
                     "lobby" &&
                 currentBingoPlayer?.is_ready !==
@@ -1394,6 +1550,73 @@ function placePlayerItem(
 
     renderPlayerItemTray();
     renderPlayerBingoGrid();
+}
+
+function schedulePlayerCardDraftSave() {
+
+    clearTimeout(
+        playerDraftSaveTimer
+    );
+
+    playerDraftSaveTimer =
+        setTimeout(
+            () => {
+
+                if (
+                    !currentBingoPlayer?.id ||
+                    currentPlayerRoom?.status !==
+                        "lobby" ||
+                    currentBingoPlayer
+                        ?.is_ready === true
+                ) {
+                    return;
+                }
+
+                const positions = [];
+                const itemIds = [];
+
+                playerCardItems.forEach(
+                    (itemId, index) => {
+                        if (itemId !== null) {
+                            positions.push(
+                                index + 1
+                            );
+
+                            itemIds.push(
+                                Number(itemId)
+                            );
+                        }
+                    }
+                );
+
+                playerDraftSaveChain =
+                    playerDraftSaveChain
+                        .then(
+                            () =>
+                                dbSaveBingoCardDraft(
+                                    currentBingoPlayer.id,
+                                    positions,
+                                    itemIds
+                                )
+                        )
+                        .then(result => {
+                            if (result.error) {
+                                showPageMessage(
+                                    "Your card draft could not be saved.",
+                                    "error"
+                                );
+                            }
+                        })
+                        .catch(error => {
+                            console.error(
+                                "Bingo draft save error:",
+                                error
+                            );
+                        });
+
+            },
+            500
+        );
 }
 
 async function markPlayerBingoCell(
@@ -1708,6 +1931,92 @@ teacherSetupForm.addEventListener(
                 return;
             }
 
+            let savedSetId =
+                selectedSavedBingoSetId;
+
+            if (saveBingoSetCheckbox.checked) {
+                if (session.user?.is_anonymous) {
+                    showPageMessage(
+                        "Please log in with a regular account to save this Bingo Game.",
+                        "error"
+                    );
+
+                    return;
+                }
+
+                const saveResult =
+                    await dbSaveBingoSet({
+                        name:
+                            bingoNameInput.value.trim(),
+
+                        languageId:
+                            Number(
+                                languageSelect.value
+                            ),
+
+                        gridSize:
+                            Number(
+                                gridSizeSelect.value
+                            ),
+
+                        hasFreeCenter:
+                            freeCenterCheckbox.checked,
+
+                        hostDisplayMode:
+                            hostDisplayMode.value,
+
+                        playerDisplayMode:
+                            playerDisplayMode.value,
+
+                        itemIds:
+                            itemPool.map(
+                                item =>
+                                    Number(item.id)
+                            )
+                    });
+
+                if (saveResult.error) {
+                    const errorMessage =
+                        saveResult.error.message || "";
+
+                    const duplicateName =
+                        errorMessage.includes(
+                            "already have a Bingo set"
+                        );
+
+                    const reachedFreeLimit =
+                        errorMessage.includes(
+                            "Free accounts can save up to 5"
+                        );
+
+                    let message =
+                        "The Bingo setup could not be saved.";
+
+                    if (duplicateName) {
+                        message =
+                            "You already have a Bingo game with this name.";
+                    } else if (reachedFreeLimit) {
+                        message =
+                            "You have reached the free limit of 5 saved Bingo games. Delete one or upgrade to Premium.";
+                    }
+
+                    showPageMessage(
+                        message,
+                        "error"
+                    );
+
+                    return;
+                }
+
+                const savedSet =
+                    Array.isArray(saveResult.data)
+                        ? saveResult.data[0]
+                        : saveResult.data;
+
+                savedSetId =
+                    savedSet?.id || null;
+            }
+
             const result =
                 await dbCreateBingoSession({
                     name:
@@ -1743,7 +2052,7 @@ teacherSetupForm.addEventListener(
                                 Number(item.id)
                         ),
 
-                    setId: null
+                    setId: savedSetId
                 });
 
             if (result.error) {
@@ -1760,10 +2069,34 @@ teacherSetupForm.addEventListener(
                     ? result.data[0]
                     : result.data;
 
-            hostRoomCode.textContent =
+            const roomCode =
                 currentBingoSession?.room_code ||
                 currentBingoSession?.code ||
-                "------";
+                "";
+
+            hostRoomCode.textContent =
+                roomCode || "------";
+
+            const studentJoinUrl =
+                new URL(window.location.href);
+
+            studentJoinUrl.search = "";
+            studentJoinUrl.hash = "";
+
+            studentJoinUrl.searchParams.set(
+                "room",
+                roomCode
+            );
+
+            QrUtils.create({
+                qrElement:
+                    hostRoomQr,
+
+                text:
+                    studentJoinUrl.toString(),
+
+                size: 160
+            });
 
             hostPlayerCount.textContent =
                 "0";
@@ -1790,6 +2123,14 @@ teacherSetupForm.addEventListener(
                 "hidden"
             );
 
+            startBingoGameBtn.classList.remove(
+                "hidden"
+            );
+
+            startBingoGameBtn.disabled = false;
+            startBingoGameBtn.textContent =
+                "Start Game";
+
             showView(hostGameView);
             renderTeacherPicker();
 
@@ -1813,6 +2154,11 @@ teacherSetupForm.addEventListener(
             createRoomBtn.disabled = false;
             createRoomBtn.textContent =
                 "Create Bingo Room";
+
+            playBingoAgainBtn.disabled = false;
+            playBingoAgainBtn.textContent =
+                "Play Again";
+
         }
     }
 );
@@ -1831,7 +2177,7 @@ joinGameForm.addEventListener(
         const displayName =
             playerNameInput.value.trim();
 
-        if (displayName.length > 20) {
+        if (displayName.length > 15) {
             showPageMessage(
                 "Player names can contain no more than 15 characters.",
                 "error"
@@ -1917,12 +2263,42 @@ joinGameForm.addEventListener(
 
             selectedTrayItemId = null;
 
+            const totalSquares =
+                Number(
+                    currentPlayerRoom.grid_size
+                ) ** 2;
+
             playerCardItems =
-                Array(
-                    Number(
-                        currentPlayerRoom.grid_size
-                    ) ** 2
-                ).fill(null);
+                Array(totalSquares).fill(null);
+
+            const savedCellsResult =
+                await dbGetBingoPlayerCells(
+                    currentBingoPlayer.id
+                );
+
+            if (savedCellsResult.error) {
+                showPageMessage(
+                    "Your saved Bingo card could not be restored.",
+                    "error"
+                );
+
+                return;
+            }
+
+            savedPlayerCells =
+                savedCellsResult.data;
+
+            savedPlayerCells.forEach(cell => {
+                if (
+                    !cell.is_free &&
+                    cell.item_id !== null
+                ) {
+                    playerCardItems[
+                        Number(cell.position) - 1
+                    ] =
+                        Number(cell.item_id);
+                }
+            });
 
             showView(playerGameView);
 
@@ -1961,6 +2337,14 @@ joinGameForm.addEventListener(
 playerReadyBtn.addEventListener(
     "click",
     async () => {
+
+        clearTimeout(
+            playerDraftSaveTimer
+        );
+
+        playerDraftSaveTimer = null;
+
+        await playerDraftSaveChain;
 
         const completedItems =
             getCompletedPlayerCardItems();
@@ -2180,6 +2564,8 @@ pickNextItemBtn.addEventListener(
     "click",
     async () => {
 
+        await PickerUtils.prepareAudio();
+
         const sessionId =
             currentBingoSession?.id ||
             currentBingoSession?.session_id;
@@ -2254,6 +2640,17 @@ pickNextItemBtn.addEventListener(
                 return;
             }
 
+            await PickerUtils.animateSelection({
+                container:
+                    teacherPickerItems,
+
+                selectedItemId:
+                    calledItemId,
+
+                duration:
+                    1000
+            });
+
             pickedHostItemIds.add(
                 calledItemId
             );
@@ -2277,7 +2674,17 @@ pickNextItemBtn.addEventListener(
                     hostDisplayMode.value
             });
 
-            clearPageMessage();
+            if (
+                pickedHostItemIds.size >=
+                hostPickerItems.length
+            ) {
+                showPageMessage(
+                    "All items have been selected. Finish the game when everyone is ready.",
+                    "success"
+                );
+            } else {
+                clearPageMessage();
+            }
 
         } catch (error) {
             console.error(
@@ -2400,15 +2807,6 @@ finishBingoGameBtn.addEventListener(
             return;
         }
 
-        const shouldFinish =
-            window.confirm(
-                "Finish this Bingo game? Student cards and temporary game data will be permanently deleted."
-            );
-
-        if (!shouldFinish) {
-            return;
-        }
-
         finishBingoGameBtn.disabled = true;
         finishBingoGameBtn.textContent =
             "Finishing...";
@@ -2471,93 +2869,44 @@ finishBingoGameBtn.addEventListener(
                 "Finish Game";
         }
     }
-);finishBingoGameBtn.addEventListener(
+);
+
+playBingoAgainBtn.addEventListener(
     "click",
-    async () => {
+    () => {
 
-        const sessionId =
-            currentBingoSession?.id ||
-            currentBingoSession?.session_id;
+        playBingoAgainBtn.disabled = true;
+        playBingoAgainBtn.textContent =
+            "Creating Room...";
 
-        if (!sessionId) {
-            showPageMessage(
-                "The Bingo room information is missing.",
-                "error"
-            );
+        availableBingoItems = [
+            ...hostPickerItems
+        ];
 
-            return;
-        }
+        teacherItemMode = "specific";
 
-        const shouldFinish =
-            window.confirm(
-                "Finish this Bingo game? Student cards and temporary game data will be permanently deleted."
-            );
-
-        if (!shouldFinish) {
-            return;
-        }
-
-        finishBingoGameBtn.disabled = true;
-        finishBingoGameBtn.textContent =
-            "Finishing...";
-
-        try {
-            await showHostFinalResults();
-
-            const result =
-                await dbFinishBingoSession(
-                    sessionId
-                );
-
-            if (result.error) {
-                hostFinalResults.classList.add(
-                    "hidden"
-                );
-
-                teacherPicker.classList.remove(
-                    "hidden"
-                );
-
-                hostFinishControls.classList.remove(
-                    "hidden"
-                );
-
-                showPageMessage(
-                    "The Bingo game could not be finished.",
-                    "error"
-                );
-
-                return;
+        teacherItemModeInputs.forEach(
+            input => {
+                input.checked =
+                    input.value ===
+                    "specific";
             }
+        );
 
-            currentBingoSession = {
-                ...currentBingoSession,
-                status: "finished"
-            };
+        selectedPoolItemIds.clear();
 
-            showPageMessage(
-                "The Bingo game has finished.",
-                "success"
-            );
+        availableBingoItems.forEach(
+            item => {
+                selectedPoolItemIds.add(
+                    Number(item.id)
+                );
+            }
+        );
 
-        } catch (error) {
-            console.error(
-                "Finish Bingo game error:",
-                error
-            );
+        categorySelect.required = false;
+        saveBingoSetCheckbox.checked = false;
 
-            showPageMessage(
-                "The Bingo game could not be finished.",
-                "error"
-            );
-
-        } finally {
-            finishBingoGameBtn.disabled =
-                false;
-
-            finishBingoGameBtn.textContent =
-                "Finish Game";
-        }
+        teacherSetupForm.requestSubmit();
     }
 );
 
@@ -2636,6 +2985,327 @@ teacherItemModeInputs.forEach(input => {
     );
 });
 
+savedBingoSetSelect.addEventListener(
+    "change",
+    async () => {
+        const setId =
+            Number(
+                savedBingoSetSelect.value
+            );
+
+        if (!setId) {
+            selectedSavedBingoSetId =
+                null;
+
+            categorySelect.required =
+                true;
+
+            deleteBingoSetBtn.classList.add(
+                "hidden"
+            );
+
+            savedBingoSetChangeNote.classList.add(
+                "hidden"
+            );
+
+            updateBingoSetShareControls(
+                null
+            );
+
+            return;
+        }
+
+        const selectedSet =
+            savedBingoSets.find(
+                set =>
+                    Number(set.id) ===
+                    setId
+            );
+
+        if (!selectedSet) {
+            return;
+        }
+
+        savedBingoSetSelect.disabled =
+            true;
+
+        try {
+            const result =
+                await dbGetBingoSetItems(
+                    setId,
+                    Number(
+                        selectedSet.language_id
+                    )
+                );
+
+            if (
+                result.error ||
+                result.data.length === 0
+            ) {
+                showPageMessage(
+                    "The saved Bingo set could not be loaded.",
+                    "error"
+                );
+
+                return;
+            }
+
+            selectedSavedBingoSetId =
+                setId;
+
+            deleteBingoSetBtn.classList.remove(
+                "hidden"
+            );
+
+            savedBingoSetChangeNote.classList.remove(
+                "hidden"
+            );
+
+            updateBingoSetShareControls(
+                selectedSet
+            );
+
+            bingoNameInput.value =
+                selectedSet.name;
+
+            languageSelect.value =
+                String(
+                    selectedSet.language_id
+                );
+
+            gridSizeSelect.value =
+                String(
+                    selectedSet.grid_size
+                );
+
+            freeCenterCheckbox.checked =
+                Boolean(
+                    selectedSet.has_free_center
+                );
+
+            hostDisplayMode.value =
+                selectedSet.host_display_mode;
+
+            playerDisplayMode.value =
+                selectedSet.player_display_mode;
+
+            updateGridSettings();
+
+            teacherItemMode =
+                "specific";
+
+            teacherItemModeInputs.forEach(
+                input => {
+                    input.checked =
+                        input.value ===
+                        "specific";
+                }
+            );
+
+            specificPoolControls.classList.remove(
+                "hidden"
+            );
+
+            availableBingoItems =
+                result.data;
+
+            selectedPoolItemIds.clear();
+
+            availableBingoItems.forEach(
+                item => {
+                    selectedPoolItemIds.add(
+                        Number(item.id)
+                    );
+                }
+            );
+
+            categorySelect.required =
+                false;
+
+            saveBingoSetCheckbox.checked =
+                false;
+
+            renderAvailableBingoItems();
+
+            showPageMessage(
+                `"${selectedSet.name}" was loaded.`,
+                "success"
+            );
+
+        } finally {
+            savedBingoSetSelect.disabled =
+                false;
+        }
+    }
+);
+
+deleteBingoSetBtn.addEventListener(
+    "click",
+    async () => {
+        const setId =
+            selectedSavedBingoSetId;
+
+        if (!setId) {
+            return;
+        }
+
+        const selectedSet =
+            savedBingoSets.find(
+                set =>
+                    Number(set.id) ===
+                    Number(setId)
+            );
+
+        const confirmed =
+            window.confirm(
+                `Permanently delete "${selectedSet?.name || "this Bingo set"}"? ` +
+                "This cannot be undone."
+            );
+
+        if (!confirmed) {
+            return;
+        }
+
+        deleteBingoSetBtn.disabled =
+            true;
+
+        deleteBingoSetBtn.textContent =
+            "Deleting...";
+
+        try {
+            const result =
+                await dbDeleteBingoSet(
+                    setId
+                );
+
+            if (result.error) {
+                showPageMessage(
+                    "The saved Bingo set could not be deleted.",
+                    "error"
+                );
+
+                return;
+            }
+
+            selectedSavedBingoSetId =
+                null;
+
+            savedBingoSetSelect.value =
+                "";
+
+            deleteBingoSetBtn.classList.add(
+                "hidden"
+            );
+
+            savedBingoSetChangeNote.classList.add(
+                "hidden"
+            );
+
+            await loadSavedBingoSets();
+
+            showPageMessage(
+                `"${selectedSet?.name || "The Bingo set"}" was permanently deleted. ` +
+                "The currently loaded setup can still be used for this game.",
+                "success"
+            );
+
+        } finally {
+            deleteBingoSetBtn.disabled =
+                false;
+
+            deleteBingoSetBtn.textContent =
+                "Delete Saved Set";
+        }
+    }
+);
+
+createBingoShareLinkBtn.addEventListener(
+    "click",
+    async () => {
+        const selectedSet =
+            savedBingoSets.find(
+                set =>
+                    Number(set.id) ===
+                    Number(
+                        selectedSavedBingoSetId
+                    )
+            );
+
+        if (!selectedSet) {
+            return;
+        }
+
+        createBingoShareLinkBtn.disabled =
+            true;
+
+        createBingoShareLinkBtn.textContent =
+            "Creating Link...";
+
+        try {
+            const slug =
+                selectedSet.slug ||
+                crypto.randomUUID();
+
+            const result =
+                await dbEnableBingoSetSharing(
+                    selectedSet.id,
+                    slug
+                );
+
+            if (result.error) {
+                bingoShareMessage.textContent =
+                    "The teacher share link could not be created.";
+
+                return;
+            }
+
+            Object.assign(
+                selectedSet,
+                result.data
+            );
+
+            updateBingoSetShareControls(
+                selectedSet
+            );
+
+            bingoShareMessage.textContent =
+                "Teacher share link created.";
+
+        } finally {
+            createBingoShareLinkBtn.disabled =
+                false;
+
+            createBingoShareLinkBtn.textContent =
+                "Create Teacher Share Link";
+        }
+    }
+);
+
+copyBingoShareLinkBtn.addEventListener(
+    "click",
+    async () => {
+        try {
+            await navigator.clipboard.writeText(
+                bingoShareLinkInput.value
+            );
+
+            bingoShareMessage.textContent =
+                "Teacher share link copied.";
+
+        } catch (error) {
+            console.error(
+                "Could not copy Bingo share link:",
+                error
+            );
+
+            bingoShareLinkInput.select();
+
+            bingoShareMessage.textContent =
+                "Copy the selected link manually.";
+        }
+    }
+);
+
 selectAllPoolItemsBtn.addEventListener(
     "click",
     () => {
@@ -2689,6 +3359,296 @@ hostWinnerCelebration.addEventListener(
     }
 );
 
+function createBingoSetShareUrl(
+    slug
+) {
+    const shareUrl =
+        new URL(
+            window.location.href
+        );
+
+    shareUrl.search = "";
+    shareUrl.hash = "";
+
+    shareUrl.searchParams.set(
+        "set",
+        slug
+    );
+
+    return shareUrl.toString();
+}
+
+function updateBingoSetShareControls(
+    selectedSet = null
+) {
+    shareBingoSetControls.classList.toggle(
+        "hidden",
+        !selectedSet
+    );
+
+    bingoShareMessage.textContent =
+        "";
+
+    if (!selectedSet) {
+        bingoShareLinkInput.value =
+            "";
+
+        bingoShareLinkContainer.classList.add(
+            "hidden"
+        );
+
+        return;
+    }
+
+    if (
+        selectedSet.is_public &&
+        selectedSet.slug
+    ) {
+        bingoShareLinkInput.value =
+            createBingoSetShareUrl(
+                selectedSet.slug
+            );
+
+        bingoShareLinkContainer.classList.remove(
+            "hidden"
+        );
+
+        createBingoShareLinkBtn.classList.add(
+            "hidden"
+        );
+    } else {
+        bingoShareLinkInput.value =
+            "";
+
+        bingoShareLinkContainer.classList.add(
+            "hidden"
+        );
+
+        createBingoShareLinkBtn.classList.remove(
+            "hidden"
+        );
+    }
+}
+
+async function loadSavedBingoSets() {
+    const result =
+        await dbGetMyBingoSets();
+
+    savedBingoSets =
+        result.data || [];
+
+    savedBingoSetSelect.innerHTML = "";
+
+    const defaultOption =
+        document.createElement(
+            "option"
+        );
+
+    defaultOption.value = "";
+    defaultOption.textContent =
+        "Choose a saved Bingo set";
+
+    savedBingoSetSelect.appendChild(
+        defaultOption
+    );
+
+    savedBingoSets.forEach(set => {
+        const option =
+            document.createElement(
+                "option"
+            );
+
+        option.value =
+            String(set.id);
+
+        option.textContent =
+            set.name;
+
+        savedBingoSetSelect.appendChild(
+            option
+        );
+    });
+
+    savedBingoSetsControl.classList.toggle(
+        "hidden",
+        savedBingoSets.length === 0
+    );
+}
+
+async function loadSharedBingoSet(
+    slug
+) {
+    const session =
+        await ensureBingoAuthSession();
+
+    if (!session) {
+        showPageMessage(
+            "The shared Bingo set could not be opened.",
+            "error"
+        );
+
+        return false;
+    }
+
+    const setResult =
+        await dbGetSharedBingoSet(
+            slug
+        );
+
+    const sharedSet =
+        setResult.data;
+
+    if (
+        setResult.error ||
+        !sharedSet
+    ) {
+        showView(teacherSetupView);
+
+        showPageMessage(
+            "This shared Bingo set is no longer available.",
+            "error"
+        );
+
+        return false;
+    }
+
+    const itemsResult =
+        await dbGetBingoSetItems(
+            sharedSet.id,
+            Number(
+                sharedSet.language_id
+            )
+        );
+
+    if (
+        itemsResult.error ||
+        itemsResult.data.length === 0
+    ) {
+        showView(teacherSetupView);
+
+        showPageMessage(
+            "The shared Bingo items could not be loaded.",
+            "error"
+        );
+
+        return false;
+    }
+
+    selectedSavedBingoSetId =
+        sharedSet.id;
+
+    bingoNameInput.value =
+        sharedSet.name;
+
+    languageSelect.value =
+        String(
+            sharedSet.language_id
+        );
+
+    gridSizeSelect.value =
+        String(
+            sharedSet.grid_size
+        );
+
+    freeCenterCheckbox.checked =
+        Boolean(
+            sharedSet.has_free_center
+        );
+
+    hostDisplayMode.value =
+        sharedSet.host_display_mode;
+
+    playerDisplayMode.value =
+        sharedSet.player_display_mode;
+
+    updateGridSettings();
+
+    teacherItemMode =
+        "specific";
+
+    teacherItemModeInputs.forEach(
+        input => {
+            input.checked =
+                input.value ===
+                "specific";
+        }
+    );
+
+    specificPoolControls.classList.remove(
+        "hidden"
+    );
+
+    availableBingoItems =
+        itemsResult.data;
+
+    selectedPoolItemIds.clear();
+
+    availableBingoItems.forEach(
+        item => {
+            selectedPoolItemIds.add(
+                Number(item.id)
+            );
+        }
+    );
+
+    categorySelect.required =
+        false;
+
+    saveBingoSetCheckbox.checked =
+        false;
+
+    renderAvailableBingoItems();
+    showView(teacherSetupView);
+
+    showPageMessage(
+        `"${sharedSet.name}" was shared with you. ` +
+        "You may use it for a game or save your own copy.",
+        "success"
+    );
+
+    return true;
+}
+
+async function updateBingoSaveAccessMessage() {
+    const { data, error } =
+        await db.auth.getSession();
+
+    if (error) {
+        console.error(
+            "Could not check Bingo save access:",
+            error
+        );
+
+        return;
+    }
+
+    const user =
+        data.session?.user;
+
+    const hasRegularAccount =
+        Boolean(
+            user &&
+            !user.is_anonymous
+        );
+
+    bingoSaveLimitMessage.classList.toggle(
+        "hidden",
+        !hasRegularAccount
+    );
+
+    if (!hasRegularAccount) {
+        return;
+    }
+
+    const hasPremium =
+        await dbUserHasPremium();
+
+    bingoSaveLimitMessage.textContent =
+        hasPremium
+            ? "Premium account: Unlimited saved Bingo games."
+            : "Free account: You can save up to 5 Bingo games.";
+}
+
 async function initializeBingoPage() {
     await loadCategories(
         categorySelect
@@ -2722,11 +3682,49 @@ async function initializeBingoPage() {
         () => {}
     );
 
+    await updateBingoSaveAccessMessage();
+
     await loadLanguages(
         languageSelect
     );
 
+    await loadSavedBingoSets();
+
     updateGridSettings();
+
+    const sharedRoomCode =
+        new URLSearchParams(
+            window.location.search
+        )
+            .get("room")
+            ?.trim()
+            .toUpperCase();
+
+    const sharedSetSlug =
+        new URLSearchParams(
+            window.location.search
+        )
+            .get("set")
+            ?.trim();
+
+    if (sharedRoomCode) {
+        roomCodeInput.value =
+            sharedRoomCode
+                .replace(
+                    /[^A-Z0-9]/g,
+                    ""
+                )
+                .slice(0, 6);
+
+        showView(joinGameView);
+        playerNameInput.focus();
+
+    } else if (sharedSetSlug) {
+        await loadSharedBingoSet(
+            sharedSetSlug
+        );
+    }
+
 }
 
 function updateGridSettings() {
@@ -2947,5 +3945,33 @@ async function updateBingoItemsPreview() {
 
     renderAvailableBingoItems();
 }
+
+async function refreshBingoAccountState() {
+    await updateBingoSaveAccessMessage();
+    await loadSavedBingoSets();
+}
+
+window.addEventListener(
+    "focus",
+    refreshBingoAccountState
+);
+
+document.addEventListener(
+    "visibilitychange",
+    () => {
+        if (!document.hidden) {
+            refreshBingoAccountState();
+        }
+    }
+);
+
+db.auth.onAuthStateChange(
+    () => {
+        setTimeout(
+            refreshBingoAccountState,
+            0
+        );
+    }
+);
 
 initializeBingoPage();

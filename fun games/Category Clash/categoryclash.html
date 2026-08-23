@@ -104,6 +104,11 @@
                 Log in to save your board and use it again later.
             </p>
 
+            <p
+                id="save-limit-message"
+                class="hidden"
+            ></p>
+
             <div id="board-name-fields">
                 <label for="board-title">
                     Board Name
@@ -215,12 +220,21 @@
         <div id="board-container">
         
             <div id="board"></div>
-            <div id="question-modal" 
+            <div
+                id="question-modal"
                 class="hidden"
                 tabindex="0"
                 role="dialog"
                 aria-modal="true"
             >
+                <div
+                    id="question-timer"
+                    class="question-timer"
+                    aria-live="polite"
+                >
+                    30
+                </div>
+
                 <div id="question-content"></div>
             </div>
                 
@@ -247,6 +261,7 @@
 <script src="../../js/supabase.js"></script>
 <script src="../../js/storage.js"></script>
 <script src="../../js/database.js"></script>
+<script src="../../js/soundUtils.js"></script>
 
 <script src="script.js"></script>
 

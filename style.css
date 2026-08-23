@@ -15,6 +15,11 @@
   --category-background: #fefce8;
 }
 
+.green {
+  --category-color: #15803d;
+  --category-background: #bbf7d0;
+}
+
 html {
   scroll-behavior: smooth;
 }

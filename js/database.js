@@ -2220,6 +2220,387 @@ async function dbGetBingoItems(
         .filter(Boolean);
 }
 
+async function dbSaveBingoSet({
+    name,
+    languageId,
+    gridSize,
+    hasFreeCenter,
+    hostDisplayMode,
+    playerDisplayMode,
+    itemIds
+}) {
+    const { data, error } =
+        await db.rpc(
+            "save_bingo_set",
+            {
+                input_name:
+                    name,
+
+                input_language_id:
+                    languageId,
+
+                input_grid_size:
+                    gridSize,
+
+                input_has_free_center:
+                    hasFreeCenter,
+
+                input_host_display_mode:
+                    hostDisplayMode,
+
+                input_player_display_mode:
+                    playerDisplayMode,
+
+                input_item_ids:
+                    itemIds
+            }
+        );
+
+    if (error) {
+        console.error(
+            "Could not save Bingo set:",
+            error
+        );
+
+        return {
+            data: null,
+            error
+        };
+    }
+
+    return {
+        data,
+        error: null
+    };
+}
+
+async function dbGetMyBingoSets() {
+    const userResult =
+        await db.auth.getUser();
+
+    const user =
+        userResult.data?.user;
+
+    if (
+        userResult.error ||
+        !user ||
+        user.is_anonymous
+    ) {
+        return {
+            data: [],
+            error:
+                userResult.error || null
+        };
+    }
+
+    const { data, error } =
+        await db
+            .from("bingo_sets")
+            .select(`
+                id,
+                name,
+                language_id,
+                slug,
+                is_public,
+                grid_size,
+                has_free_center,
+                host_display_mode,
+                player_display_mode,
+                created_at,
+                updated_at
+            `)
+            .eq(
+                "owner_id",
+                user.id
+            )
+            .eq(
+                "active",
+                true
+            )
+            .order(
+                "updated_at",
+                {
+                    ascending: false
+                }
+            );
+
+    if (error) {
+        console.error(
+            "Could not load saved Bingo sets:",
+            error
+        );
+
+        return {
+            data: [],
+            error
+        };
+    }
+
+    return {
+        data: data || [],
+        error: null
+    };
+}
+
+async function dbGetBingoSetItems(
+    setId,
+    languageId
+) {
+    const {
+        data: setItemRows,
+        error: setItemsError
+    } =
+        await db
+            .from("bingo_set_items")
+            .select(
+                "item_id, position"
+            )
+            .eq(
+                "set_id",
+                setId
+            )
+            .order(
+                "position",
+                {
+                    ascending: true
+                }
+            );
+
+    if (setItemsError) {
+        console.error(
+            "Could not load Bingo set items:",
+            setItemsError
+        );
+
+        return {
+            data: [],
+            error: setItemsError
+        };
+    }
+
+    const itemIds =
+        (setItemRows || []).map(
+            row =>
+                Number(row.item_id)
+        );
+
+    if (itemIds.length === 0) {
+        return {
+            data: [],
+            error: null
+        };
+    }
+
+    const [
+        itemsResult,
+        translationsResult
+    ] =
+        await Promise.all([
+            db
+                .from("items")
+                .select(
+                    "id, image_url, active"
+                )
+                .in(
+                    "id",
+                    itemIds
+                )
+                .eq(
+                    "active",
+                    true
+                ),
+
+            db
+                .from("translations")
+                .select(
+                    "item_id, text"
+                )
+                .in(
+                    "item_id",
+                    itemIds
+                )
+                .eq(
+                    "language_id",
+                    languageId
+                )
+        ]);
+
+    if (
+        itemsResult.error ||
+        translationsResult.error
+    ) {
+        const error =
+            itemsResult.error ||
+            translationsResult.error;
+
+        console.error(
+            "Could not load the saved Bingo items:",
+            error
+        );
+
+        return {
+            data: [],
+            error
+        };
+    }
+
+    const orderedItems =
+        itemIds
+            .map(itemId => {
+                const item =
+                    itemsResult.data.find(
+                        row =>
+                            Number(row.id) ===
+                            itemId
+                    );
+
+                if (!item) {
+                    return null;
+                }
+
+                const translation =
+                    translationsResult.data.find(
+                        row =>
+                            Number(row.item_id) ===
+                            itemId
+                    );
+
+                return {
+                    id:
+                        itemId,
+
+                    name:
+                        translation?.text ||
+                        "(No translation)",
+
+                    url:
+                        item.image_url
+                };
+            })
+            .filter(Boolean);
+
+    return {
+        data: orderedItems,
+        error: null
+    };
+}
+
+async function dbDeleteBingoSet(
+    setId
+) {
+    const { data, error } =
+        await db.rpc(
+            "delete_bingo_set",
+            {
+                input_set_id:
+                    setId
+            }
+        );
+
+    if (error) {
+        console.error(
+            "Could not delete Bingo set:",
+            error
+        );
+
+        return {
+            data: null,
+            error
+        };
+    }
+
+    return {
+        data,
+        error: null
+    };
+}
+
+async function dbEnableBingoSetSharing(
+    setId,
+    slug
+) {
+    const { data, error } =
+        await db.rpc(
+            "enable_bingo_set_sharing",
+            {
+                input_set_id:
+                    setId,
+
+                input_slug:
+                    slug
+            }
+        );
+
+    if (error) {
+        console.error(
+            "Could not create Bingo share link:",
+            error
+        );
+
+        return {
+            data: null,
+            error
+        };
+    }
+
+    return {
+        data:
+            Array.isArray(data)
+                ? data[0]
+                : data,
+
+        error: null
+    };
+}
+
+async function dbGetSharedBingoSet(
+    slug
+) {
+    const { data, error } =
+        await db
+            .from("bingo_sets")
+            .select(`
+                id,
+                name,
+                slug,
+                language_id,
+                grid_size,
+                has_free_center,
+                host_display_mode,
+                player_display_mode
+            `)
+            .eq(
+                "slug",
+                slug
+            )
+            .eq(
+                "is_public",
+                true
+            )
+            .eq(
+                "active",
+                true
+            )
+            .maybeSingle();
+
+    if (error) {
+        console.error(
+            "Could not load shared Bingo set:",
+            error
+        );
+
+        return {
+            data: null,
+            error
+        };
+    }
+
+    return {
+        data,
+        error: null
+    };
+}
+
 async function dbCreateBingoSession({
     name,
     languageId,
@@ -2508,7 +2889,6 @@ async function dbSaveBingoPlayerCard(
         error: null
     };
 }
-
 
 async function dbSetBingoPlayerReady(
     playerId,
@@ -2804,6 +3184,44 @@ async function dbFinishBingoSession(
     };
 }
 
+async function dbSaveBingoCardDraft(
+    playerId,
+    positions,
+    itemIds
+) {
+    const { data, error } =
+        await db.rpc(
+            "save_bingo_card_draft",
+            {
+                input_player_id:
+                    playerId,
+
+                input_positions:
+                    positions,
+
+                input_item_ids:
+                    itemIds
+            }
+        );
+
+    if (error) {
+        console.error(
+            "Could not save Bingo card draft:",
+            error
+        );
+
+        return {
+            data: null,
+            error
+        };
+    }
+
+    return {
+        data,
+        error: null
+    };
+}
+
 // ADMIN
 
 async function dbGetAdminCategoryClashBoards(
@@ -2941,4 +3359,24 @@ async function dbUnpublishCategoryClashPreset(
     }
 
     return Boolean(data);
+}
+
+// SUBSCRIPTION
+
+async function dbUserHasPremium() {
+    const { data, error } =
+        await db.rpc(
+            "user_has_premium"
+        );
+
+    if (error) {
+        console.error(
+            "Could not check Premium access:",
+            error
+        );
+
+        return false;
+    }
+
+    return data === true;
 }

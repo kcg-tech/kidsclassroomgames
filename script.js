@@ -16,6 +16,14 @@ const categorySections = [
     section: "fun-games"
   },
   {
+    title: "Live Games",
+    description:
+      "Create live game rooms where teachers and students can play together on different devices.",
+    color: "green",
+    id: "live-games",
+    section: "live-games"
+  },
+  {
     title: "Random Pickers",
     description:
       "Make quick random classroom selections for names, numbers, and activities.",

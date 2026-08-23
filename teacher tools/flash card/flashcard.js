@@ -35,6 +35,16 @@ const cardSides =
         "cardSides"
     );
 
+const twoSidedOption =
+    document.getElementById(
+        "twoSidedOption"
+    );
+
+const twoSidedLoginMessage =
+    document.getElementById(
+        "twoSidedLoginMessage"
+    );
+
 const backLanguageControl =
     document.getElementById(
         "backLanguageControl"
@@ -67,6 +77,55 @@ const previewPages =
 
 let generatedItems = [];
 let generatedBackItems = [];
+let isFlashcardUserLoggedIn = false;
+
+async function updateFlashcardLoginAccess() {
+    const { data, error } =
+        await db.auth.getSession();
+
+    if (error) {
+        console.error(
+            "Could not check flashcard login:",
+            error
+        );
+
+        isFlashcardUserLoggedIn = false;
+    } else {
+        const user =
+            data.session?.user;
+
+        isFlashcardUserLoggedIn =
+            Boolean(
+                user &&
+                !user.is_anonymous
+            );
+    }
+
+    twoSidedOption.disabled =
+        !isFlashcardUserLoggedIn;
+
+    twoSidedOption.textContent =
+        isFlashcardUserLoggedIn
+            ? "Two-sided"
+            : "Two-sided — Login required";
+
+    twoSidedLoginMessage.classList.toggle(
+        "hidden",
+        isFlashcardUserLoggedIn
+    );
+
+    if (
+        !isFlashcardUserLoggedIn &&
+        cardSides.value === "two-sided"
+    ) {
+        cardSides.value =
+            "one-sided";
+
+        backLanguageControl.classList.add(
+            "hidden"
+        );
+    }
+}
 
 cardSides.addEventListener("change", () => {
     const isTwoSided =
@@ -319,6 +378,21 @@ function createTwoSidedPreview(
 }
 
 async function generateFlashCards() {
+
+    const requestedTwoSided =
+        cardSides.value === "two-sided";
+
+    if (requestedTwoSided) {
+        await updateFlashcardLoginAccess();
+
+        if (!isFlashcardUserLoggedIn) {
+            alert(
+                "Please log in or create a free account to generate two-sided flashcards."
+            );
+
+            return;
+        }
+    }
 
     const selectedCategoryId =
         categorySelect.value;
@@ -869,6 +943,21 @@ async function addJapaneseFont(pdf) {
 
 async function downloadPdf() {
 
+    const downloadingTwoSided =
+        generatedBackItems.length > 0;
+
+    if (downloadingTwoSided) {
+        await updateFlashcardLoginAccess();
+
+        if (!isFlashcardUserLoggedIn) {
+            alert(
+                "Please log in or create a free account to download two-sided flashcards."
+            );
+
+            return;
+        }
+    }
+
     downloadPdfBtn.disabled = true;
 
     downloadPdfBtn.classList.add(
@@ -1170,6 +1259,7 @@ function reset() {
 
 async function initialize() {
 
+    await updateFlashcardLoginAccess();
 
     await loadCategories(
         categorySelect
@@ -1198,5 +1288,28 @@ async function initialize() {
     );
 
 }
+
+window.addEventListener(
+    "focus",
+    updateFlashcardLoginAccess
+);
+
+document.addEventListener(
+    "visibilitychange",
+    () => {
+        if (!document.hidden) {
+            updateFlashcardLoginAccess();
+        }
+    }
+);
+
+db.auth.onAuthStateChange(
+    () => {
+        setTimeout(
+            updateFlashcardLoginAccess,
+            0
+        );
+    }
+);
 
 initialize();

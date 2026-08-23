@@ -31,6 +31,11 @@ const modalContent =
         'question-content'
     );
 
+const questionTimer =
+    document.getElementById(
+        "question-timer"
+    );
+
 const imagePickerModal =
     document.getElementById(
         "image-picker-modal"
@@ -79,6 +84,11 @@ const saveBoardMessage =
 const loginSaveMessage =
     document.getElementById(
         "login-save-message"
+    );
+
+const saveLimitMessage =
+    document.getElementById(
+        "save-limit-message"
     );
 
 const boardNameFields =
@@ -155,12 +165,16 @@ let showingAnswer = null;
 let currentquizCell = null;
 let showingReward = false;
 let activeImageTargetId = null;
+let questionTimerId = null;
+let questionTimeRemaining = 30;
 
 let availableBoards = [];
 let imageLibraryItems = [];
 let imageLibraryCategories = [];
 let imageLibraryTags = [];
 let activeBoardData = [];
+
+
 
 const rewardList = [
     {
@@ -1192,7 +1206,9 @@ async function getUserInput(event) {
     const session =
         data.session;
 
-    if (!session) {
+    if (
+        !session ||
+        session.user?.is_anonymous) {
 
         presetSelect.value = "select";
         updateBoardManagementControls();        
@@ -1285,8 +1301,21 @@ submitBtn.textContent =
                 );
 
             if (result.error) {
+                const reachedFreeLimit =
+                    result.error.message?.includes(
+                        "Free accounts can save up to 5"
+                    );
+
                 saveBoardMessage.textContent =
-                    "The board could not be saved.";
+                    reachedFreeLimit
+                        ? "You have reached the free limit of 5 Tornado boards. Delete one or upgrade to Premium."
+                        : "The board could not be saved.";
+
+                if (reachedFreeLimit) {
+                    alert(
+                        "You have reached the free limit of 5 Tornado boards. Delete one or upgrade to Premium."
+                    );
+                }
 
                 return;
             }
@@ -1869,10 +1898,12 @@ function renderBoard(boardData) {
 
             quizCell.addEventListener(
                 "click",
-                () => {
+                async () => {
                     if (question.used) {
                         return;
                     }
+
+                    await SoundUtils.prepare();
 
                     currentquizCell =
                         quizCell;
@@ -1927,6 +1958,105 @@ function showModalTextAndImage(
     );
 }
 
+function updateQuestionTimerDisplay() {
+    questionTimer.classList.remove(
+        "warning",
+        "danger",
+        "finished"
+    );
+
+    SoundUtils.playTimerTick({
+        secondsRemaining:
+            questionTimeRemaining,
+
+        totalSeconds:
+            30
+    });
+
+    if (questionTimeRemaining <= 0) {
+        questionTimer.textContent =
+            "TIME'S UP!";
+
+        questionTimer.classList.add(
+            "finished"
+        );
+
+        return;
+    }
+
+    questionTimer.textContent =
+        String(questionTimeRemaining);
+
+    if (questionTimeRemaining <= 5) {
+        questionTimer.classList.add(
+            "danger"
+        );
+
+    } else if (
+        questionTimeRemaining <= 10
+    ) {
+        questionTimer.classList.add(
+            "warning"
+        );
+    }
+}
+
+function stopQuestionTimer() {
+    if (questionTimerId) {
+        clearInterval(
+            questionTimerId
+        );
+
+        questionTimerId = null;
+    }
+}
+
+function hideQuestionTimer() {
+    stopQuestionTimer();
+
+    questionTimer.classList.add(
+        "hidden"
+    );
+}
+
+function startQuestionTimer() {
+    stopQuestionTimer();
+
+    questionTimeRemaining = 30;
+
+    questionTimer.classList.remove(
+        "hidden"
+    );
+
+    updateQuestionTimerDisplay();
+
+    questionTimerId = setInterval(
+        () => {
+            questionTimeRemaining -= 1;
+
+
+            updateQuestionTimerDisplay();
+
+            if (
+                questionTimeRemaining > 0
+            ) {
+                SoundUtils.playTimerTick({
+                    secondsRemaining:
+                        questionTimeRemaining,
+
+                    totalSeconds:
+                        30
+                });
+
+            } else {
+                stopQuestionTimer();
+                SoundUtils.playTimeUp();
+            }
+        },
+        1000
+    );
+}
+
 function showQuestion(question) {
     currentQuestion = question;
     showingAnswer = false;
@@ -1943,6 +2073,8 @@ function showQuestion(question) {
         question.questionImg,
         "Question image"
     );
+
+    startQuestionTimer();
 }
 
 function showReward(question) {
@@ -1953,6 +2085,16 @@ function showReward(question) {
                 question.rewardType
         ) ||
         question.reward;
+
+    if (reward.type === "double") {
+        SoundUtils.playGood("big");
+
+    } else if (reward.type === "switch") {
+        SoundUtils.playGood("normal");
+
+    } else if (reward.type === "tornado") {
+        SoundUtils.playBad();
+    }
 
     modalContent.innerHTML = "";
 
@@ -2039,10 +2181,31 @@ async function updateSaveBoardAccess() {
         return;
     }
 
+    const user =
+        data.session?.user;
+
     const isLoggedIn =
         Boolean(
-            data.session
+            user &&
+            !user.is_anonymous
         );
+
+    const hasPremium =
+        isLoggedIn
+            ? await dbUserHasPremium()
+            : false;
+
+    saveLimitMessage.classList.toggle(
+        "hidden",
+        !isLoggedIn
+    );
+
+    if (isLoggedIn) {
+        saveLimitMessage.textContent =
+            hasPremium
+                ? "Premium account: Unlimited saved boards."
+                : "Free account: You can save up to 5 Tornado boards.";
+    }
 
     loginSaveMessage.classList.toggle(
         "hidden",
@@ -2255,6 +2418,8 @@ modal.addEventListener("click", () => {
     // First click after opening
     if (!showingAnswer) {
         showingAnswer = true;
+
+        hideQuestionTimer();
 
         showModalTextAndImage(
             currentQuestion.answer,

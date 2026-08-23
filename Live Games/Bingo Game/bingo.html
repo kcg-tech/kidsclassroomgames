@@ -71,6 +71,77 @@
             <h2>Create a Bingo Game</h2>
 
             <form id="teacher-setup-form">
+
+                <div
+                    id="saved-bingo-sets-control"
+                    class="setup-control hidden"
+                >
+                    <label for="saved-bingo-set-select">
+                         Saved Bingo Games
+                    </label>
+
+                    <select id="saved-bingo-set-select">
+                        <option value="">
+                            Select a Bingo Game
+                        </option>
+                    </select>
+
+                    <button
+                        type="button"
+                        id="delete-bingo-set-btn"
+                        class="delete-bingo-set-btn hidden"
+                    >
+                        Delete Bingo
+                    </button> 
+
+                    <div
+                        id="share-bingo-set-controls"
+                        class="share-bingo-set-controls hidden"
+                    >
+                        <button
+                            type="button"
+                            id="create-bingo-share-link-btn"
+                            class="secondary-btn"
+                        >
+                            Create Teacher Share Link
+                        </button>
+
+                        <div
+                            id="bingo-share-link-container"
+                            class="bingo-share-link-container hidden"
+                        >
+                            <label for="bingo-share-link">
+                                Share Link to other teachers.
+                            </label>
+
+                            <input
+                                type="text"
+                                id="bingo-share-link"
+                                readonly
+                            >
+
+                            <button
+                                type="button"
+                                id="copy-bingo-share-link-btn"
+                                class="secondary-btn"
+                            >
+                                Copy Link
+                            </button>
+                        </div>
+
+                        <p id="bingo-share-message"></p>
+                    </div>
+
+                    <p
+                        id="saved-bingo-set-change-note"
+                        class="saved-bingo-set-change-note hidden"
+                    >
+                        Changes you make after loading this set apply only to this game.
+                        To keep the changes, enter a new game name and save it as a new Bingo set.
+                    </p>
+                                        
+                </div>
+
                 <div class="setup-control">
                     <label for="bingo-name-input">
                         Game Name
@@ -277,6 +348,29 @@
                     </select>
                 </fieldset>
 
+                <div
+                    id="save-bingo-set-control"
+                    class="setup-control"
+                >
+                    <label>
+                        <input
+                            type="checkbox"
+                            id="save-bingo-set-checkbox"
+                        >
+                        Save this BINGO to My Account
+                    </label>
+
+                    <p class="save-bingo-set-note">
+                        A regular account is required to save reusable Bingo Game.
+                    </p>
+
+                    <p
+                        id="bingo-save-limit-message"
+                        class="save-bingo-set-note hidden"
+                    ></p>
+
+                </div>
+
 
                 <button
                     type="submit"
@@ -285,6 +379,7 @@
                 >
                     Create Bingo Room
                 </button>
+
             </form>
 
             <button
@@ -323,7 +418,7 @@
                 <input
                     type="text"
                     id="player-name-input"
-                    maxlength="20"
+                    maxlength="15"
                     autocomplete="nickname"
                     required
                 >
@@ -370,6 +465,20 @@
                     <p>
                         Share this code with your students.
                     </p>
+
+                    <div
+                        id="host-qr-container"
+                        class="host-qr-container"
+                        role="button"
+                        tabindex="0"
+                        aria-label="Enlarge room QR code"
+                    >
+                        <div id="host-room-qr"></div>
+
+                        <p class="host-qr-instruction">
+                            Click QR code to enlarge
+                        </p>
+                    </div>
 
                     <div class="host-lobby-status">
                         <p>
@@ -463,6 +572,15 @@
                         id="host-final-standings"
                         class="host-final-standings"
                     ></div>
+
+                    <button
+                        type="button"
+                        id="play-bingo-again-btn"
+                        class="primary-btn"
+                    >
+                        Play Again
+                    </button>
+
                 </section>
 
                 <section
@@ -625,7 +743,9 @@
 
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    
+    <script src="../../js/qrUtils.js"></script>
     <script src="../../js/config.js"></script>
     <script src="../../js/utils.js"></script>
     <script src="../../js/supabase.js"></script>

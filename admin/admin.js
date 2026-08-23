@@ -1692,6 +1692,9 @@ function getHomepageSectionLabel(
         "fun-games":
             "Fun Games",
 
+        "live-games":
+            "Live Games",
+
         "random-pickers":
             "Random Pickers"
     };
