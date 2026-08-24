@@ -860,7 +860,10 @@ languageId = 1) {
     let filteredGameItems =
         gameItems;
 
-    if (categoryId) {
+    if (
+        categoryId &&
+        categoryId !== "browse-by-tag"
+    ) {
 
         filteredGameItems =
             gameItems.filter(
@@ -896,7 +899,7 @@ languageId = 1) {
 
 
     };
-//added here
+
     filteredGameItems =
         filteredGameItems.filter(
             gameItem =>
@@ -917,6 +920,9 @@ languageId = 1) {
                 );
 
             return {
+
+                id: 
+                    gameItem.item_id,
 
                 name:
                     englishTranslation

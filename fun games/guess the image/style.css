@@ -3,53 +3,173 @@
 }
 
 body {
-    font-family: "Comic Sans MS", "Comic Sans", cursive;
-    background-image: url("../../images/home/kcgbackground.png");
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-color: beige;
+    min-height: 100vh;
+    margin: 0;
+    padding: 24px 0 50px;
 
+    font-family:
+        "Comic Sans MS",
+        "Comic Sans",
+        cursive;
+
+    color: #172b63;
+
+    background-color: #f5f8ff;
+    background-image:
+        url("../../images/home/kcgbackground.png");
+    background-repeat: repeat;
+    background-size: 420px;
 }
 
+#setup-page header {
+    width: min(900px, 92vw);
+    margin: 0 auto 24px;
+    padding: 24px;
 
-header {
     text-align: center;
+
+    border: 4px solid #2f66e8;
+    border-radius: 24px;
+
+    background:
+        rgba(255, 255, 255, 0.96);
+
+    box-shadow:
+        0 10px 24px
+        rgba(47, 102, 232, 0.15);
+}
+
+#setup-page header h1 {
+    margin: 0 0 8px;
+
+    color: #2f66e8;
+
+    font-size:
+        clamp(30px, 5vw, 52px);
+}
+
+#setup-page header p {
+    margin: 0;
+
+    color: #172b63;
+
+    font-size:
+        clamp(17px, 2vw, 22px);
+
+    font-weight: bold;
 }
 
 .controls {
-    background-color: #f9f9f9;
+    width: min(900px, 92vw);
+    margin: 24px auto;
+    padding: clamp(20px, 4vw, 36px);
+
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    border: 2px double gray;
-    padding: 30px;
-    margin: 20px;
-    gap: 10px;
+    gap: 22px;
 
+    border: 4px solid #2f66e8;
+    border-radius: 24px;
+
+    background:
+        rgba(255, 255, 255, 0.96);
+
+    box-shadow:
+        0 10px 24px
+        rgba(47, 102, 232, 0.15);
 }
 
-
-.controls div {
+.controls > div {
     display: flex;
     flex-direction: column;
+    gap: 8px;
 }
 
-.btn-container{
-    margin-top: 2.5vh;
+.controls label,
+.controls h3,
+.controls legend {
+    margin: 0;
+
+    color: #172b63;
+
+    font-size:
+        clamp(18px, 2vw, 24px);
+
+    font-weight: bold;
+}
+
+.controls select {
+    width: 100%;
+    min-height: 52px;
+    padding: 10px 14px;
+
+    border: 3px solid #b8d0ff;
+    border-radius: 14px;
+
+    background: white;
+    color: #172b63;
+
+    font: inherit;
+}
+
+.controls select:focus {
+    outline: 3px solid
+        rgba(47, 102, 232, 0.2);
+
+    border-color: #2f66e8;
+}
+
+.btn-container {
+    width: min(900px, 92vw);
+    margin: 24px auto;
+
     display: flex;
-    justify-content: space-around;
-    
+    justify-content: center;
 }
 
 #start-btn {
-    border: 2px solid gray;
-    background-color: green;
-     color: white;
-    width: 25%;
-    height: 90%;
-    padding: 10px;
-    font-size: 30px;
+    width: min(420px, 100%);
+    min-height: 64px;
+
+    padding: 14px 24px;
+
+    border: none;
+    border-radius: 16px;
+
+    color: white;
+    background: #16a85a;
+
+    font: inherit;
+    font-size:
+        clamp(20px, 2.5vw, 28px);
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 6px 0
+        rgba(0, 0, 0, 0.18);
+
+    transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+#start-btn:hover {
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 8px 0
+        rgba(0, 0, 0, 0.18);
+}
+
+#start-btn:active {
+    transform: translateY(3px);
+
+    box-shadow:
+        0 3px 0
+        rgba(0, 0, 0, 0.18);
 }
 
 #image-wrapper{
@@ -201,6 +321,59 @@ header {
     display: grid;
     place-items: center;
     font-weight: bold;
+}
+
+#specific-selection-controls {
+    margin-bottom: 16px;
+
+    text-align: center;
+}
+
+#specific-selection-controls p {
+    margin: 0 0 14px;
+
+    color: #172b63;
+
+    font-size:
+        clamp(16px, 1.8vw, 20px);
+
+    font-weight: bold;
+}
+
+.specific-selection-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+}
+
+.specific-selection-buttons button {
+    min-width: 150px;
+    padding: 10px 18px;
+
+    border: none;
+    border-radius: 12px;
+
+    color: white;
+
+    font: inherit;
+    font-size: 17px;
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+#select-all-items-btn {
+    background: #2563eb;
+}
+
+#clear-selected-items-btn {
+    background: #ef4444;
+}
+
+.specific-selection-buttons button:hover {
+    filter: brightness(1.08);
+    transform: translateY(-2px);
 }
 
 @media (max-width: 768px){
@@ -414,11 +587,28 @@ header {
 }
 
 #item-selection-mode-control {
-    margin-top: 3vh;
+    margin: 0;
+    padding: 20px;
+
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    padding: 20px;
+    gap: 14px;
+
+    border: 3px solid #b8d0ff;
+    border-radius: 16px;
+
+    background: #f5f9ff;
+}
+
+#item-selection-mode-control legend {
+    padding: 0 10px;
+
+    color: #172b63;
+
+    font-size:
+        clamp(19px, 2.2vw, 26px);
+
+    font-weight: bold;
 }
 
 #item-selection-mode-control > label {
@@ -439,11 +629,84 @@ input[type="radio"] {
     margin: 0;
 }
 
+#item-selection-mode-control > label {
+    padding: 10px 12px;
+
+    border: 2px solid #d7e4ff;
+    border-radius: 12px;
+
+    background: white;
+}
+
+#item-selection-mode-control > label:hover {
+    border-color: #2f66e8;
+    background: #eef5ff;
+}
+
 #random-item-count-control {
     display: flex;
     flex-direction: column;
     gap: 6px;
     margin-top: 5px;
+}
+
+#selectedItemsContainer {
+    width: min(900px, 92vw);
+    margin: 24px auto;
+    padding: clamp(18px, 3vw, 28px);
+
+    border: 4px solid #ffae2b;
+    border-radius: 24px;
+
+    background:
+        rgba(255, 249, 232, 0.97);
+
+    box-shadow:
+        0 10px 24px
+        rgba(255, 174, 43, 0.16);
+}
+
+#selectedItemsContainer > h3 {
+    margin: 0 0 16px;
+
+    color: #172b63;
+
+    text-align: center;
+
+    font-size:
+        clamp(20px, 2.5vw, 28px);
+}
+
+.preview-item {
+    min-width: 0;
+    padding: 10px;
+
+    border: 3px solid #b8d0ff;
+    border-radius: 14px;
+
+    background: #eef5ff;
+
+    color: #172b63;
+
+    text-align: center;
+    font-weight: bold;
+
+    overflow-wrap: anywhere;
+}
+
+.preview-item img {
+    width: 80px;
+    height: 80px;
+
+    object-fit: contain;
+
+    display: block;
+
+    margin: 0 auto 7px;
+
+    border-radius: 8px;
+
+    background: white;
 }
 
 body.play-mode {

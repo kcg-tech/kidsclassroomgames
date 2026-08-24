@@ -7,7 +7,7 @@
     content="width=device-width, initial-scale=1.0">
   <title>Flash Card Generator</title>
   <link rel="stylesheet" href="style.css">
-  <link rel="icon" type="image/png" href="images/home/kcgfavicon.png">
+  <link rel="icon" type="image/png" href="../../images/home/kcgfavicon.png">
 </head>
 
 <body>
@@ -111,8 +111,11 @@
             </select>
 
             <p id="twoSidedLoginMessage" class="hidden">
-                Log in to usw thi feature.
-                <a href="../../account.html">
+                Log in to use this feature.
+                <a 
+                    id="flashcardLoginLink"
+                    href="../../account.html"
+                >
                     Log in or create an account
                 </a>
             </p>
@@ -175,7 +178,10 @@
    </div>
    
     
-   <div id="generatedCardsContainer">
+   <div 
+        id="generatedCardsContainer"
+        class="hidden"
+    >
     
       <h3>Generated Cards</h3>
        <button type="button"

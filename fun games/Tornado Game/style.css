@@ -10,6 +10,191 @@ body {
     background-color: beige;
 }
 
+/* Tornado setup screen */
+
+body:not(.play-mode) {
+    min-height: 100vh;
+    margin: 0;
+    padding: 32px 20px;
+
+    box-sizing: border-box;
+
+    color: #172554;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    background-color: #f5f8ff;
+    background-image:
+        url("../../images/home/kcgbackground.png");
+    background-repeat: repeat;
+    background-size: 420px;
+}
+
+body:not(.play-mode) header .main {
+    width: min(100%, 1100px);
+    margin: 0 auto 24px;
+    padding: 28px;
+
+    text-align: center;
+
+    background:
+        rgba(255, 255, 255, 0.94);
+
+    border: 4px solid #2563eb;
+    border-radius: 24px;
+
+    box-shadow:
+        0 10px 25px
+        rgba(30, 58, 138, 0.15);
+}
+
+body:not(.play-mode) header h1 {
+    margin: 0 0 12px;
+
+    color: #1d4ed8;
+
+    font-size:
+        clamp(32px, 5vw, 52px);
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+}
+
+body:not(.play-mode) header p {
+    margin: 0;
+
+    font-size: 18px;
+    line-height: 1.5;
+}
+
+body:not(.play-mode) > .main {
+    width: min(100%, 1100px);
+    margin: 0 auto;
+    padding: 28px;
+
+    box-sizing: border-box;
+
+    background:
+        rgba(255, 255, 255, 0.94);
+
+    border: none;
+    border-radius: 24px;
+
+    box-shadow:
+        0 10px 25px
+        rgba(30, 58, 138, 0.15);
+}
+
+body:not(.play-mode) #setup {
+    width: 100%;
+    text-align: center;
+}
+
+body:not(.play-mode) #preset-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+}
+
+body:not(.play-mode) #preset-container h2 {
+    margin: 0 0 8px;
+
+    color: #1d4ed8;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+}
+
+body:not(.play-mode) select,
+body:not(.play-mode) input {
+    width: min(100%, 420px);
+    min-height: 46px;
+
+    padding: 10px 14px;
+
+    border: 2px solid #bfdbfe;
+    border-radius: 10px;
+
+    box-sizing: border-box;
+
+    color: #172554;
+    background: white;
+
+    font: inherit;
+    font-size: 16px;
+}
+
+body:not(.play-mode) button {
+    min-height: 48px;
+    padding: 10px 24px;
+
+    border: none;
+    border-radius: 12px;
+
+    background: #2563eb;
+    color: white;
+
+    font: inherit;
+    font-size: 17px;
+    font-weight: bold;
+
+    cursor: pointer;
+
+    transition:
+        transform 0.15s ease,
+        background-color 0.15s ease;
+}
+
+body:not(.play-mode) button:hover {
+    background: #1d4ed8;
+    transform: translateY(-1px);
+}
+
+body:not(.play-mode) #create-btn {
+    width: min(100%, 320px);
+    background: #f59e0b;
+    color: white;
+}
+
+body:not(.play-mode) #create-btn:hover {
+    background: #d97706;
+}
+
+body:not(.play-mode) #start-btn {
+    display: block;
+
+    width: min(100%, 360px);
+    min-height: 58px;
+
+    margin: 24px auto 12px;
+
+    background: #16a34a;
+
+    font-size:
+        clamp(19px, 2vw, 24px);
+}
+
+body:not(.play-mode) #start-btn:hover {
+    background: #15803d;
+}
+
+body:not(.play-mode) #start-game-message {
+    margin: 10px auto;
+
+    color: #172554;
+
+    text-align: center;
+    font-weight: bold;
+}
+
 .main {
     background-color: white;
     border: 5px solid rgba(205, 202, 202, 0.647);
@@ -248,6 +433,7 @@ gap:5px;
 
 #submit{
     background-color: rgb(164, 40, 40);
+    color: white;
 }
 
 /* Tornado board editor */

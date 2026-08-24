@@ -4,7 +4,7 @@ const puzzleItems = document.getElementById("puzzle-items");
 const caseSelect = document.getElementById("case-select");
 const generateBtn = document.getElementById("generate-btn");
 const puzzleContainer = document.getElementById("puzzle-container");
-const downloadBtn = document.getElementById("download-btn");
+
 
 // GENERATE BUTTON
 generateBtn.addEventListener("click", generatePuzzle);
@@ -26,6 +26,20 @@ function generatePuzzle() {
   if (words.length > 15){
     alert("Maximun of 15 words only");
     return;
+  }
+  if (
+      puzzleType.value ===
+          "word-search" &&
+      words.some(
+          word =>
+              word.length > 12
+      )
+  ) {
+      alert(
+          "Word Search words must be 12 characters or fewer."
+      );
+
+      return;
   }
   
 

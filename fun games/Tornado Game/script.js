@@ -1417,7 +1417,7 @@ startGameBtn.addEventListener(
 
 function createSharedBoardUrl(shareSlug) {
     const shareUrl =
-        new URL(window.location.href);
+        createShareablePageUrl();
 
     shareUrl.search = "";
 

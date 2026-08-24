@@ -1148,6 +1148,38 @@ async function subscribeToPlayerCalls() {
     renderPlayerBingoGrid();
 }
 
+async function refreshPlayerAfterReconnect() {
+    if (
+        !currentBingoPlayer ||
+        !currentPlayerRoom?.id
+    ) {
+        return;
+    }
+
+    await subscribeToPlayerCalls();
+
+    renderPlayerBingoGrid();
+}
+
+window.addEventListener(
+    "online",
+    () => {
+        setTimeout(
+            refreshPlayerAfterReconnect,
+            750
+        );
+    }
+);
+
+document.addEventListener(
+    "visibilitychange",
+    () => {
+        if (!document.hidden) {
+            refreshPlayerAfterReconnect();
+        }
+    }
+);
+
 function renderPlayerItemTray() {
 
     playerItemTray.innerHTML = "";
@@ -2078,7 +2110,7 @@ teacherSetupForm.addEventListener(
                 roomCode || "------";
 
             const studentJoinUrl =
-                new URL(window.location.href);
+                createShareablePageUrl();
 
             studentJoinUrl.search = "";
             studentJoinUrl.hash = "";
@@ -3362,10 +3394,8 @@ hostWinnerCelebration.addEventListener(
 function createBingoSetShareUrl(
     slug
 ) {
-    const shareUrl =
-        new URL(
-            window.location.href
-        );
+const shareUrl =
+    createShareablePageUrl();
 
     shareUrl.search = "";
     shareUrl.hash = "";
@@ -3653,6 +3683,12 @@ async function initializeBingoPage() {
     await loadCategories(
         categorySelect
     );
+
+    categorySelect.innerHTML = `
+        <option value="browse-by-tag">
+            All Categories (Filter by Tags)
+        </option>
+    ` + categorySelect.innerHTML;
 
     const oldAllCategoriesOption =
         categorySelect.querySelector(

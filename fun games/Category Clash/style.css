@@ -927,3 +927,53 @@ body:not(.play-mode) .remove-image-btn:hover {
 #share-board-controls button:hover {
     filter: brightness(1.1);
 }
+
+#restart-game-btn:not(.hidden) {
+    display: block;
+
+    width: min(380px, 90vw);
+    min-height: 66px;
+
+    margin: 28px auto;
+    padding: 16px 28px;
+
+    border: none;
+    border-radius: 18px;
+
+    background: #f97316;
+    color: white;
+
+    font: inherit;
+    font-size:
+        clamp(20px, 2.4vw, 30px);
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 7px 0 #b9430a;
+
+    transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease,
+        background-color 0.15s ease;
+}
+
+#restart-game-btn:hover {
+    background: #ea580c;
+
+    transform:
+        translateY(-2px);
+
+    box-shadow:
+        0 9px 0 #9f3708;
+}
+
+#restart-game-btn:active {
+    transform:
+        translateY(3px);
+
+    box-shadow:
+        0 4px 0 #9f3708;
+}

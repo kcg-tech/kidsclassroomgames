@@ -5,9 +5,9 @@
   <meta
     name="viewport"
     content="width=device-width, initial-scale=1.0">
-  <title>Teacher Tools</title>
+  <title>Bingo Card Generator | Kids Classroom Games</title>
   <link rel="stylesheet" href="style.css">
-  <link rel="icon" type="image/png" href="images/home/kcgfavicon.png">
+  <link rel="icon" type="image/png" href="../../images/home/kcgfavicon.png">
 </head>
 
 <body>
@@ -73,6 +73,51 @@
 
         </div>
 
+        <div>
+            <label>PDF Layout:</label>
+            <select id="pdfLayout">
+                <option value="1">
+                    1 Card per sheet
+                </option>
+                <option value="2">
+                    2 Cards per sheet
+                </option>
+            </select>
+        </div>
+
+        <fieldset id="itemSelectionModeControl">
+            <legend>
+                Choose Bingo Items
+            </legend>
+
+            <label class="item-mode-option">
+                <input
+                    type="radio"
+                    name="bingoItemMode"
+                    value="all"
+                    checked
+                >
+                <span>
+                    Use All Matching Items
+                </span>
+            </label>
+
+            <label class="item-mode-option">
+                <input
+                    type="radio"
+                    name="bingoItemMode"
+                    value="specific"
+                >
+                <span>
+                    Choose Specific Items
+                </span>
+            </label>
+
+            <p class="item-mode-note">
+                Choose a category and tags, then select which items can appear on the cards.
+            </p>
+        </fieldset>
+
   </div>
 
   <div id="selectedItemsContainer">
@@ -88,40 +133,23 @@
   </div>
 
    <div class="btn-container">
-
         <button id="generateBtn">GENERATE BINGO</button>
         <button id="resetBtn">RESET</button>
-
    </div>
 
-  
-      
-  </button>
-
-    <div>
-
-        <label>PDF Layout:</label>
-
-        <select id="pdfLayout">
-
-            <option value="1">
-                1 Card per sheet
-            </option>
-
-            <option value="2">
-                2 Cards per sheet
-            </option>
-
-        </select>
-
-    </div>
+   
 
 
    
     
    <div id="generatedCardsContainer">
 
-      <h3>Generated Cards</h3>
+        <h3
+            id="generatedCardsHeading"
+            class="hidden"
+        >  
+            Generated Cards
+        </h3>
        <button
       id="downloadPdfBtn"
       class="hidden"
@@ -144,8 +172,6 @@
     <script src="../../js/filters.js"></script>
     <script src="../../js/preview.js"></script>
 
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 

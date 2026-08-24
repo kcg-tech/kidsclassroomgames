@@ -39,6 +39,35 @@ const passwordToggleButtons =
         ".password-toggle"
     );
 
+function returnToRequestedPage() {
+    const returnTo =
+        new URLSearchParams(
+            window.location.search
+        ).get("returnTo");
+
+    if (!returnTo) {
+        return false;
+    }
+
+    const returnUrl =
+        new URL(
+            returnTo,
+            window.location.origin
+        );
+
+    if (
+        returnUrl.origin !==
+        window.location.origin
+    ) {
+        return false;
+    }
+
+    window.location.assign(
+        returnUrl.href
+    );
+
+    return true;
+}
 
 function showMessage(
     element,
@@ -58,7 +87,6 @@ function showMessage(
             : "message-success"
     );
 }
-
 
 function updateAccountScreen(session) {
     const isLoggedIn =
@@ -262,6 +290,8 @@ loginForm.addEventListener(
         updateAccountScreen(
             data.session
         );
+
+        returnToRequestedPage();
     }
 );
 

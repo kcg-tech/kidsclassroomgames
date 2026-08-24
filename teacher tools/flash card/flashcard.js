@@ -34,17 +34,18 @@ const cardSides =
     document.getElementById(
         "cardSides"
     );
-
 const twoSidedOption =
     document.getElementById(
         "twoSidedOption"
     );
-
 const twoSidedLoginMessage =
     document.getElementById(
         "twoSidedLoginMessage"
     );
-
+const flashcardLoginLink =
+    document.getElementById(
+        "flashcardLoginLink"
+    );
 const backLanguageControl =
     document.getElementById(
         "backLanguageControl"
@@ -54,7 +55,6 @@ const backLanguageSelect =
     document.getElementById(
         "backLanguageSelect"
     );
-
 const generateBtn =
     document.getElementById(
         "generateBtn"
@@ -63,12 +63,14 @@ const downloadPdfBtn =
     document.getElementById(
         "downloadPdfBtn"
     );
-
+const generatedCardsContainer =
+    document.getElementById(
+        "generatedCardsContainer"
+    );
 const resetBtn =
     document.getElementById(
         "resetBtn"
     );
-
 const previewPages =
     document.getElementById(
         "previewPages"
@@ -78,6 +80,66 @@ const previewPages =
 let generatedItems = [];
 let generatedBackItems = [];
 let isFlashcardUserLoggedIn = false;
+
+flashcardLoginLink.addEventListener(
+    "click",
+    () => {
+        const flashcardState = {
+            category:
+                categorySelect.value,
+
+            tagIds:
+                Array.from(
+                    tagsContainer.querySelectorAll(
+                        "input:checked"
+                    )
+                ).map(
+                    checkbox =>
+                        checkbox.value
+                ),
+
+            frontLanguage:
+                languageSelect.value,
+
+            cardsPerPage:
+                cardsPerPage.value,
+
+            orientation:
+                orientation.value,
+
+            cardSides:
+                cardSides.value,
+
+            displayMode:
+                displayMode.value,
+
+            backLanguage:
+                backLanguageSelect.value
+        };
+
+        sessionStorage.setItem(
+            "flashcardReturnState",
+            JSON.stringify(
+                flashcardState
+            )
+        );
+
+        const accountUrl =
+            new URL(
+                flashcardLoginLink.href,
+                window.location.href
+            );
+
+        accountUrl.searchParams.set(
+            "returnTo",
+            window.location.pathname +
+                window.location.search
+        );
+
+        flashcardLoginLink.href =
+            accountUrl.href;
+    }
+);
 
 async function updateFlashcardLoginAccess() {
     const { data, error } =
@@ -415,6 +477,18 @@ async function generateFlashCards() {
                     )
             );
 
+    if (
+        selectedCategoryId ===
+            "browse-by-tag" &&
+        selectedTagIds.length === 0
+    ) {
+        alert(
+            "Please select at least one tag before generating flashcards."
+        );
+
+        return;
+    }
+
     const items =
         await dbGetItems(
             selectedCategoryId,
@@ -470,7 +544,9 @@ async function generateFlashCards() {
             "front"
         );
     }
-
+    generatedCardsContainer.classList.remove(
+        "hidden"
+    );
     previewPages.scrollIntoView({
 
         block: "start"
@@ -857,9 +933,12 @@ function drawPdfBackPage(
                 ? originalRow
                 : layout.rows - 1 - originalRow;
 
+        const backOffsetX = -5;
+
         const x =
             margin +
-            col * (cardWidth + gap);
+            col * (cardWidth + gap) +
+            backOffsetX;
 
         const backOffsetY = 2;
 
@@ -1252,6 +1331,10 @@ function reset() {
 
     previewPages.innerHTML = "";
 
+    generatedCardsContainer.classList.add(
+        "hidden"
+    );
+
     downloadPdfBtn.classList.add(
         "hidden"
     );
@@ -1265,9 +1348,31 @@ async function initialize() {
         categorySelect
     );
 
+    categorySelect.querySelector(
+        'option[value=""]'
+    )?.remove();
+
+    categorySelect.innerHTML = `
+        <option value="browse-by-tag">
+            All Categories (Filter by Tags)
+        </option>
+    ` + categorySelect.innerHTML;
+
     await loadTags(
         tagsContainer,
-        dbGetItems
+        () => {
+            updateSelectedItemsPreview(
+                dbGetItems
+            );
+
+            downloadPdfBtn.classList.add(
+                "hidden"
+            );
+
+            generatedCardsContainer.classList.add(
+                "hidden"
+            );
+        }
     );
 
     await loadLanguages(
@@ -1277,6 +1382,8 @@ async function initialize() {
     await loadLanguages(
         backLanguageSelect
     );
+
+    restoreFlashcardReturnState();
 
     await updateSelectedItemsPreview(
         dbGetItems,
@@ -1311,5 +1418,97 @@ db.auth.onAuthStateChange(
         );
     }
 );
+
+function restoreFlashcardReturnState() {
+    const savedState =
+        sessionStorage.getItem(
+            "flashcardReturnState"
+        );
+
+    if (!savedState) {
+        return;
+    }
+
+    try {
+        const state =
+            JSON.parse(savedState);
+
+        if (state.category !== undefined) {
+            categorySelect.value =
+                state.category;
+        }
+
+        if (
+            Array.isArray(
+                state.tagIds
+            )
+        ) {
+            const savedTagIds =
+                new Set(
+                    state.tagIds.map(
+                        String
+                    )
+                );
+
+            tagsContainer
+                .querySelectorAll(
+                    "input[type='checkbox']"
+                )
+                .forEach(checkbox => {
+                    checkbox.checked =
+                        savedTagIds.has(
+                            String(
+                                checkbox.value
+                            )
+                        );
+                });
+        }
+
+        if (state.frontLanguage) {
+            languageSelect.value =
+                state.frontLanguage;
+        }
+
+        if (state.cardsPerPage) {
+            cardsPerPage.value =
+                state.cardsPerPage;
+        }
+
+        if (state.orientation) {
+            orientation.value =
+                state.orientation;
+        }
+
+        if (state.cardSides) {
+            cardSides.value =
+                state.cardSides;
+        }
+
+        if (state.displayMode) {
+            displayMode.value =
+                state.displayMode;
+        }
+
+        if (state.backLanguage) {
+            backLanguageSelect.value =
+                state.backLanguage;
+        }
+
+        backLanguageControl.classList.toggle(
+            "hidden",
+            cardSides.value !==
+                "two-sided"
+        );
+    } catch (error) {
+        console.error(
+            "Could not restore flashcard settings:",
+            error
+        );
+    }
+
+    sessionStorage.removeItem(
+        "flashcardReturnState"
+    );
+}
 
 initialize();

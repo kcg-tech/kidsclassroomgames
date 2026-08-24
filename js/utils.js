@@ -66,3 +66,36 @@ function generateFileName(name, extension) {
     return `${cleanName}_${Date.now()}.${extension}`;
 
 }
+
+function createShareablePageUrl() {
+    const currentUrl =
+        new URL(window.location.href);
+
+    const isLocalWebsite =
+        currentUrl.hostname ===
+            "localhost" ||
+        currentUrl.hostname ===
+            "127.0.0.1";
+
+    if (!isLocalWebsite) {
+        return currentUrl;
+    }
+
+    let pagePath =
+        currentUrl.pathname;
+
+    if (
+        !pagePath.startsWith(
+            "/kidsclassroomgames/"
+        )
+    ) {
+        pagePath =
+            "/kidsclassroomgames" +
+            pagePath;
+    }
+
+    return new URL(
+        pagePath,
+        "https://kcg-tech.github.io"
+    );
+}

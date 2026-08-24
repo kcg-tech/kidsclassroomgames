@@ -21,6 +21,23 @@ async function updateSelectedItemsPreview(getItemsFunction) {
             languageSelect.value
         );
 
+    if (
+        selectedCategoryId ===
+            "browse-by-tag" &&
+        selectedTagIds.length === 0
+    ) {
+        selectedItemsList.innerHTML = `
+            <p class="item-filter-message">
+                Select at least one tag to show items.
+            </p>
+        `;
+
+        selectedItemsCount.textContent =
+            "0";
+
+        return;
+    }
+
     const items =
         await getItemsFunction(
             selectedCategoryId,
