@@ -198,16 +198,20 @@ const createRoomBtn =
         "create-room-btn"
     );
 
-const saveBingoSetCheckbox =
+const saveBingoSetBtn =
     document.getElementById(
-        "save-bingo-set-checkbox"
+        "save-bingo-set-btn"
     );
 
-const bingoSaveLimitMessage =
+const bingoSaveLoginMessage =
     document.getElementById(
-        "bingo-save-limit-message"
+        "bingo-save-login-message"
     );
 
+const bingoSaveMessage =
+    document.getElementById(
+        "bingo-save-message"
+    );
 const gridSizeSelect =
     document.getElementById(
         "grid-size-select"
@@ -485,11 +489,20 @@ function renderTeacherPicker() {
         !gameIsActive
     );
 
+    const allItemsPicked =
+        hostPickerItems.length > 0 &&
+        pickedHostItemIds.size >=
+            hostPickerItems.length;
+
     pickNextItemBtn.disabled =
         !gameIsActive ||
         hostPickerItems.length === 0 ||
-        pickedHostItemIds.size >=
-            hostPickerItems.length;
+        allItemsPicked;
+
+    pickNextItemBtn.textContent =
+        allItemsPicked
+            ? "All Items Selected"
+            : "Pick Next";
 }
 
 async function refreshHostPlayers() {
@@ -1800,7 +1813,6 @@ pickerModal.addEventListener(
         }
     }
 );
-
 document.addEventListener(
     "keydown",
     event => {
@@ -1816,7 +1828,6 @@ document.addEventListener(
         }
     }
 );
-
 function showPageMessage(
     message,
     type = ""
@@ -1833,11 +1844,9 @@ function showPageMessage(
         );
     }
 }
-
 function clearPageMessage() {
     showPageMessage("");
 }
-
 async function ensureBingoAuthSession() {
 
     const sessionResult =
@@ -1870,7 +1879,6 @@ async function ensureBingoAuthSession() {
 
     return signInResult.data.session;
 }
-
 function getChosenBingoPool() {
 
     if (teacherItemMode === "specific") {
@@ -1888,7 +1896,6 @@ function getChosenBingoPool() {
         )
         .slice(0, 50);
 }
-
 function validateBingoSetup(itemPool) {
 
     const gridSize =
@@ -1922,7 +1929,137 @@ function validateBingoSetup(itemPool) {
 
     return "";
 }
+saveBingoSetBtn.addEventListener(
+    "click",
+    async () => {
+        bingoSaveMessage.textContent = "";
 
+        const itemPool =
+            getChosenBingoPool();
+
+        const validationMessage =
+            validateBingoSetup(
+                itemPool
+            );
+
+        if (validationMessage) {
+            bingoSaveMessage.textContent =
+                validationMessage;
+
+            return;
+        }
+
+        const { data, error } =
+            await db.auth.getSession();
+
+        const user =
+            data?.session?.user;
+
+        if (
+            error ||
+            !user ||
+            user.is_anonymous
+        ) {
+            bingoSaveMessage.textContent =
+                "Log in or create a free account to save Bingo sets.";
+
+            return;
+        }
+
+        saveBingoSetBtn.disabled = true;
+        saveBingoSetBtn.textContent =
+            "Saving...";
+
+        try {
+            const saveResult =
+                await dbSaveBingoSet({
+                    name:
+                        bingoNameInput.value.trim(),
+
+                    languageId:
+                        Number(
+                            languageSelect.value
+                        ),
+
+                    gridSize:
+                        Number(
+                            gridSizeSelect.value
+                        ),
+
+                    hasFreeCenter:
+                        freeCenterCheckbox.checked,
+
+                    hostDisplayMode:
+                        hostDisplayMode.value,
+
+                    playerDisplayMode:
+                        playerDisplayMode.value,
+
+                    itemIds:
+                        itemPool.map(
+                            item =>
+                                Number(item.id)
+                        )
+                });
+
+            if (saveResult.error) {
+                const errorMessage =
+                    saveResult.error.message || "";
+
+                if (
+                    errorMessage.includes(
+                        "already have a Bingo set"
+                    )
+                ) {
+                    bingoSaveMessage.textContent =
+                        "You already have a Bingo set with this name.";
+                } else if (
+                    errorMessage.includes(
+                        "Free accounts can save up to 5"
+                    )
+                ) {
+                    bingoSaveMessage.textContent =
+                        "You have reached the free limit of 5 saved Bingo sets.";
+                } else {
+                    bingoSaveMessage.textContent =
+                        "The Bingo set could not be saved.";
+                }
+
+                console.error(
+                    "Save Bingo set error:",
+                    saveResult.error
+                );
+
+                return;
+            }
+
+            const savedSet =
+                Array.isArray(saveResult.data)
+                    ? saveResult.data[0]
+                    : saveResult.data;
+
+            selectedSavedBingoSetId =
+                savedSet?.id || null;
+
+            await loadSavedBingoSets();
+
+            if (selectedSavedBingoSetId) {
+                savedBingoSetSelect.value =
+                    String(
+                        selectedSavedBingoSetId
+                    );
+            }
+
+            bingoSaveMessage.textContent =
+                `"${bingoNameInput.value.trim()}" was saved. ` +
+                "You can create a room now or use it later.";
+        } finally {
+            saveBingoSetBtn.disabled = false;
+            saveBingoSetBtn.textContent =
+                "Save Bingo Set";
+        }
+    }
+);
 teacherSetupForm.addEventListener(
     "submit",
     async event => {
@@ -1965,89 +2102,6 @@ teacherSetupForm.addEventListener(
 
             let savedSetId =
                 selectedSavedBingoSetId;
-
-            if (saveBingoSetCheckbox.checked) {
-                if (session.user?.is_anonymous) {
-                    showPageMessage(
-                        "Please log in with a regular account to save this Bingo Game.",
-                        "error"
-                    );
-
-                    return;
-                }
-
-                const saveResult =
-                    await dbSaveBingoSet({
-                        name:
-                            bingoNameInput.value.trim(),
-
-                        languageId:
-                            Number(
-                                languageSelect.value
-                            ),
-
-                        gridSize:
-                            Number(
-                                gridSizeSelect.value
-                            ),
-
-                        hasFreeCenter:
-                            freeCenterCheckbox.checked,
-
-                        hostDisplayMode:
-                            hostDisplayMode.value,
-
-                        playerDisplayMode:
-                            playerDisplayMode.value,
-
-                        itemIds:
-                            itemPool.map(
-                                item =>
-                                    Number(item.id)
-                            )
-                    });
-
-                if (saveResult.error) {
-                    const errorMessage =
-                        saveResult.error.message || "";
-
-                    const duplicateName =
-                        errorMessage.includes(
-                            "already have a Bingo set"
-                        );
-
-                    const reachedFreeLimit =
-                        errorMessage.includes(
-                            "Free accounts can save up to 5"
-                        );
-
-                    let message =
-                        "The Bingo setup could not be saved.";
-
-                    if (duplicateName) {
-                        message =
-                            "You already have a Bingo game with this name.";
-                    } else if (reachedFreeLimit) {
-                        message =
-                            "You have reached the free limit of 5 saved Bingo games. Delete one or upgrade to Premium.";
-                    }
-
-                    showPageMessage(
-                        message,
-                        "error"
-                    );
-
-                    return;
-                }
-
-                const savedSet =
-                    Array.isArray(saveResult.data)
-                        ? saveResult.data[0]
-                        : saveResult.data;
-
-                savedSetId =
-                    savedSet?.id || null;
-            }
 
             const result =
                 await dbCreateBingoSession({
@@ -2936,7 +2990,6 @@ playBingoAgainBtn.addEventListener(
         );
 
         categorySelect.required = false;
-        saveBingoSetCheckbox.checked = false;
 
         teacherSetupForm.requestSubmit();
     }
@@ -3152,9 +3205,6 @@ savedBingoSetSelect.addEventListener(
             );
 
             categorySelect.required =
-                false;
-
-            saveBingoSetCheckbox.checked =
                 false;
 
             renderAvailableBingoItems();
@@ -3624,9 +3674,6 @@ async function loadSharedBingoSet(
     categorySelect.required =
         false;
 
-    saveBingoSetCheckbox.checked =
-        false;
-
     renderAvailableBingoItems();
     showView(teacherSetupView);
 
@@ -3661,22 +3708,26 @@ async function updateBingoSaveAccessMessage() {
             !user.is_anonymous
         );
 
-    bingoSaveLimitMessage.classList.toggle(
+    bingoSaveLoginMessage.classList.toggle(
         "hidden",
-        !hasRegularAccount
+        hasRegularAccount
     );
 
+    saveBingoSetBtn.disabled =
+        !hasRegularAccount;
+
     if (!hasRegularAccount) {
+        bingoSaveMessage.textContent = "";
         return;
     }
 
     const hasPremium =
         await dbUserHasPremium();
 
-    bingoSaveLimitMessage.textContent =
+    bingoSaveMessage.textContent =
         hasPremium
-            ? "Premium account: Unlimited saved Bingo games."
-            : "Free account: You can save up to 5 Bingo games.";
+            ? "Premium account: Unlimited saved Bingo sets."
+            : "Free account: You can save up to 5 Bingo sets.";
 }
 
 async function initializeBingoPage() {

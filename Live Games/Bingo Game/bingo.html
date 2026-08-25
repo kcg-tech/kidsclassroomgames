@@ -348,29 +348,41 @@
                     </select>
                 </fieldset>
 
-                <div
-                    id="save-bingo-set-control"
-                    class="setup-control"
-                >
-                    <label>
-                        <input
-                            type="checkbox"
-                            id="save-bingo-set-checkbox"
-                        >
-                        Save this BINGO to My Account
-                    </label>
+                <div id="bingo-save-controls">
+                    <p>
+                        Save this Bingo set to your account without starting a game.
+                    </p>
 
-                    <p class="save-bingo-set-note">
-                        A regular account is required to save reusable Bingo Game.
+                    <button
+                        id="save-bingo-set-btn"
+                        type="button"
+                        class="btn"
+                    >
+                        Save Bingo Set
+                    </button>
+
+                    <p
+                        id="bingo-save-login-message"
+                        class="hidden"
+                    >
+                        Log in or create a free account to save reusable Bingo sets.
                     </p>
 
                     <p
-                        id="bingo-save-limit-message"
-                        class="save-bingo-set-note hidden"
+                        id="bingo-save-message"
+                        aria-live="polite"
                     ></p>
-
                 </div>
 
+                <div class="create-room-explanation">
+                    <h3>Play Now</h3>
+
+                    <p>
+                        Create Bingo Room starts a new game but does not save this
+                        Bingo set to your account. Select Save Bingo Set first if
+                        you want to use these settings again later.
+                    </p>
+                </div>
 
                 <button
                     type="submit"

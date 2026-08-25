@@ -933,7 +933,7 @@ function drawPdfBackPage(
                 ? originalRow
                 : layout.rows - 1 - originalRow;
 
-        const backOffsetX = -5;
+        const backOffsetX = 0.5;
 
         const x =
             margin +
