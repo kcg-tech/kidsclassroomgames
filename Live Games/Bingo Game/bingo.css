@@ -1203,3 +1203,21 @@ transition:
     cursor: not-allowed;
     opacity: 0.75;
 }
+
+.student-privacy-note {
+    max-width: 520px;
+    margin: 14px auto;
+    color: #475569;
+    font-size: clamp(13px, 1.5vw, 16px);
+    line-height: 1.5;
+    text-align: center;
+}
+
+.student-privacy-note a {
+    color: #1d4ed8;
+    font-weight: bold;
+}
+
+.student-privacy-note a:hover {
+    color: #15803d;
+}

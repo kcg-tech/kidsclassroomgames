@@ -168,6 +168,7 @@ let imageLibraryItems = [];
 let imageLibraryCategories = [];
 let imageLibraryTags = [];
 const userDataInput = [];
+let freeSavedGameLimit = 10;
 
 
 createBtn.addEventListener(
@@ -922,18 +923,19 @@ userInputs.addEventListener(
                 if (result.error) {
                     const reachedFreeLimit =
                         result.error.message?.includes(
-                            "Free accounts can save up to 5"
+                            "Free accounts can save up to"
                         );
+
+                    const limitMessage =
+                        `You have reached the free limit of ${freeSavedGameLimit} Category Clash boards. Delete one or upgrade to Premium.`;
 
                     saveBoardMessage.textContent =
                         reachedFreeLimit
-                            ? "You have reached the free limit of 5 Category Clash boards. Delete one or upgrade to Premium."
+                            ? limitMessage
                             : "The board could not be saved.";
 
                     if (reachedFreeLimit) {
-                        alert(
-                            "You have reached the free limit of 5 Category Clash boards. Delete one or upgrade to Premium."
-                        );
+                        alert(limitMessage);
                     }
 
                     return;
@@ -2207,6 +2209,11 @@ async function updateSaveBoardAccess() {
             !user.is_anonymous
         );
 
+    if (isLoggedIn) {
+        freeSavedGameLimit =
+            await dbGetFreeSavedGameLimit();
+    }
+
     const hasPremium =
         isLoggedIn
             ? await dbUserHasPremium()
@@ -2221,7 +2228,7 @@ async function updateSaveBoardAccess() {
         saveLimitMessage.textContent =
             hasPremium
                 ? "Premium account: Unlimited saved boards."
-                : "Free account: You can save up to 5 Category Clash boards.";
+                : `Free account: You can save up to ${freeSavedGameLimit} Category Clash boards.`;
     }
 
     saveBoardControls.classList.remove(

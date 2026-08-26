@@ -1,0 +1,33 @@
+.kcg-ad-slot[hidden] {
+    display: none !important;
+}
+
+.kcg-ad-slot {
+    width: min(100%, 970px);
+    min-height: 100px;
+    margin: 40px auto;
+    padding: 12px;
+    border: 1px solid #d7deec;
+    border-radius: 12px;
+    background: #f8faff;
+    box-sizing: border-box;
+    text-align: center;
+}
+
+.kcg-ad-slot::before {
+    content: "Advertisement";
+    display: block;
+    margin-bottom: 8px;
+    color: #687386;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;
+    font-weight: normal;
+}
+
+@media (max-width: 600px) {
+    .kcg-ad-slot {
+        min-height: 80px;
+        margin: 24px auto;
+        padding: 8px;
+    }
+}

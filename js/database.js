@@ -3386,3 +3386,30 @@ async function dbUserHasPremium() {
 
     return data === true;
 }
+
+async function dbGetFreeSavedGameLimit() {
+    const { data, error } =
+        await db.rpc(
+            "get_free_saved_game_limit"
+        );
+
+    if (error) {
+        console.error(
+            "Could not load the free saved-game limit:",
+            error
+        );
+
+        return 10;
+    }
+
+    const limit = Number(data);
+
+    if (
+        !Number.isInteger(limit) ||
+        limit < 1
+    ) {
+        return 10;
+    }
+
+    return limit;
+}

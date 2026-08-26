@@ -411,6 +411,7 @@ let hostWinnersChannel = null;
 let hostWinnerRefreshTimer = null;
 let playerDraftSaveTimer = null;
 let selectedSavedBingoSetId = null;
+let freeSavedGameLimit = 10;
 
 let playerDraftSaveChain =
     Promise.resolve();
@@ -2015,11 +2016,11 @@ saveBingoSetBtn.addEventListener(
                         "You already have a Bingo set with this name.";
                 } else if (
                     errorMessage.includes(
-                        "Free accounts can save up to 5"
+                        "Free accounts can save up to"
                     )
                 ) {
                     bingoSaveMessage.textContent =
-                        "You have reached the free limit of 5 saved Bingo sets.";
+                        `You have reached the free limit of ${freeSavedGameLimit} saved Bingo sets.`;
                 } else {
                     bingoSaveMessage.textContent =
                         "The Bingo set could not be saved.";
@@ -2265,7 +2266,7 @@ joinGameForm.addEventListener(
 
         if (displayName.length > 15) {
             showPageMessage(
-                "Player names can contain no more than 15 characters.",
+                "Player nicknames can contain no more than 15 characters.",
                 "error"
             );
 
@@ -2277,7 +2278,7 @@ joinGameForm.addEventListener(
             !displayName
         ) {
             showPageMessage(
-                "Enter the six-character room code and your name.",
+                "Enter the six-character room code and your nickname.",
                 "error"
             );
 
@@ -3721,13 +3722,16 @@ async function updateBingoSaveAccessMessage() {
         return;
     }
 
+    freeSavedGameLimit =
+        await dbGetFreeSavedGameLimit();
+
     const hasPremium =
         await dbUserHasPremium();
 
     bingoSaveMessage.textContent =
         hasPremium
             ? "Premium account: Unlimited saved Bingo sets."
-            : "Free account: You can save up to 5 Bingo sets.";
+            : `Free account: You can save up to ${freeSavedGameLimit} Bingo sets.`;
 }
 
 async function initializeBingoPage() {

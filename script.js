@@ -208,9 +208,12 @@ async function updateAccountNavigation() {
   }
 
   accountNavLink.textContent =
-    data.session
+    data.session?.user
       ? "My Account"
       : "Log In";
+
+  accountNavLink.href =
+    "account.html";
 }
 
 db.auth.onAuthStateChange(

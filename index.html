@@ -12,10 +12,11 @@
   >
   <title>Kids Classroom Games</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="adStyles.css">
   <link rel="icon" type="image/png" href="images/home/kcgfavicon.png">
 </head>
 
-<body>
+<body data-page-audience="general">
 
   <header>
 
@@ -94,7 +95,11 @@
   </section>
 
   <section class="categories" id="categories"></section>
-
+  <div
+      class="kcg-ad-slot"
+      data-ad-placement="homepage-after-resources"
+      hidden
+  ></div>
   <section class="why-kcg">
 
     <div class="why-kcg-heading">
@@ -141,6 +146,12 @@
 
   </section>
 
+  <div
+      class="kcg-ad-slot"
+      data-ad-placement="homepage-before-footer"
+      hidden
+  ></div>
+
   <footer class="footer">
     <div class="footer-container">
 
@@ -178,6 +189,12 @@
             <a href="account.html">
               My Account
             </a>
+            <a href="privacy.html">
+                Privacy Policy
+            </a>
+            <a href="terms.html">
+                Terms of Use
+            </a>
           </div>
         </section>
 
@@ -190,10 +207,10 @@
           </p>
 
           <a
-            class="footer-email"
-            href="mailto:kidsclassroomgames@gmail.com"
+              class="footer-email"
+              href="mailto:support@kidsclassroomgames.com"
           >
-            kidsclassroomgames@gmail.com
+              support@kidsclassroomgames.com
           </a>
         </section>
 
@@ -216,6 +233,7 @@
 <script src="js/supabase.js"></script>
 <script src="js/storage.js"></script>
 <script src="js/database.js"></script>
+<script src="js/adUtils.js"></script>
 
 <script src="script.js"></script>
 </body>

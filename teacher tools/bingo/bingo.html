@@ -7,16 +7,23 @@
     content="width=device-width, initial-scale=1.0">
   <title>Bingo Card Generator | Kids Classroom Games</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="../../adStyles.css">
   <link rel="icon" type="image/png" href="../../images/home/kcgfavicon.png">
 </head>
 
-<body>
+<body data-page-audience="teacher">
    <header>
         <h1>BINGO</h1>
         <p>Select which category you like
         <br> choose the number of items.
         </p>
    </header>
+
+    <div
+        class="kcg-ad-slot"
+        data-ad-placement="bingo-generator-top"
+        hidden
+    ></div>
 
    <div class="controls">
 
@@ -137,11 +144,6 @@
         <button id="resetBtn">RESET</button>
    </div>
 
-   
-
-
-   
-    
    <div id="generatedCardsContainer">
 
         <h3
@@ -160,6 +162,12 @@
 
    </div>
 
+    <div
+        class="kcg-ad-slot"
+        data-ad-placement="bingo-generator-bottom"
+        hidden
+    ></div>
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <script src="../../js/config.js"></script>
@@ -167,6 +175,7 @@
     <script src="../../js/supabase.js"></script>
     <script src="../../js/storage.js"></script>
     <script src="../../js/database.js"></script>
+    <script src="../../js/adUtils.js"></script>
 
     <script src="../../js/gameUtils.js"></script>
     <script src="../../js/filters.js"></script>

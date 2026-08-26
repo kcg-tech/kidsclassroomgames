@@ -34,9 +34,58 @@ const showSignupBtn =
 const showLoginBtn =
     document.getElementById("show-login-btn");
 
+const forgotPasswordBtn =
+    document.getElementById(
+        "forgot-password-btn"
+    );
+
+const recoveryCard =
+    document.getElementById(
+        "recovery-card"
+    );
+
+const recoveryForm =
+    document.getElementById(
+        "recovery-form"
+    );
+
+const recoveryEmail =
+    document.getElementById(
+        "recovery-email"
+    );
+
+const recoveryMessage =
+    document.getElementById(
+        "recovery-message"
+    );
+
+const recoveryBackBtn =
+    document.getElementById(
+        "recovery-back-btn"
+    );
+
+const adminDashboardLink =
+    document.getElementById(
+        "admin-dashboard-link"
+    );
+
 const passwordToggleButtons =
     document.querySelectorAll(
         ".password-toggle"
+    );
+const deleteAccountSection =
+    document.getElementById(
+        "delete-account-section"
+    );
+
+const deleteAccountBtn =
+    document.getElementById(
+        "delete-account-btn"
+    );
+
+const deleteAccountMessage =
+    document.getElementById(
+        "delete-account-message"
     );
 
 function returnToRequestedPage() {
@@ -101,24 +150,84 @@ function updateAccountScreen(session) {
     currentUserEmail.textContent =
         session?.user?.email || "";
 }
+async function updateAdminAccountAccess(
+    session
+) {
+    if (!session?.user) {
+        adminDashboardLink.hidden = true;
+        deleteAccountSection.hidden = true;
+        return false;
+    }
 
+    const { data: isAdmin, error } =
+        await db.rpc(
+            "is_site_admin"
+        );
 
-showSignupBtn.addEventListener(
+    if (error) {
+        deleteAccountSection.hidden = true;
+        console.error(
+            "Could not check administrator access:",
+            error
+        );
+
+        adminDashboardLink.hidden = true;
+        return null;
+    }
+
+    adminDashboardLink.hidden =
+        !isAdmin;
+    deleteAccountSection.hidden =
+        Boolean(isAdmin);
+
+    return Boolean(isAdmin);
+}
+async function handleSuccessfulLogin(
+    session
+) {
+    updateAccountScreen(
+        session
+    );
+
+    if (
+        returnToRequestedPage()
+    ) {
+        return;
+    }
+
+    const isAdmin =
+        await updateAdminAccountAccess(
+            session
+        );
+
+    if (isAdmin === false) {
+        window.location.assign(
+            "index.html"
+        );
+    }
+}
+
+forgotPasswordBtn.addEventListener(
     "click",
     () => {
         loginCard.hidden = true;
-        signupCard.hidden = false;
+        signupCard.hidden = true;
+        recoveryCard.hidden = false;
 
-        document
-            .getElementById("signup-name")
-            .focus();
+        recoveryEmail.value =
+            document
+                .getElementById("login-email")
+                .value
+                .trim();
+
+        recoveryEmail.focus();
     }
 );
 
-
-showLoginBtn.addEventListener(
+recoveryBackBtn.addEventListener(
     "click",
     () => {
+        recoveryCard.hidden = true;
         signupCard.hidden = true;
         loginCard.hidden = false;
 
@@ -128,6 +237,31 @@ showLoginBtn.addEventListener(
     }
 );
 
+showSignupBtn.addEventListener(
+    "click",
+    () => {
+        loginCard.hidden = true;
+        signupCard.hidden = false;
+        recoveryCard.hidden = true;
+
+        document
+            .getElementById("signup-name")
+            .focus();
+    }
+);
+
+showLoginBtn.addEventListener(
+    "click",
+    () => {
+        signupCard.hidden = true;
+        loginCard.hidden = false;
+        recoveryCard.hidden = true;
+
+        document
+            .getElementById("login-email")
+            .focus();
+    }
+);
 
 passwordToggleButtons.forEach(
     button => {
@@ -171,6 +305,55 @@ passwordToggleButtons.forEach(
     }
 );
 
+recoveryForm.addEventListener(
+    "submit",
+    async event => {
+        event.preventDefault();
+
+        const email =
+            recoveryEmail.value.trim();
+
+        showMessage(
+            recoveryMessage,
+            "Sending your reset link...",
+            "success"
+        );
+
+        const { error } =
+            await db.auth
+                .resetPasswordForEmail(
+                    email,
+                    {
+                        redirectTo:
+                            window.location.origin +
+                            "/reset-password.html"
+                    }
+                );
+
+        if (error) {
+            console.error(
+                "Could not send password reset email:",
+                error
+            );
+
+            showMessage(
+                recoveryMessage,
+                "The reset email could not be sent. Please wait a moment and try again.",
+                "error"
+            );
+
+            return;
+        }
+
+        recoveryForm.reset();
+
+        showMessage(
+            recoveryMessage,
+            "If an account exists for that email, a password reset link has been sent.",
+            "success"
+        );
+    }
+);
 
 signupForm.addEventListener(
     "submit",
@@ -208,7 +391,16 @@ signupForm.addEventListener(
                 options: {
                     data: {
                         display_name:
-                            displayName
+                            displayName,
+
+                        terms_accepted_at:
+                            new Date().toISOString(),
+
+                        terms_version:
+                            "2026-08-26",
+
+                        privacy_version:
+                            "2026-08-26"
                     },
 
                     emailRedirectTo:
@@ -244,7 +436,6 @@ signupForm.addEventListener(
         );
     }
 );
-
 
 loginForm.addEventListener(
     "submit",
@@ -287,11 +478,85 @@ loginForm.addEventListener(
 
         loginForm.reset();
 
-        updateAccountScreen(
+        await handleSuccessfulLogin(
             data.session
         );
+    }
+);
 
-        returnToRequestedPage();
+deleteAccountBtn.addEventListener(
+    "click",
+    async () => {
+        const firstConfirmation =
+            window.confirm(
+                "Permanently delete your account and all saved games and boards? This cannot be undone."
+            );
+
+        if (!firstConfirmation) {
+            return;
+        }
+
+        const confirmationText =
+            window.prompt(
+                'Type DELETE to permanently delete your account.'
+            );
+
+        if (
+            confirmationText !==
+            "DELETE"
+        ) {
+            showMessage(
+                deleteAccountMessage,
+                "Account deletion was cancelled.",
+                "error"
+            );
+
+            return;
+        }
+
+        deleteAccountBtn.disabled = true;
+
+        showMessage(
+            deleteAccountMessage,
+            "Deleting your account...",
+            "success"
+        );
+
+        const { error } =
+            await db.rpc(
+                "delete_own_account"
+            );
+
+        if (error) {
+            console.error(
+                "Could not delete account:",
+                error
+            );
+
+            deleteAccountBtn.disabled =
+                false;
+
+            showMessage(
+                deleteAccountMessage,
+                error.message ||
+                    "Your account could not be deleted.",
+                "error"
+            );
+
+            return;
+        }
+
+        await db.auth.signOut({
+            scope: "local"
+        });
+
+        window.alert(
+            "Your account and saved content were permanently deleted."
+        );
+
+        window.location.assign(
+            "index.html"
+        );
     }
 );
 
@@ -324,9 +589,20 @@ async function initializeAccount() {
         return;
     }
 
-    updateAccountScreen(
-        data.session
-    );
+    if (data.session) {
+        updateAccountScreen(
+            data.session
+        );
+
+        await updateAdminAccountAccess(
+            data.session
+        );
+
+        return;
+    }
+
+    updateAccountScreen(null);
+    adminDashboardLink.hidden = true;
 }
 
 initializeAccount();

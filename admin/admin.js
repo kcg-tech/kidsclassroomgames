@@ -917,7 +917,8 @@ function updateFormData() {
     formData.games = [];
 
     const checkedGames = document.querySelectorAll(
-    'input[type="checkbox"]:checked');
+        '#gamesContainer input[type="checkbox"]:checked'
+    );
 
      checkedGames.forEach(game => {
 

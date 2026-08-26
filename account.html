@@ -69,6 +69,13 @@
                     <button type="submit">
                         Log In
                     </button>
+                    <button
+                        id="forgot-password-btn"
+                        type="button"
+                        class="text-button"
+                    >
+                        Forgot your password?
+                    </button>
                 </form>
 
                 <p
@@ -89,6 +96,48 @@
                         Create Account
                     </button>
                 </div>
+            </div>
+
+            <div
+                id="recovery-card"
+                class="account-card"
+                hidden
+            >
+                <h2>Reset Password</h2>
+
+                <p>
+                    Enter your email address and we’ll send you a password reset link.
+                </p>
+
+                <form id="recovery-form">
+                    <label for="recovery-email">
+                        Email
+                    </label>
+
+                    <input
+                        id="recovery-email"
+                        type="email"
+                        autocomplete="email"
+                        required
+                    >
+
+                    <button type="submit">
+                        Send Reset Link
+                    </button>
+                </form>
+
+                <p
+                    id="recovery-message"
+                    aria-live="polite"
+                ></p>
+
+                <button
+                    id="recovery-back-btn"
+                    type="button"
+                    class="secondary-btn"
+                >
+                    Return to Log In
+                </button>
             </div>
 
             <div
@@ -144,6 +193,32 @@
                             Show
                         </button>
                     </div>
+                    <label class="terms-agreement">
+                        <input
+                            id="signup-terms"
+                            type="checkbox"
+                            required
+                        >
+
+                        <span>
+                            I confirm that I am an adult and agree to the
+                            <a
+                                href="terms.html"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                Terms of Use
+                            </a>
+                            and
+                            <a
+                                href="privacy.html"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                Privacy Policy
+                            </a>.
+                        </span>
+                    </label>
 
                     <button type="submit">
                         Sign Up
@@ -182,6 +257,14 @@
                     Signed in as
                     <strong id="current-user-email"></strong>
                 </p>
+                <a
+                    id="admin-dashboard-link"
+                    class="admin-dashboard-link"
+                    href="admin/admin.html"
+                    hidden
+                >
+                    Admin Dashboard
+                </a>
 
                 <button
                     id="logout-btn"
@@ -189,6 +272,30 @@
                 >
                     Log Out
                 </button>
+                <div
+                    id="delete-account-section"
+                    class="delete-account-section"
+                    hidden
+                >
+                    <h3>Delete Account</h3>
+
+                    <p>
+                        Permanently delete your account and all saved games and boards. This cannot be undone.
+                    </p>
+
+                    <button
+                        id="delete-account-btn"
+                        type="button"
+                        class="danger-btn"
+                    >
+                        Delete My Account
+                    </button>
+
+                    <p
+                        id="delete-account-message"
+                        aria-live="polite"
+                    ></p>
+                </div>
             </div>
         </section>
 
