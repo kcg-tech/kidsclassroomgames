@@ -131,8 +131,15 @@ newPasswordForm.addEventListener(
                 error
             );
 
+            const passwordErrorMessage =
+                error.message?.includes(
+                    "different from the old password"
+                )
+                    ? "Your new password must be different from your current password."
+                    : "Your password could not be updated. Please request a new reset link and try again.";
+
             showResetMessage(
-                "This reset link may be invalid or expired. Please request a new one.",
+                passwordErrorMessage,
                 "error"
             );
 
