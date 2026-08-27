@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+Disallow: /admin/
+Disallow: /account.html
+Disallow: /reset-password.html
+
+Sitemap: https://www.kidsclassroomgames.com/sitemap.xml
