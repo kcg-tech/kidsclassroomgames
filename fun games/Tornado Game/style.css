@@ -703,6 +703,126 @@ gap:5px;
     background: #b91c1c;
 }
 
+body.play-mode .resource-guide {
+    display: none;
+}
+
+body:not(.play-mode) .resource-guide {
+    width: min(100%, 1100px);
+
+    margin: 42px auto 0;
+    padding: clamp(24px, 4vw, 40px);
+
+    color: #172554;
+    background:
+        rgba(255, 255, 255, 0.96);
+
+    border: 4px solid #2563eb;
+    border-radius: 24px;
+
+    box-sizing: border-box;
+
+    box-shadow:
+        0 10px 25px
+        rgba(30, 58, 138, 0.15);
+}
+
+body:not(.play-mode)
+.resource-guide-heading {
+    max-width: 820px;
+    margin: 0 auto 28px;
+
+    text-align: center;
+}
+
+body:not(.play-mode)
+.resource-guide-heading h2 {
+    margin: 0 0 14px;
+
+    color: #1d4ed8;
+
+    font-size:
+        clamp(26px, 3.4vw, 42px);
+}
+
+body:not(.play-mode)
+.resource-guide-heading p {
+    margin: 0;
+
+    color: #34466f;
+
+    font-size:
+        clamp(17px, 1.8vw, 21px);
+
+    line-height: 1.65;
+}
+
+body:not(.play-mode)
+.resource-guide-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 20px;
+}
+
+body:not(.play-mode)
+.resource-guide-grid article {
+    padding: 22px;
+
+    background: #eff6ff;
+
+    border: 3px solid #bfdbfe;
+    border-radius: 18px;
+}
+
+body:not(.play-mode)
+.resource-guide-grid article:nth-child(2) {
+    background: #f5f3ff;
+    border-color: #c4b5fd;
+}
+
+body:not(.play-mode)
+.resource-guide-grid h3 {
+    margin: 0 0 12px;
+
+    color: #1e3a8a;
+
+    font-size:
+        clamp(20px, 2vw, 25px);
+}
+
+body:not(.play-mode)
+.resource-guide-grid p,
+body:not(.play-mode)
+.resource-guide-grid li {
+    color: #405176;
+
+    font-size: 17px;
+    line-height: 1.55;
+}
+
+body:not(.play-mode)
+.resource-guide-grid ul,
+body:not(.play-mode)
+.resource-guide-grid ol {
+    margin: 0;
+    padding-left: 24px;
+}
+
+body:not(.play-mode)
+.resource-guide-grid li + li {
+    margin-top: 8px;
+}
+
+@media (max-width: 700px) {
+    body:not(.play-mode)
+    .resource-guide-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 /* Full-screen play page */
 
 body.play-mode {
