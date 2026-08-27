@@ -501,6 +501,7 @@ nav a:focus-visible,
   outline-offset: 3px;
 }
 
+
 /* RESPONSIVE LAYOUT */
 @media (max-width: 900px) {
   header {

@@ -461,6 +461,31 @@ function showView(viewToShow) {
         );
     });
 
+    const isTeacherSetup =
+        viewToShow === roleSelectionView ||
+        viewToShow === teacherSetupView;
+
+    const isStudentView =
+        viewToShow === joinGameView ||
+        viewToShow === playerGameView;
+
+    const isActiveGameView =
+        viewToShow === hostGameView;
+
+    document.body.classList.toggle(
+        "student-mode",
+        isStudentView
+    );
+
+    document.body.classList.toggle(
+        "active-game-mode",
+        isActiveGameView
+    );
+
+    setGameNavigationVisible(
+        isTeacherSetup
+    );
+
     clearPageMessage();
 }
 

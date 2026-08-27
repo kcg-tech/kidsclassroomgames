@@ -21,16 +21,13 @@
         href="../../images/home/kcgfavicon.png"
     >
 
-    <link
-        rel="stylesheet"
-        href="bingo.css"
-    >
+    <link rel="stylesheet" href="bingo.css">
+    <link rel="stylesheet" href="../../gameNavigation.css">
 </head>
 
 <body>
     <header class="page-header">
         <h1>Multiplayer Bingo</h1>
-
         <p>
             Create a classroom game or join
             with a room code.
@@ -62,7 +59,6 @@
                 </button>
             </div>
         </section>
-
 
         <section
             id="teacher-setup-view"
@@ -156,7 +152,6 @@
                     >
                 </div>
 
-
                 <div class="setup-control">
                     <label for="category-select">
                         Choose a Category
@@ -168,13 +163,11 @@
                     ></select>
                 </div>
 
-
                 <div class="setup-control">
                     <h3>Filter by Tags</h3>
 
                     <div id="tags-container"></div>
                 </div>
-
 
                 <div class="setup-control">
                     <label for="language-select">
@@ -186,7 +179,6 @@
                         required
                     ></select>
                 </div>
-
 
                 <fieldset id="teacher-item-mode">
                     <legend>Choose the Item Pool</legend>
@@ -234,7 +226,6 @@
 
                 </fieldset>
 
-
                 <div
                     id="specific-pool-controls"
                     class="hidden"
@@ -263,7 +254,6 @@
                     </div>
                 </div>
 
-
                 <section id="available-items-section">
                     <h3>
                         <span id="available-items-heading">
@@ -276,7 +266,6 @@
                     <div id="available-items-list"></div>
                 </section>
 
-
                 <fieldset id="game-settings">
                     <legend>Game Settings</legend>
 
@@ -288,7 +277,6 @@
                         >
                         Use a FREE center square
                     </label>
-
 
                     <label for="host-display-mode">
                         Teacher Display
@@ -308,7 +296,6 @@
                         </option>
                     </select>
 
-
                     <label for="player-display-mode">
                         Student Card Display
                     </label>
@@ -326,7 +313,6 @@
                             Word Only
                         </option>
                     </select>
-
 
                     <label for="max-players-select">
                         Maximum Players
@@ -403,7 +389,6 @@
             </button>
         </section>
 
-
         <section
             id="join-game-view"
             class="view-panel hidden"
@@ -460,7 +445,6 @@
                 Back
             </button>
         </section>
-
 
         <section
             id="host-game-view"
@@ -667,7 +651,6 @@
 
         </section>
 
-
         <section
             id="player-game-view"
             class="view-panel hidden"
@@ -754,7 +737,6 @@
         ></p>
     </main>
 
-
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     
@@ -769,6 +751,7 @@
     <script src="../../js/preview.js"></script>
     <script src="../../js/pickerUtils.js"></script>
 
+    <script src="../../js/gameNavigation.js"></script>
     <script src="bingo.js"></script>
 </body>
 </html>

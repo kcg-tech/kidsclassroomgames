@@ -185,7 +185,29 @@ async function renderCategories() {
 
     container.appendChild(card);
   });
+
+  const requestedSection =
+    window.location.hash.slice(1);
+
+  if (requestedSection) {
+    const section =
+      document.getElementById(
+        requestedSection
+      );
+
+    if (section) {
+      requestAnimationFrame(() => {
+        section.scrollIntoView({
+          behavior: "auto",
+          block: "start"
+        });
+      });
+    }
+  }
+
 }
+
+
 
 renderCategories();
 
@@ -231,4 +253,3 @@ window.addEventListener(
 );
 
 updateAccountNavigation();
-

@@ -1,0 +1,142 @@
+.game-site-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+
+    width: 100vw;
+    margin-top: 0;
+    margin-right: calc(50% - 50vw);
+    margin-bottom: 28px;
+    margin-left: calc(50% - 50vw);
+    padding: 12px clamp(18px, 5vw, 70px);
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+
+    box-sizing: border-box;
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    background: rgba(255, 255, 255, 0.96);
+    border-bottom: 1px solid #dbeafe;
+    box-shadow: 0 3px 14px rgba(30, 64, 175, 0.08);
+}
+
+.game-site-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+}
+
+.game-site-logo img {
+    width: 52px;
+    height: 52px;
+    object-fit: contain;
+}
+
+.game-site-logo-name {
+    color: #15803d;
+    font-size: clamp(18px, 2vw, 26px);
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.game-site-nav {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.game-site-nav a {
+    display: block;
+    padding: 10px 14px;
+
+    color: #1e3a8a;
+    font-size: 15px;
+    font-weight: 700;
+    text-decoration: none;
+
+    border-radius: 10px;
+
+    transition:
+        background-color 0.2s,
+        color 0.2s,
+        transform 0.2s;
+}
+
+.game-site-nav a:hover {
+    color: white;
+    background: #2563eb;
+    transform: translateY(-2px);
+}
+
+.game-site-nav .game-account-link {
+    color: white;
+    background: #16a34a;
+}
+
+.game-site-nav .game-account-link:hover {
+    background: #15803d;
+}
+
+.game-site-logo:focus-visible,
+.game-site-nav a:focus-visible {
+    outline: 4px solid #f93e3e;
+    outline-offset: 3px;
+}
+
+.game-site-header[hidden],
+body.play-mode .game-site-header,
+body.student-mode .game-site-header,
+body.active-game-mode .game-site-header {
+    display: none;
+}
+
+@media (max-width: 900px) {
+    .game-site-header {
+        flex-direction: column;
+        justify-content: center;
+        gap: 10px;
+        padding: 12px 18px;
+    }
+
+    .game-site-nav {
+        justify-content: center;
+        width: 100%;
+    }
+}
+
+@media (max-width: 520px) {
+    .game-site-logo {
+        width: 100%;
+        justify-content: center;
+        gap: 6px;
+    }
+
+    .game-site-logo img {
+        width: 34px;
+        height: 34px;
+    }
+
+    .game-site-logo-name {
+        font-size: 16px;
+        white-space: normal;
+        text-align: center;
+    }
+
+    .game-site-nav {
+        gap: 5px;
+    }
+
+    .game-site-nav a {
+        padding: 8px 9px;
+        font-size: 13px;
+    }
+}
