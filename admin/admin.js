@@ -1280,6 +1280,24 @@ async function deleteItem(item) {
     if (!confirmed)
         return;
 
+    const deletedTags =
+        await dbDeleteItemTags(
+            item.id
+        );
+
+    console.log(
+        "tags deleted",
+        deletedTags
+    );
+
+    if (!deletedTags) {
+        alert(
+            "The item's tag connections could not be deleted."
+        );
+
+        return;
+    }    
+
     const deletedTranslations =
         await dbDeleteTranslations(
             item.id
@@ -1304,6 +1322,14 @@ async function deleteItem(item) {
         await dbDeleteItem(
             item.id
         );
+
+    if (!deletedItem) {
+        alert(
+            "The item could not be deleted."
+        );
+
+        return;
+    }
 
     console.log(
         "item deleted",
