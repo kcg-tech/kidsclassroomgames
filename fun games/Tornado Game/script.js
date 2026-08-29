@@ -1338,8 +1338,22 @@ submitBtn.textContent =
         presetSelect.value =
             String(savedBoardId);
 
+        customBoardReady = true;
+
+        userInputs.classList.add(
+            "hidden"
+        );
+
+        createBtn.textContent =
+            "Create Board";
+
         updateStartButton();
         updateBoardManagementControls();
+
+        startGameBtn.scrollIntoView({
+            behavior: "smooth",
+            block: "center"
+        });
     } catch (error) {
         console.error(
             "Save Tornado board error:",
@@ -2803,6 +2817,5 @@ function buildScoreBoard() {
 
 refreshAccountState();
 initializePageMode();
-
 
 
