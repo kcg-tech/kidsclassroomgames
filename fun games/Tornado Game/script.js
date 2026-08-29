@@ -159,6 +159,8 @@ const startGameMessage =
 let currentUserId = null;
 let customBoardReady = false;
 let editingBoardId = null;
+let boardSaveInProgress = false;
+let boardOptionsLoadRequest = 0;
 
 let currentQuestion = null;
 let showingAnswer = null;
@@ -1263,8 +1265,11 @@ submitBtn.disabled = true;
 submitBtn.textContent =
     "Saving...";
 
+    boardSaveInProgress = true;
+
     try {
         let savedBoardId;
+        let completionAlertMessage;
 
         if (editingBoardId) {
             const updated =
@@ -1288,9 +1293,8 @@ submitBtn.textContent =
             saveBoardMessage.textContent =
                 `"${boardName}" was updated successfully.`;
 
-            alert(
-                "Your changes were saved. The previous share link is no longer valid. Click Start Game to play."
-            );
+            completionAlertMessage =
+                "Your changes were saved. The previous share link is no longer valid. Click Start Game to play.";
 
             editingBoardId = null;
         } else {
@@ -1328,9 +1332,8 @@ submitBtn.textContent =
             saveBoardMessage.textContent =
                 `"${boardName}" was saved successfully.`;
 
-            alert(
-                "Your Tornado board has been saved. Click Start Game to play."
-            );
+            completionAlertMessage =
+                "Your Tornado board has been saved. Click Start Game to play.";
         }
 
         await loadBoardOptions();
@@ -1354,6 +1357,10 @@ submitBtn.textContent =
             behavior: "smooth",
             block: "center"
         });
+
+        alert(
+            completionAlertMessage
+        );
     } catch (error) {
         console.error(
             "Save Tornado board error:",
@@ -1363,6 +1370,7 @@ submitBtn.textContent =
         saveBoardMessage.textContent =
             "The board could not be saved.";
     } finally {
+        boardSaveInProgress = false;
         submitBtn.disabled = false;
         submitBtn.textContent =
             "Save & Use Board";
@@ -2309,6 +2317,12 @@ function addBoardOptionGroup(
 }
 
 async function loadBoardOptions() {
+    const requestId =
+        ++boardOptionsLoadRequest;
+
+    const selectedBoardValue =
+        presetSelect.value;
+
     const { data, error } =
         await db.auth.getSession();
 
@@ -2329,6 +2343,13 @@ async function loadBoardOptions() {
         await dbGetTornadoBoardList(
             userId
         );
+
+    if (
+        requestId !==
+        boardOptionsLoadRequest
+    ) {
+        return;
+    }
 
     availableBoards =
         boards;
@@ -2377,6 +2398,20 @@ async function loadBoardOptions() {
         myBoards
     );
 
+    const selectedBoardStillExists =
+        Array.from(
+            presetSelect.options
+        ).some(
+            option =>
+                option.value ===
+                    selectedBoardValue
+        );
+
+    if (selectedBoardStillExists) {
+        presetSelect.value =
+            selectedBoardValue;
+    }
+
     updateStartButton();
 }
 
@@ -2398,6 +2433,10 @@ document
     );
 
 async function refreshAccountState() {
+    if (boardSaveInProgress) {
+        return;
+    }
+
     await updateSaveBoardAccess();
     await loadBoardOptions();
 
@@ -2817,5 +2856,3 @@ function buildScoreBoard() {
 
 refreshAccountState();
 initializePageMode();
-
-
