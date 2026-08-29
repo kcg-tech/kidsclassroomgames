@@ -14,6 +14,11 @@ const japanese =
 const gamesContainer =
     document.getElementById("gamesContainer");
 
+const selectAllGamesBtn =
+    document.getElementById(
+        "selectAllGamesBtn"
+    );
+
 const tagsContainer =
     document.getElementById(
         "tagsContainer"
@@ -418,6 +423,23 @@ filterTagsContainer.addEventListener(
     loadItems
 );
 
+selectAllGamesBtn.addEventListener(
+    "click",
+    () => {
+
+        gamesContainer
+            .querySelectorAll(
+                'input[type="checkbox"]'
+            )
+            .forEach(checkbox => {
+
+                checkbox.checked = true;
+
+            });
+
+    }
+);
+
 async function updateSavedItemTagFilters() {
     filterTagsContainer.innerHTML = "";
 
@@ -557,7 +579,34 @@ async function saveItem(formData) {
     let imagePath = null;
     const savedGameIds = [];
     
-    try{   
+    try{
+
+        const englishLanguage =
+            await dbGetLanguageByCode("en");
+
+        if (!englishLanguage) {
+
+            throw new Error(
+                "English language not found"
+            );
+
+        }
+
+        const duplicateItems =
+            await dbGetTranslationByText(
+                englishLanguage.id,
+                formData.translations.en
+            );
+
+        if (duplicateItems.length > 0) {
+
+            alert(
+                "English item already exists. The image was not uploaded."
+            );
+
+            return;
+
+        }
         
         const image =
             await storageUploadImage(
@@ -589,33 +638,6 @@ async function saveItem(formData) {
 
         formData.item.id = savedItem.id;
         itemId = savedItem.id; 
-
-        const englishLanguage =
-        await dbGetLanguageByCode("en");
-
-        if (!englishLanguage) {
-
-            throw new Error(
-                "English language not found"
-            );
-
-        }
-
-        const duplicateItems =
-            await dbGetTranslationByText(
-                englishLanguage.id,
-                formData.translations.en
-            );
-
-        if (duplicateItems.length > 0) {
-
-            alert(
-                "English item already exists."
-            );
-
-            return;
-
-        }
 
         const japaneseLanguage =
             await dbGetLanguageByCode("jp");

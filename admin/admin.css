@@ -177,6 +177,21 @@ input[type="text"]{
     background: #f8fafc;
 }
 
+.checkbox-action-btn {
+    margin: 0 0 10px;
+    padding: 9px 14px;
+    border: 2px solid #2563eb;
+    border-radius: 8px;
+    background: #2563eb;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.checkbox-action-btn:hover {
+    background: #1d4ed8;
+}
+
 #gamesContainer label,
 #tagsContainer label {
     display: flex;

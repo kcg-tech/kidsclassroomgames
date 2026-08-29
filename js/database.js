@@ -516,7 +516,7 @@ async function dbGetTranslationByText(
                 "language_id",
                 languageId
             )
-            .ilike(
+            .eq(
                 "text",
                 text
             );
