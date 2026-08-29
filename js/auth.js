@@ -13,8 +13,11 @@ const loggedOutSection =
 const loggedInSection =
     document.getElementById("logged-in-section");
 
-const currentUserEmail =
-    document.getElementById("current-user-email");
+const currentUserName =
+    document.getElementById("current-user-name");
+
+const currentAccountType =
+    document.getElementById("current-account-type");
 
 const signupMessage =
     document.getElementById("signup-message");
@@ -147,9 +150,53 @@ function updateAccountScreen(session) {
     loggedInSection.hidden =
         !isLoggedIn;
 
-    currentUserEmail.textContent =
-        session?.user?.email || "";
+    currentUserName.textContent =
+        session?.user?.user_metadata
+            ?.display_name?.trim() ||
+        "User";
+
+    if (!isLoggedIn) {
+        currentAccountType.textContent = "";
+    }
 }
+
+async function updateAccountType(
+    session,
+    isAdmin
+) {
+    if (!session?.user) {
+        currentAccountType.textContent = "";
+        return;
+    }
+
+    if (isAdmin) {
+        currentAccountType.textContent =
+            "Administrator Account";
+        return;
+    }
+
+    const { data: hasPremium, error } =
+        await db.rpc(
+            "user_has_premium"
+        );
+
+    if (error) {
+        console.error(
+            "Could not check account type:",
+            error
+        );
+
+        currentAccountType.textContent =
+            "Regular Account";
+        return;
+    }
+
+    currentAccountType.textContent =
+        hasPremium
+            ? "Premium Account"
+            : "Regular Account";
+}
+
 async function updateAdminAccountAccess(
     session
 ) {
@@ -199,6 +246,11 @@ async function handleSuccessfulLogin(
         await updateAdminAccountAccess(
             session
         );
+
+    await updateAccountType(
+        session,
+        isAdmin
+    );
 
     if (isAdmin === false) {
         window.location.assign(
@@ -577,6 +629,10 @@ db.auth.onAuthStateChange(
         updateAccountScreen(
             session
         );
+
+        if (!session) {
+            currentAccountType.textContent = "";
+        }
     }
 );
 
@@ -594,8 +650,14 @@ async function initializeAccount() {
             data.session
         );
 
-        await updateAdminAccountAccess(
-            data.session
+        const isAdmin =
+            await updateAdminAccountAccess(
+                data.session
+            );
+
+        await updateAccountType(
+            data.session,
+            isAdmin
         );
 
         return;
