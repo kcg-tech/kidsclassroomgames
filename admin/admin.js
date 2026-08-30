@@ -36,6 +36,8 @@ const dropZone =
 const saveBtn = 
     document.getElementById("saveBtn");
 
+let itemSaveInProgress = false;
+
 const searchInput =
     document.getElementById(
         "searchInput"
@@ -383,6 +385,10 @@ dropZone.addEventListener("dragleave",()=>{
 
 saveBtn.addEventListener("click", async () => {
 
+    if (itemSaveInProgress) {
+        return;
+    }
+
     updateFormData();
 
     if (!validateItem(formData))
@@ -391,16 +397,40 @@ saveBtn.addEventListener("click", async () => {
     if (!validateGames(formData))
         return;
 
-    if (formData.editMode) {
+    itemSaveInProgress = true;
+    saveBtn.disabled = true;
+    saveBtn.setAttribute(
+        "aria-busy",
+        "true"
+    );
+    saveBtn.textContent =
+        formData.editMode
+            ? "Updating..."
+            : "Saving...";
 
-        await updateItem(formData);
+    try {
+        if (formData.editMode) {
 
+            await updateItem(formData);
+
+        }
+        else {
+
+            await saveItem(formData);
+
+        }
     }
-    else {
-
-        await saveItem(formData);
-
-    };
+    finally {
+        itemSaveInProgress = false;
+        saveBtn.disabled = false;
+        saveBtn.removeAttribute(
+            "aria-busy"
+        );
+        saveBtn.textContent =
+            formData.editMode
+                ? "Update Item"
+                : "Save Item";
+    }
 
 
 });

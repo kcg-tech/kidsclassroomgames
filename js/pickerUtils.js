@@ -314,7 +314,7 @@ const revealNotes = [
 
         const pickedIds =
             new Set(
-                pickedItemIds.map(Number)
+                pickedItemIds.map(String)
             );
 
         items.forEach((item, index) => {
@@ -333,7 +333,7 @@ const revealNotes = [
 
             if (
                 pickedIds.has(
-                    Number(item.id)
+                    String(item.id)
                 )
             ) {
                 itemCard.classList.add(
@@ -355,7 +355,8 @@ const revealNotes = [
             }
 
             if (
-                displayMode !== "image"
+                displayMode !== "image" ||
+                item.custom
             ) {
                 const itemName =
                     document.createElement("span");

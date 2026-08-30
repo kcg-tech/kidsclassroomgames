@@ -3413,3 +3413,161 @@ async function dbGetFreeSavedGameLimit() {
 
     return limit;
 }
+
+// GRID LOTTERY
+
+async function dbSaveGridLotterySet({
+    name,
+    languageId,
+    displayMode,
+    itemIds,
+    customItems
+}) {
+    const { data, error } = await db.rpc(
+        "save_grid_lottery_set",
+        {
+            input_name: name,
+            input_language_id: languageId,
+            input_display_mode: displayMode,
+            input_item_ids: itemIds,
+            input_custom_items: customItems
+        }
+    );
+
+    if (error) console.error("Could not save Grid Lottery Set:", error);
+    return { data, error };
+}
+
+async function dbUpdateGridLotterySet({
+    setId,
+    name,
+    languageId,
+    displayMode,
+    itemIds,
+    customItems
+}) {
+    const { data, error } = await db.rpc(
+        "update_grid_lottery_set",
+        {
+            input_set_id: setId,
+            input_name: name,
+            input_language_id: languageId,
+            input_display_mode: displayMode,
+            input_item_ids: itemIds,
+            input_custom_items: customItems
+        }
+    );
+
+    if (error) console.error("Could not update Grid Lottery Set:", error);
+    return { data, error };
+}
+
+async function dbGetMyGridLotterySets() {
+    const { data, error } = await db
+        .from("grid_lottery_sets")
+        .select("id, name, language_id, display_mode, custom_items, created_at, updated_at")
+        .eq("active", true)
+        .order("updated_at", { ascending: false });
+
+    if (error) console.error("Could not load Grid Lottery Sets:", error);
+    return { data: data || [], error };
+}
+
+async function dbGetGridLotterySetItems(setId, languageId) {
+    const { data: setRows, error: setError } = await db
+        .from("grid_lottery_set_items")
+        .select("item_id, position")
+        .eq("set_id", setId)
+        .order("position", { ascending: true });
+
+    if (setError) {
+        console.error("Could not load Grid Lottery Set items:", setError);
+        return { data: [], error: setError };
+    }
+
+    const itemIds = (setRows || []).map(row => Number(row.item_id));
+
+    if (itemIds.length === 0) return { data: [], error: null };
+
+    const [itemsResult, translationsResult] = await Promise.all([
+        db
+            .from("items")
+            .select("id, image_url, active")
+            .in("id", itemIds)
+            .eq("active", true),
+        db
+            .from("translations")
+            .select("item_id, text")
+            .in("item_id", itemIds)
+            .eq("language_id", languageId)
+    ]);
+
+    const error = itemsResult.error || translationsResult.error;
+
+    if (error) {
+        console.error("Could not load Grid Lottery Set items:", error);
+        return { data: [], error };
+    }
+
+    const items = itemIds.map(itemId => {
+        const item = itemsResult.data.find(row => Number(row.id) === itemId);
+        const translation = translationsResult.data.find(
+            row => Number(row.item_id) === itemId
+        );
+
+        if (!item) return null;
+
+        return {
+            id: itemId,
+            name: translation?.text || "(No translation)",
+            url: item.image_url
+        };
+    }).filter(Boolean);
+
+    return {
+        data: items,
+        error: null
+    };
+}
+
+async function dbDeleteGridLotterySet(setId) {
+    const { data, error } = await db.rpc(
+        "delete_grid_lottery_set",
+        { input_set_id: setId }
+    );
+
+    if (error) console.error("Could not delete Grid Lottery Set:", error);
+    return { data, error };
+}
+
+async function dbEnableGridLotterySetSharing(setId) {
+    const { data, error } = await db.rpc(
+        "enable_grid_lottery_set_sharing",
+        { input_set_id: setId }
+    );
+
+    if (error) console.error("Could not share Grid Lottery Set:", error);
+    return { data, error };
+}
+
+async function dbGetSharedGridLotterySet(slug) {
+    const { data: set, error } = await db
+        .from("grid_lottery_sets")
+        .select("id, name, language_id, display_mode, custom_items")
+        .eq("slug", slug)
+        .eq("active", true)
+        .eq("is_public", true)
+        .maybeSingle();
+
+    if (error || !set) {
+        if (error) console.error("Could not load shared Grid Lottery Set:", error);
+        return { data: null, error };
+    }
+
+    const itemsResult = await dbGetGridLotterySetItems(set.id, set.language_id);
+
+    return {
+        data: itemsResult.error ? null : { ...set, items: itemsResult.data },
+        error: itemsResult.error
+    };
+}

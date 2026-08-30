@@ -161,6 +161,7 @@ let customBoardReady = false;
 let editingBoardId = null;
 let boardSaveInProgress = false;
 let boardOptionsLoadRequest = 0;
+let preferredBoardId = null;
 
 let currentQuestion = null;
 let showingAnswer = null;
@@ -1336,12 +1337,8 @@ submitBtn.textContent =
                 "Your Tornado board has been saved. Click Start Game to play.";
         }
 
-        await loadBoardOptions();
-
-        presetSelect.value =
+        preferredBoardId =
             String(savedBoardId);
-
-        customBoardReady = true;
 
         userInputs.classList.add(
             "hidden"
@@ -1349,6 +1346,13 @@ submitBtn.textContent =
 
         createBtn.textContent =
             "Create Board";
+
+        await loadBoardOptions();
+
+        presetSelect.value =
+            preferredBoardId;
+
+        customBoardReady = false;
 
         updateStartButton();
         updateBoardManagementControls();
@@ -1808,6 +1812,7 @@ deleteBoardBtn.addEventListener(
 
         presetSelect.value = "select";
         customBoardReady = false;
+        preferredBoardId = null;
 
         updateStartButton();
         updateBoardManagementControls();
@@ -1821,6 +1826,14 @@ deleteBoardBtn.addEventListener(
 presetSelect.addEventListener(
     "change",
     () => {
+        preferredBoardId =
+            presetSelect.value ===
+                "select"
+                ? null
+                : presetSelect.value;
+
+        customBoardReady = false;
+
         updateStartButton();
         updateBoardManagementControls();
     }
@@ -2321,6 +2334,7 @@ async function loadBoardOptions() {
         ++boardOptionsLoadRequest;
 
     const selectedBoardValue =
+        preferredBoardId ||
         presetSelect.value;
 
     const { data, error } =
@@ -2409,6 +2423,9 @@ async function loadBoardOptions() {
 
     if (selectedBoardStillExists) {
         presetSelect.value =
+            selectedBoardValue;
+
+        preferredBoardId =
             selectedBoardValue;
     }
 

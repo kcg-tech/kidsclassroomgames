@@ -1,0 +1,382 @@
+:root {
+    --navy: #172b63;
+    --blue: #2f66e8;
+    --light-blue: #eaf2ff;
+    --green: #18a957;
+    --orange: #ffad25;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+    margin: 0;
+    padding-bottom: 48px;
+    font-family: "Comic Sans MS", "Comic Sans", cursive;
+    color: var(--navy);
+    background:
+        rgba(255, 255, 255, 0.8)
+        url("../../images/home/kcgbackground.png")
+        center / cover fixed;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.page-heading {
+    width: min(1000px, calc(100% - 32px));
+    margin: 0 auto 22px;
+    text-align: center;
+}
+
+.page-heading h1 {
+    margin: 0 0 8px;
+    color: #245ddd;
+    font-size: clamp(38px, 7vw, 72px);
+}
+
+.page-heading p {
+    margin: 0;
+    font-size: clamp(17px, 2.3vw, 24px);
+    font-weight: 700;
+}
+
+main {
+    width: min(1050px, calc(100% - 28px));
+    margin: 0 auto;
+}
+
+.lottery-setup,
+.resource-guide {
+    margin: 22px auto;
+    padding: clamp(20px, 4vw, 38px);
+    border: 4px solid var(--blue);
+    border-radius: 28px;
+    background: rgba(255, 255, 255, 0.97);
+    box-shadow: 0 12px 30px rgba(47, 102, 232, 0.15);
+}
+
+.lottery-setup > h2,
+.resource-guide h2 {
+    margin: 0 0 24px;
+    text-align: center;
+    font-size: clamp(27px, 4vw, 42px);
+}
+
+.form-control {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.form-control label,
+fieldset legend {
+    font-size: clamp(18px, 2vw, 23px);
+    font-weight: 800;
+}
+
+input,
+select,
+textarea,
+button {
+    font: inherit;
+}
+
+input,
+select,
+textarea {
+    width: 100%;
+    min-height: 52px;
+    padding: 11px 14px;
+    color: var(--navy);
+    border: 3px solid #b8d0ff;
+    border-radius: 14px;
+    background: white;
+}
+
+textarea {
+    min-height: 130px;
+    resize: vertical;
+}
+
+input:focus,
+select:focus,
+textarea:focus,
+button:focus-visible {
+    outline: 4px solid rgba(255, 173, 37, 0.45);
+    outline-offset: 2px;
+}
+
+.filter-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.tag-fieldset,
+.item-mode-control {
+    margin: 0 0 22px;
+    padding: 18px;
+    border: 3px solid #c7d9ff;
+    border-radius: 18px;
+    background: #f7faff;
+}
+
+.tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
+}
+
+.tag-list label,
+.item-mode-control label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 12px;
+    border: 2px solid #d6e3ff;
+    border-radius: 12px;
+    background: white;
+    cursor: pointer;
+}
+
+.tag-list input,
+.item-mode-control input {
+    width: 20px;
+    min-height: 20px;
+    margin: 0;
+}
+
+.item-mode-control {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.item-mode-control legend {
+    padding: 0 8px;
+}
+
+.library-items {
+    margin: 24px 0;
+    padding: 18px;
+    border: 4px solid var(--orange);
+    border-radius: 22px;
+    background: #fffaf0;
+}
+
+.saved-lottery-sets {
+    margin: 0 0 26px;
+    padding: 18px;
+    border: 3px solid #b8d0ff;
+    border-radius: 20px;
+    background: #f5f9ff;
+}
+
+.saved-lottery-sets .section-title-row h3 {
+    font-size: clamp(20px, 2.5vw, 28px);
+}
+
+.saved-lottery-sets .section-title-row span {
+    font-weight: 800;
+}
+
+.saved-set-controls {
+    display: grid;
+    grid-template-columns: minmax(180px, 1fr) auto auto auto;
+    gap: 10px;
+}
+
+.saved-set-controls button {
+    min-height: 52px;
+    padding: 10px 18px;
+    color: white;
+    font-weight: 800;
+    border: 0;
+    border-radius: 13px;
+    background: var(--blue);
+    cursor: pointer;
+}
+
+#shareSavedSetBtn {
+    background: var(--green);
+}
+
+#editSavedSetBtn {
+    background: var(--orange);
+}
+
+.saved-set-controls #deleteSavedSetBtn {
+    background: #c83b3b;
+}
+
+.saved-set-controls button:disabled,
+.setup-actions button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.saved-set-message {
+    min-height: 22px;
+    margin: 10px 0 0;
+    text-align: center;
+    font-weight: 800;
+}
+
+.section-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 14px;
+}
+
+.section-title-row h3 {
+    margin: 0;
+    font-size: clamp(22px, 3vw, 31px);
+}
+
+.item-preview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 12px;
+    max-height: 390px;
+    overflow-y: auto;
+    padding: 4px;
+}
+
+.preview-item {
+    min-width: 0;
+    min-height: 145px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 7px;
+    color: var(--navy);
+    text-align: center;
+    font-weight: 800;
+    border: 3px solid #b8d0ff;
+    border-radius: 16px;
+    background: var(--light-blue);
+}
+
+button.preview-item {
+    cursor: pointer;
+}
+
+.preview-item img {
+    width: 88px;
+    height: 88px;
+    object-fit: contain;
+    background: white;
+}
+
+.preview-item.selected-item {
+    color: #0c622f;
+    border-color: var(--green);
+    background: #dff8e8;
+    box-shadow: inset 0 0 0 3px white;
+}
+
+.preview-item:not(.selected-item)[aria-pressed="false"] {
+    opacity: 0.52;
+}
+
+.item-filter-message {
+    grid-column: 1 / -1;
+    text-align: center;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.custom-items-control p {
+    margin: 0;
+    font-size: 15px;
+}
+
+.setup-message {
+    min-height: 24px;
+    margin: 12px 0;
+    color: #bf2525;
+    text-align: center;
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.setup-actions {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.setup-actions button {
+    min-width: min(300px, 100%);
+    min-height: 58px;
+    padding: 12px 24px;
+    color: white;
+    font-size: clamp(19px, 2.5vw, 27px);
+    font-weight: 900;
+    border: 0;
+    border-radius: 16px;
+    cursor: pointer;
+    box-shadow: 0 5px 0 #0f7139;
+}
+
+#startLotteryBtn {
+    background: var(--green);
+}
+
+#saveLotteryBtn {
+    background: var(--blue);
+    box-shadow: 0 5px 0 #1845aa;
+}
+
+#resetLotteryBtn {
+    color: var(--navy);
+    background: #dfe7f6;
+    box-shadow: 0 5px 0 #9ba9c2;
+}
+
+.resource-guide {
+    border-color: var(--orange);
+}
+
+.resource-guide ol {
+    width: min(680px, 100%);
+    margin: 0 auto;
+    padding-left: 28px;
+    font-size: clamp(17px, 2vw, 21px);
+    line-height: 1.7;
+}
+
+@media (max-width: 760px) {
+    .filter-grid {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    .item-preview-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        max-height: 340px;
+    }
+
+    .section-title-row {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .setup-actions {
+        flex-direction: column;
+    }
+
+    .saved-set-controls {
+        grid-template-columns: 1fr;
+    }
+}

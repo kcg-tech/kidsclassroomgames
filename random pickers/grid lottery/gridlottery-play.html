@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+    <title>Play Grid Lottery | Kids Classroom Games</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="icon" type="image/png" href="../../images/home/kcgfavicon.png">
+    <link rel="stylesheet" href="gridlottery-play.css">
+</head>
+
+<body>
+    <main class="play-layout">
+        <header class="play-heading">
+            <h1 id="lotteryTitle">Grid Lottery</h1>
+
+            <div class="play-controls">
+                <p id="remainingCount">0 items remaining</p>
+
+                <button id="pickNextBtn" type="button">
+                    Pick Next
+                </button>
+
+                <button id="resetBtn" type="button">
+                    Reset
+                </button>
+            </div>
+        </header>
+
+        <section
+            id="lotteryGrid"
+            class="lottery-grid"
+            aria-label="Covered Grid Lottery items"
+        ></section>
+
+        <p id="playMessage" class="play-message" aria-live="polite"></p>
+    </main>
+
+    <div
+        id="selectedItemModal"
+        class="selected-item-modal hidden"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="selectedItemTitle"
+    >
+        <div class="selected-item-card">
+            <button
+                id="closeSelectedItemBtn"
+                type="button"
+                aria-label="Close selected item"
+            >
+                ×
+            </button>
+
+            <h2 id="selectedItemTitle">Selected Item</h2>
+            <div id="selectedItemContent"></div>
+            <p class="close-note">Click anywhere to continue</p>
+        </div>
+    </div>
+
+    <script src="../../js/pickerUtils.js"></script>
+    <script src="gridlottery-play.js"></script>
+</body>
+</html>

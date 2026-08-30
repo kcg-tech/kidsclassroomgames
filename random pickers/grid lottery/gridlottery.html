@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+    <title>Grid Lottery | Kids Classroom Games</title>
+    <meta
+        name="description"
+        content="Create a classroom grid lottery using vocabulary pictures and words from the Kids Classroom Games library or your own custom entries."
+    >
+    <link
+        rel="canonical"
+        href="https://www.kidsclassroomgames.com/random%20pickers/grid%20lottery/gridlottery.html"
+    >
+    <link rel="icon" type="image/png" href="../../images/home/kcgfavicon.png">
+    <link rel="stylesheet" href="../../gameNavigation.css">
+    <link rel="stylesheet" href="../../adStyles.css">
+    <link rel="stylesheet" href="gridlottery.css">
+</head>
+
+<body data-page-audience="teacher">
+    <header class="page-heading">
+        <h1>Grid Lottery</h1>
+        <p>
+            Choose items from the library, add your own entries,
+            and open a covered lottery grid for your class.
+        </p>
+    </header>
+
+    <div
+        class="kcg-ad-slot"
+        data-ad-placement="grid-lottery-top"
+        hidden
+    ></div>
+
+    <main>
+        <section class="lottery-setup" aria-labelledby="setup-title">
+            <h2 id="setup-title">Create a Grid Lottery</h2>
+
+            <section class="saved-lottery-sets" aria-labelledby="saved-sets-title">
+                <div class="section-title-row">
+                    <h3 id="saved-sets-title">Saved Grid Lottery Sets</h3>
+                    <span id="savedSetsLimit">Log in to save up to 10 sets.</span>
+                </div>
+
+                <div class="saved-set-controls">
+                    <select id="savedSetSelect" aria-label="Saved Grid Lottery Sets">
+                        <option value="">Choose a saved set</option>
+                    </select>
+                    <button id="editSavedSetBtn" type="button" disabled>Edit</button>
+                    <button id="shareSavedSetBtn" type="button" disabled>Create Link</button>
+                    <button id="deleteSavedSetBtn" type="button" disabled>Delete Set</button>
+                </div>
+
+                <p id="savedSetMessage" class="saved-set-message" aria-live="polite"></p>
+            </section>
+
+            <div class="form-control">
+                <label for="lotteryTitle">Grid Lottery Name</label>
+                <input
+                    id="lotteryTitle"
+                    type="text"
+                    maxlength="80"
+                    placeholder="Example: Animal Vocabulary"
+                    required
+                >
+            </div>
+
+            <div class="filter-grid">
+                <div class="form-control">
+                    <label for="categorySelect">Category</label>
+                    <select id="categorySelect" required></select>
+                </div>
+
+                <div class="form-control">
+                    <label for="languageSelect">Language</label>
+                    <select id="languageSelect" required></select>
+                </div>
+
+                <div class="form-control">
+                    <label for="displayMode">Item Display</label>
+                    <select id="displayMode" required>
+                        <option value="image-text">Image + Word</option>
+                        <option value="image">Image Only</option>
+                        <option value="text">Word Only</option>
+                    </select>
+                </div>
+            </div>
+
+            <fieldset class="tag-fieldset">
+                <legend>Filter by Tags</legend>
+                <div id="tagsContainer" class="tag-list"></div>
+            </fieldset>
+
+            <fieldset class="item-mode-control">
+                <legend>Choose Library Items</legend>
+
+                <label>
+                    <input
+                        type="radio"
+                        name="lotteryItemMode"
+                        value="all"
+                        checked
+                    >
+                    Use All Matching Items
+                </label>
+
+                <label>
+                    <input
+                        type="radio"
+                        name="lotteryItemMode"
+                        value="specific"
+                    >
+                    Choose Specific Items
+                </label>
+            </fieldset>
+
+            <section class="library-items" aria-labelledby="library-items-title">
+                <div class="section-title-row">
+                    <h3 id="library-items-title">Library Items</h3>
+                    <span>
+                        Selected: <strong id="selectedItemsCount">0</strong>
+                    </span>
+                </div>
+
+                <div id="selectedItemsList" class="item-preview-grid"></div>
+            </section>
+
+            <div class="form-control custom-items-control">
+                <label for="customItems">Add Your Own Items</label>
+                <textarea
+                    id="customItems"
+                    rows="5"
+                    maxlength="3000"
+                    placeholder="Enter items separated by commas or press Enter after each item."
+                ></textarea>
+                <p>
+                    Custom entries are displayed as words, even when Image Only is selected.
+                </p>
+            </div>
+
+            <p id="setupMessage" class="setup-message" aria-live="polite"></p>
+
+            <div class="setup-actions">
+                <button id="startLotteryBtn" type="button">
+                    Start Grid Lottery
+                </button>
+
+                <button id="saveLotteryBtn" type="button">
+                    Save Grid Lottery Set
+                </button>
+
+                <button id="resetLotteryBtn" type="button">
+                    Reset
+                </button>
+            </div>
+        </section>
+
+        <section class="resource-guide" aria-labelledby="guide-title">
+            <h2 id="guide-title">How to Use Grid Lottery</h2>
+            <ol>
+                <li>Choose library items or add your own words.</li>
+                <li>Open the lottery in a separate classroom tab.</li>
+                <li>Select Pick Next to reveal one covered square.</li>
+                <li>Continue until every item has been revealed.</li>
+            </ol>
+        </section>
+    </main>
+
+    <div
+        class="kcg-ad-slot"
+        data-ad-placement="grid-lottery-bottom"
+        hidden
+    ></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../../js/config.js"></script>
+    <script src="../../js/utils.js"></script>
+    <script src="../../js/supabase.js"></script>
+    <script src="../../js/database.js"></script>
+    <script src="../../js/filters.js"></script>
+    <script src="../../js/adUtils.js"></script>
+    <script src="../../js/gameNavigation.js"></script>
+    <script src="gridlottery.js"></script>
+</body>
+</html>

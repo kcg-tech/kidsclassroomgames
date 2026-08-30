@@ -466,17 +466,21 @@ async function generateBingo() {
 );
 }
 
-async function addBingoJapaneseFont(
-    pdf
+async function addBingoPdfFont(
+    pdf,
+    fontUrl,
+    fileName,
+    fontName,
+    fontStyle = "normal"
 ) {
     const response =
         await fetch(
-            "../flash card/fonts/NotoSansJP.ttf"
+            fontUrl
         );
 
     if (!response.ok) {
         throw new Error(
-            "Could not load the Japanese font."
+            `Could not load ${fontName}.`
         );
     }
 
@@ -513,15 +517,41 @@ async function addBingoJapaneseFont(
         btoa(binaryString);
 
     pdf.addFileToVFS(
-        "NotoSansJP.ttf",
+        fileName,
         fontBase64
     );
 
     pdf.addFont(
-        "NotoSansJP.ttf",
-        "NotoSansJP",
-        "normal"
+        fileName,
+        fontName,
+        fontStyle
     );
+}
+
+async function addBingoPdfFonts(
+    pdf
+) {
+    await Promise.all([
+        addBingoPdfFont(
+            pdf,
+            "../flash card/fonts/NotoSansJP.ttf",
+            "NotoSansJP.ttf",
+            "NotoSansJP"
+        ),
+        addBingoPdfFont(
+            pdf,
+            "fonts/ComicNeue-Regular.ttf",
+            "ComicNeue-Regular.ttf",
+            "ComicNeue"
+        ),
+        addBingoPdfFont(
+            pdf,
+            "fonts/ComicNeue-Bold.ttf",
+            "ComicNeue-Bold.ttf",
+            "ComicNeue",
+            "bold"
+        )
+    ]);
 }
 
 function bingoTextContainsJapanese(
@@ -576,7 +606,7 @@ function setBingoPdfFont(
     }
 
     pdf.setFont(
-        "helvetica",
+        "ComicNeue",
         useBold
             ? "bold"
             : "normal"
@@ -907,7 +937,7 @@ async function downloadPdf() {
                 format: "a4"
             });
 
-        await addBingoJapaneseFont(
+        await addBingoPdfFonts(
             pdf
         );
 
