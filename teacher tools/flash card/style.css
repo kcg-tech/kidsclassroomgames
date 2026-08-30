@@ -4,6 +4,7 @@
     box-sizing: border-box;
 }
 
+html,
 body {
     min-height: 100vh;
     margin: 0;
@@ -19,6 +20,13 @@ body {
         url("../../images/home/kcgbackground.png");
     background-repeat: repeat;
     background-size: 420px;
+}
+
+button,
+input,
+select,
+textarea {
+    font-family: inherit;
 }
 
 header {
