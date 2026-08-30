@@ -89,6 +89,11 @@ body {
     background: #dfe7f6;
 }
 
+#resetBtn.play-again {
+    color: white;
+    background: #d93636;
+}
+
 .play-controls button:disabled {
     opacity: 0.5;
     cursor: not-allowed;
@@ -262,12 +267,6 @@ body {
     font-weight: 900;
     line-height: 1.05;
     overflow-wrap: anywhere;
-}
-
-.close-note {
-    margin: 18px 0 0;
-    font-size: clamp(14px, 2vw, 19px);
-    font-weight: 700;
 }
 
 @media (max-width: 720px) {

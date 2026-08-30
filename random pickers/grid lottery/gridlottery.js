@@ -65,6 +65,7 @@ let availableLibraryItems = [];
 let itemSelectionMode = "all";
 let savedLotterySets = [];
 let freeSavedGameLimit = 10;
+let editingSetId = null;
 
 const selectedLibraryItemIds =
     new Set();
@@ -439,23 +440,39 @@ async function saveGridLotterySet() {
     saveLotteryBtn.disabled = true;
     saveLotteryBtn.textContent = "Saving...";
 
-    const result = await dbSaveGridLotterySet({
+    const saveValues = {
         name: setup.name,
         languageId: setup.languageId,
         displayMode: setup.displayMode,
         itemIds: setup.libraryItems.map(item => Number(item.id)),
         customItems: setup.customItems.map(item => item.name)
-    });
+    };
+
+    const updatingExistingSet = editingSetId !== null;
+
+    const result = updatingExistingSet
+        ? await dbUpdateGridLotterySet({
+            setId: editingSetId,
+            ...saveValues
+        })
+        : await dbSaveGridLotterySet(saveValues);
 
     saveLotteryBtn.disabled = false;
     saveLotteryBtn.textContent = "Save Grid Lottery Set";
 
     if (result.error) {
-        savedSetMessage.textContent = result.error.message || "The Grid Lottery Set could not be saved.";
+        savedSetMessage.textContent = result.error.message || (
+            updatingExistingSet
+                ? "The saved set could not be edited."
+                : "The Grid Lottery Set could not be saved."
+        );
         return;
     }
 
-    savedSetMessage.textContent = "Grid Lottery Set saved successfully.";
+    editingSetId = null;
+    savedSetMessage.textContent = updatingExistingSet
+        ? "Grid Lottery Set updated successfully."
+        : "Grid Lottery Set saved successfully.";
     await loadSavedLotterySets();
 }
 
@@ -495,51 +512,10 @@ async function editSelectedLotterySet() {
 
     if (!set) return;
 
-    const requiredFields = [
-        document.getElementById("lotteryTitle"),
-        categorySelect,
-        languageSelect,
-        displayModeSelect
-    ];
-    const firstInvalidField = requiredFields.find(
-        field => !field.checkValidity()
-    );
-
-    if (firstInvalidField) {
-        firstInvalidField.reportValidity();
-        return;
-    }
-
-    const setup = getLotterySetupValues();
-    const validationMessage = validateLotterySetup(setup, true);
-
-    if (validationMessage) {
-        savedSetMessage.textContent = validationMessage;
-        return;
-    }
-
+    editingSetId = Number(set.id);
     editSavedSetBtn.disabled = true;
-    editSavedSetBtn.textContent = "Saving...";
-
-    const result = await dbUpdateGridLotterySet({
-        setId: set.id,
-        name: setup.name,
-        languageId: setup.languageId,
-        displayMode: setup.displayMode,
-        itemIds: setup.libraryItems.map(item => Number(item.id)),
-        customItems: setup.customItems.map(item => item.name)
-    });
-
-    editSavedSetBtn.textContent = "Edit";
-
-    if (result.error) {
-        editSavedSetBtn.disabled = false;
-        savedSetMessage.textContent = result.error.message || "The saved set could not be edited.";
-        return;
-    }
-
-    savedSetMessage.textContent = "Grid Lottery Set updated successfully.";
-    await loadSavedLotterySets();
+    savedSetMessage.textContent =
+        "Make your changes, then click Save Grid Lottery Set.";
 }
 
 async function shareSelectedLotterySet() {
@@ -629,7 +605,9 @@ function resetGridLottery() {
     customItemsInput.value = "";
     displayModeSelect.value =
         "image-text";
+    languageSelect.selectedIndex = 0;
     itemSelectionMode = "all";
+    editingSetId = null;
 
     itemModeInputs.forEach(input => {
         input.checked =
@@ -647,6 +625,7 @@ function resetGridLottery() {
     categorySelect.selectedIndex = 0;
     selectedLibraryItemIds.clear();
     setupMessage.textContent = "";
+    savedSetMessage.textContent = "";
     updateLibraryItems();
 }
 
@@ -689,12 +668,15 @@ shareSavedSetBtn.addEventListener("click", shareSelectedLotterySet);
 deleteSavedSetBtn.addEventListener("click", deleteSelectedLotterySet);
 savedSetSelect.addEventListener("change", async () => {
     const hasSelection = Boolean(savedSetSelect.value);
+    editingSetId = null;
     editSavedSetBtn.disabled = !hasSelection;
     shareSavedSetBtn.disabled = !hasSelection;
     deleteSavedSetBtn.disabled = !hasSelection;
 
     if (hasSelection) {
         await loadSelectedLotterySet();
+    } else {
+        resetGridLottery();
     }
 });
 

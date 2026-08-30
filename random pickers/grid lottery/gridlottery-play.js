@@ -222,12 +222,21 @@ function updateRemainingCount() {
         remaining === 0 ||
         selectionInProgress;
 
+    resetBtn.classList.toggle(
+        "play-again",
+        remaining === 0
+    );
+
     if (remaining === 0) {
         pickNextBtn.textContent =
             "All Items Revealed";
+        resetBtn.textContent =
+            "Play Again";
     } else {
         pickNextBtn.textContent =
             "Pick Next";
+        resetBtn.textContent =
+            "Reset";
     }
 }
 
