@@ -940,18 +940,56 @@ languageId = 1) {
 
 };
 
-async function dbGetImageLibraryItems() {
-    const { data: items, error: itemsError } =
-        await db
-            .from("items")
-            .select(
-                "id, image_url, active, category_id"
+async function dbGetImageLibraryItems(
+    categoryId = null,
+    tagIds = []
+) {
+    const itemTags = await dbGetItemTags();
+
+    let matchingItemIds = null;
+
+    if (tagIds.length > 0) {
+        matchingItemIds = [
+            ...new Set(
+                itemTags
+                    .filter(itemTag =>
+                        tagIds.includes(itemTag.tag_id)
+                    )
+                    .map(itemTag => itemTag.item_id)
             )
-            .eq("active", true)
-            .order(
-                "display_order",
-                { ascending: true }
-            );
+        ];
+
+        if (matchingItemIds.length === 0) {
+            return [];
+        }
+    }
+
+    let itemsQuery = db
+        .from("items")
+        .select("id, image_url, active, category_id")
+        .eq("active", true)
+        .not("image_url", "is", null)
+        .order("display_order", { ascending: true });
+
+    if (
+        categoryId &&
+        categoryId !== "browse-by-tag"
+    ) {
+        itemsQuery = itemsQuery.eq(
+            "category_id",
+            categoryId
+        );
+    }
+
+    if (matchingItemIds) {
+        itemsQuery = itemsQuery.in(
+            "id",
+            matchingItemIds
+        );
+    }
+
+    const { data: items, error: itemsError } =
+        await itemsQuery;
 
     if (itemsError) {
         console.error(
@@ -964,9 +1002,6 @@ async function dbGetImageLibraryItems() {
 
     const translations =
         await dbGetTranslations();
-    const itemTags =
-        await dbGetItemTags();
-
     return items
         .filter(item => item.image_url)
         .map(item => {
@@ -3412,6 +3447,121 @@ async function dbGetFreeSavedGameLimit() {
     }
 
     return limit;
+}
+
+// CLAIM THE GRID
+
+async function dbSaveClaimGridSet({
+    name,
+    teamCount,
+    questionTimer,
+    teamColors,
+    questions
+}) {
+    const { data, error } = await db.rpc(
+        "save_claim_grid_set",
+        {
+            input_name: name,
+            input_team_count: teamCount,
+            input_question_timer: questionTimer,
+            input_team_colors: teamColors,
+            input_questions: questions
+        }
+    );
+
+    if (error) {
+        console.error(
+            "Could not save Claim the Grid Set:",
+            error
+        );
+    }
+
+    return { data, error };
+}
+
+async function dbGetMyClaimGridSets() {
+    const { data, error } = await db
+        .from("claim_grid_sets")
+        .select(
+            "id, name, team_count, question_timer, team_colors, created_at, updated_at"
+        )
+        .eq("active", true)
+        .order("updated_at", { ascending: false });
+
+    if (error) {
+        console.error(
+            "Could not load Claim the Grid Sets:",
+            error
+        );
+    }
+
+    return { data: data || [], error };
+}
+
+async function dbGetClaimGridSetDetails(setId) {
+    const { data: questions, error: questionError } = await db
+        .from("claim_grid_questions")
+        .select("id, position, question_text, question_item_id")
+        .eq("set_id", setId)
+        .order("position", { ascending: true });
+
+    if (questionError) {
+        console.error("Could not load Claim the Grid questions:", questionError);
+        return { data: null, error: questionError };
+    }
+
+    const questionIds = questions.map(question => question.id);
+    let choices = [];
+
+    if (questionIds.length > 0) {
+        const choiceResult = await db
+            .from("claim_grid_choices")
+            .select("id, question_id, position, answer_text, answer_item_id, is_correct")
+            .in("question_id", questionIds)
+            .order("position", { ascending: true });
+
+        if (choiceResult.error) {
+            console.error("Could not load Claim the Grid choices:", choiceResult.error);
+            return { data: null, error: choiceResult.error };
+        }
+
+        choices = choiceResult.data || [];
+    }
+
+    const itemIds = [
+        ...new Set([
+            ...questions.map(question => question.question_item_id),
+            ...choices.map(choice => choice.answer_item_id)
+        ].filter(Boolean))
+    ];
+    let imageItems = [];
+
+    if (itemIds.length > 0) {
+        const { data: items, error: itemError } = await db
+            .from("items")
+            .select("id, image_url")
+            .in("id", itemIds);
+
+        if (itemError) {
+            console.error("Could not load Claim the Grid images:", itemError);
+            return { data: null, error: itemError };
+        }
+
+        const translations = await dbGetTranslations();
+        imageItems = (items || []).map(item => ({
+            id: item.id,
+            imageUrl: item.image_url,
+            name: translations.find(translation =>
+                translation.item_id === item.id &&
+                translation.language_id === 1
+            )?.text || `Item ${item.id}`
+        }));
+    }
+
+    return {
+        data: { questions, choices, imageItems },
+        error: null
+    };
 }
 
 // GRID LOTTERY

@@ -209,7 +209,7 @@ h1 {
     font: 30px bold 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
 }
 h2 {
-    font-family: "Comic Sans MS", "Comic Sans", cursive;
+    font-family: "Comic Sans MS", "Comic Sans", Arial, Helvetica, sans-serif;
     margin: 5px;
 }
 

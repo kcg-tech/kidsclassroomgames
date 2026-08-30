@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claim the Grid | Kids Classroom Games</title>
+    <meta
+        name="description"
+        content="Create a live classroom quiz where teams answer together and claim territories on a shared grid."
+    >
+    <link rel="icon" type="image/png" href="../../images/home/kcgfavicon.png">
+    <link rel="stylesheet" href="../../gameNavigation.css">
+    <link rel="stylesheet" href="../../adStyles.css">
+    <link rel="stylesheet" href="claimthegrid.css">
+</head>
+
+<body data-page-audience="teacher">
+    <header class="page-heading">
+        <h1>Claim the Grid</h1>
+        <p>Answer together, choose territories, and help your team claim the grid.</p>
+    </header>
+
+    <div class="kcg-ad-slot" data-ad-placement="claim-grid-top" hidden></div>
+
+    <main>
+        <section id="savedSetsCard" class="saved-sets-card">
+            <h2>Saved Claim the Grid Sets</h2>
+            <label for="savedClaimGridSetSelect">Choose a saved set</label>
+            <select id="savedClaimGridSetSelect">
+                <option value="">Choose a saved set</option>
+            </select>
+            <p id="savedSetsCount"></p>
+            <p id="savedSetsMessage" class="setup-message" aria-live="polite"></p>
+        </section>
+
+        <form id="claimGridSetup" class="setup-card">
+            <h2>Teacher Setup</h2>
+
+            <div class="form-control full-width">
+                <label for="gameName">Game Name</label>
+                <input
+                    id="gameName"
+                    type="text"
+                    maxlength="80"
+                    placeholder="Example: Animal Review"
+                    required
+                >
+            </div>
+
+            <div class="settings-grid">
+                <div class="form-control">
+                    <label for="teamCount">Number of Teams</label>
+                    <select id="teamCount" required>
+                        <option value="2">2 Teams</option>
+                        <option value="3">3 Teams</option>
+                        <option value="4">4 Teams</option>
+                    </select>
+                </div>
+
+                <div class="form-control">
+                    <label for="questionTimer">Question Timer</label>
+                    <select id="questionTimer" required>
+                        <option value="10">10 seconds</option>
+                        <option value="20">20 seconds</option>
+                        <option value="30" selected>30 seconds</option>
+                        <option value="40">40 seconds</option>
+                        <option value="50">50 seconds</option>
+                        <option value="60">60 seconds</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <fieldset class="team-color-fieldset">
+                <legend>Team Colors</legend>
+                <p>Each team must have a different color.</p>
+                <div id="teamColorControls" class="team-color-controls"></div>
+            </fieldset>
+
+            <p id="setupMessage" class="setup-message" aria-live="polite"></p>
+
+            <div class="setup-actions">
+                <button id="continueBtn" type="submit">Continue to Questions</button>
+                <button id="resetBtn" type="reset">Reset</button>
+            </div>
+        </form>
+
+        <section id="questionEditor" class="question-editor hidden" aria-labelledby="questions-title">
+            <h2 id="questions-title">Questions</h2>
+            <p id="questionEditorSummary"></p>
+            <form id="questionForm">
+                <div id="questionList" class="question-list"></div>
+                <button id="addQuestionBtn" class="add-question-button" type="button">
+                    + Add Question
+                </button>
+                <p id="questionMessage" class="setup-message" aria-live="polite"></p>
+                <div class="setup-actions">
+                    <button id="saveClaimGridSetBtn" type="submit">
+                        Save Claim the Grid Set
+                    </button>
+                    <button id="backToSetupBtn" class="secondary-button" type="button">Back to Setup</button>
+                </div>
+            </form>
+        </section>
+    </main>
+
+    <div id="libraryModal" class="library-modal hidden" role="dialog" aria-modal="true" aria-labelledby="libraryTitle">
+        <div class="library-dialog">
+            <div class="library-heading">
+                <h2 id="libraryTitle">Choose an Image</h2>
+                <button id="closeLibraryBtn" type="button" aria-label="Close image library">×</button>
+            </div>
+            <div class="library-filters">
+                <div class="form-control">
+                    <label for="libraryCategory">Category</label>
+                    <select id="libraryCategory"></select>
+                </div>
+                <div class="form-control">
+                    <label for="librarySearch">Search</label>
+                    <input id="librarySearch" type="search" placeholder="Search library items">
+                </div>
+            </div>
+            <div id="libraryTags" class="library-tags"></div>
+            <p id="libraryMessage" class="library-message" aria-live="polite"></p>
+            <div id="libraryItems" class="library-items"></div>
+        </div>
+    </div>
+
+    <div class="kcg-ad-slot" data-ad-placement="claim-grid-bottom" hidden></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../../js/config.js"></script>
+    <script src="../../js/utils.js"></script>
+    <script src="../../js/supabase.js"></script>
+    <script src="../../js/database.js"></script>
+    <script src="../../js/filters.js"></script>
+    <script src="../../js/adUtils.js"></script>
+    <script src="../../js/gameNavigation.js"></script>
+    <script src="claimthegrid.js"></script>
+</body>
+</html>
