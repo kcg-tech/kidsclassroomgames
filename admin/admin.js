@@ -208,6 +208,8 @@ const formData = {
         imageFile: null,
         imagePath: "",
         imageUrl: "",
+        thumbnailPath: "",
+        thumbnailUrl: "",
         active: true,
         displayOrder: 1
 
@@ -607,6 +609,7 @@ async function saveItem(formData) {
     
     let itemId = null;
     let imagePath = null;
+    let thumbnailPath = null;
     const savedGameIds = [];
     
     try{
@@ -654,7 +657,10 @@ async function saveItem(formData) {
 
         formData.item.imagePath = image.imagePath;
         formData.item.imageUrl = image.imageUrl;
-        imagePath =image.imagePath; 
+        formData.item.thumbnailPath = image.thumbnailPath;
+        formData.item.thumbnailUrl = image.thumbnailUrl;
+        imagePath = image.imagePath;
+        thumbnailPath = image.thumbnailPath;
 
         
         const savedItem =
@@ -778,13 +784,10 @@ async function saveItem(formData) {
 
         }
 
-        if (imagePath) {
-
-            await storageDeleteImage(
-                imagePath
-            );
-
-        }
+        await storageDeleteImages([
+            imagePath,
+            thumbnailPath
+        ]);
 
         alert(error.message);
     }
@@ -825,6 +828,12 @@ async function updateItem(formData) {
         formData.item.imagePath =
             image.imagePath;
 
+        formData.item.thumbnailUrl =
+            image.thumbnailUrl;
+
+        formData.item.thumbnailPath =
+            image.thumbnailPath;
+
     }
     else {
 
@@ -838,6 +847,12 @@ async function updateItem(formData) {
         formData.item.imagePath =
             formData.oldImagePath;
 
+        formData.item.thumbnailUrl =
+            formData.oldThumbnailUrl;
+
+        formData.item.thumbnailPath =
+            formData.oldThumbnailPath;
+
     }
 
 
@@ -849,14 +864,26 @@ async function updateItem(formData) {
 
     console.log(updatedItem);
 
+    if (!updatedItem) {
+        if (formData.item.imageFile) {
+            await storageDeleteImages([
+                formData.item.imagePath,
+                formData.item.thumbnailPath
+            ]);
+        }
+
+        throw new Error("Item update failed");
+    }
+
     if (
         formData.item.imageFile &&
         formData.oldImagePath
     ) {
 
-        await storageDeleteImage(
-            formData.oldImagePath
-        );
+        await storageDeleteImages([
+            formData.oldImagePath,
+            formData.oldThumbnailPath
+        ]);
 
     }
     
@@ -1106,7 +1133,8 @@ async function loadItems() {
             const img =
                 document.createElement("img");
 
-            img.src = item.image_url;
+            img.src = item.thumbnail_url || item.image_url;
+            img.loading = "lazy";
             img.width = 100;
 
             div.appendChild(img);
@@ -1163,6 +1191,8 @@ async function loadItems() {
                 formData.editingItemId = item.id;
                 formData.oldImagePath = item.image_path;
                 formData.oldImageUrl = item.image_url;
+                formData.oldThumbnailPath = item.thumbnail_path;
+                formData.oldThumbnailUrl = item.thumbnail_url;
 
                 console.log(
                     formData.oldImagePath
@@ -1172,6 +1202,8 @@ async function loadItems() {
                 );
 
                 formData.item.imageUrl = item.image_url
+                formData.item.thumbnailUrl = item.thumbnail_url || "";
+                formData.item.thumbnailPath = item.thumbnail_path || "";
 
                 document
                     .querySelectorAll(
@@ -1313,7 +1345,13 @@ function resetForm() {
     formData.editingItemId = null;
     formData.item.imageFile = null;
     formData.item.imageUrl = "";
+    formData.item.imagePath = "";
+    formData.item.thumbnailUrl = "";
+    formData.item.thumbnailPath = "";
     formData.oldImagePath = null;
+    formData.oldImageUrl = null;
+    formData.oldThumbnailPath = null;
+    formData.oldThumbnailUrl = null;
     formData.tags = [];
     formData.games = [];
 
@@ -1389,9 +1427,10 @@ async function deleteItem(item) {
     );
 
     const deletedImage =
-        await storageDeleteImage(
-            item.image_path
-        );
+        await storageDeleteImages([
+            item.image_path,
+            item.thumbnail_path
+        ]);
 
     console.log(
         "image deleted",

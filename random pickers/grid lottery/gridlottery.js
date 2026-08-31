@@ -66,6 +66,7 @@ let itemSelectionMode = "all";
 let savedLotterySets = [];
 let freeSavedGameLimit = 10;
 let editingSetId = null;
+let libraryVisibleItemCount = 10;
 
 const selectedLibraryItemIds =
     new Set();
@@ -95,7 +96,9 @@ function renderLibraryItems() {
         return;
     }
 
-    availableLibraryItems.forEach(
+    availableLibraryItems
+        .slice(0, libraryVisibleItemCount)
+        .forEach(
         item => {
             const card =
                 document.createElement(
@@ -155,8 +158,9 @@ function renderLibraryItems() {
                     "img"
                 );
 
-            image.src = item.url;
+            image.src = item.thumbnailUrl || item.url;
             image.alt = item.name || "";
+            image.loading = "lazy";
 
             const name =
                 document.createElement(
@@ -174,6 +178,18 @@ function renderLibraryItems() {
             );
         }
     );
+
+    if (availableLibraryItems.length > libraryVisibleItemCount) {
+        const showMoreButton = document.createElement("button");
+        showMoreButton.type = "button";
+        showMoreButton.className = "show-more-items-button";
+        showMoreButton.textContent = "Show 10 More";
+        showMoreButton.addEventListener("click", () => {
+            libraryVisibleItemCount += 10;
+            renderLibraryItems();
+        });
+        selectedItemsList.appendChild(showMoreButton);
+    }
 }
 
 function getSelectedTagIds() {
@@ -188,6 +204,7 @@ function getSelectedTagIds() {
 }
 
 async function updateLibraryItems() {
+    libraryVisibleItemCount = 10;
     const categoryId =
         categorySelect.value;
 

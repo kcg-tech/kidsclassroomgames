@@ -380,3 +380,15 @@ button.preview-item {
         grid-template-columns: 1fr;
     }
 }
+
+.show-more-items-button {
+    grid-column: 1 / -1;
+    justify-self: center;
+    padding: 12px 20px;
+    border: 0;
+    border-radius: 999px;
+    background: #2f67e8;
+    color: #fff;
+    font: inherit;
+    cursor: pointer;
+}

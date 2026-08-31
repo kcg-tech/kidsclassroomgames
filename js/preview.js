@@ -50,7 +50,9 @@ async function updateSelectedItemsPreview(getItemsFunction) {
     selectedItemsCount.textContent =
         items.length;
 
-    items.forEach(item => {
+    let visibleCount = 10;
+
+    const appendItem = (item, beforeNode = null) => {
 
         const div =
             document.createElement(
@@ -60,21 +62,39 @@ async function updateSelectedItemsPreview(getItemsFunction) {
         div.className =
             "preview-item";
 
-        div.innerHTML = `
-            <img
-                src="${item.url}"
-                alt="${item.name}"
-            >
+        const image = document.createElement("img");
+        const name = document.createElement("div");
 
-            <div>
-                ${item.name}
-            </div>
-        `;
+        image.src = item.thumbnailUrl || item.url;
+        image.alt = item.name;
+        image.loading = "lazy";
+        name.textContent = item.name;
 
-        selectedItemsList.appendChild(
-            div
+        div.appendChild(image);
+        div.appendChild(name);
+
+        selectedItemsList.insertBefore(
+            div,
+            beforeNode
         );
 
-    });
+    };
+
+    items.slice(0, visibleCount).forEach(appendItem);
+
+    if (items.length > visibleCount) {
+        const showMoreButton = document.createElement("button");
+        showMoreButton.type = "button";
+        showMoreButton.className = "show-more-items-button";
+        showMoreButton.textContent = "Show 10 More";
+        selectedItemsList.appendChild(showMoreButton);
+
+        showMoreButton.addEventListener("click", () => {
+            const nextItems = items.slice(visibleCount, visibleCount + 10);
+            nextItems.forEach(item => appendItem(item, showMoreButton));
+            visibleCount += nextItems.length;
+            showMoreButton.classList.toggle("hidden", visibleCount >= items.length);
+        });
+    }
 
 }

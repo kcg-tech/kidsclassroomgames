@@ -30,6 +30,7 @@ const bingoItemModeInputs =
 let availableBingoItems = [];
 
 let bingoItemMode = "all";
+let bingoVisibleItemCount = 10;
 
 const selectedBingoItemIds =
     new Set();
@@ -69,7 +70,9 @@ function renderBingoItemsPreview() {
             ? selectedBingoItemIds.size
             : availableBingoItems.length;
 
-    availableBingoItems.forEach(item => {
+    availableBingoItems
+        .slice(0, bingoVisibleItemCount)
+        .forEach(item => {
         const card =
             document.createElement(
                 choosingSpecificItems
@@ -132,8 +135,9 @@ function renderBingoItemsPreview() {
                 "img"
             );
 
-        image.src = item.url;
+        image.src = item.thumbnailUrl || item.url;
         image.alt = item.name;
+        image.loading = "lazy";
 
         const name =
             document.createElement(
@@ -150,9 +154,22 @@ function renderBingoItemsPreview() {
             card
         );
     });
+
+    if (availableBingoItems.length > bingoVisibleItemCount) {
+        const showMoreButton = document.createElement("button");
+        showMoreButton.type = "button";
+        showMoreButton.className = "show-more-items-button";
+        showMoreButton.textContent = "Show 10 More";
+        showMoreButton.addEventListener("click", () => {
+            bingoVisibleItemCount += 10;
+            renderBingoItemsPreview();
+        });
+        selectedItemsList.appendChild(showMoreButton);
+    }
 }
 
 async function updateBingoItemsPreview() {
+    bingoVisibleItemCount = 10;
     const selectedCategoryId =
         categorySelect.value;
 

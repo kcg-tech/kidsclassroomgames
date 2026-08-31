@@ -438,6 +438,8 @@ async function dbSaveItem(item) {
             category_id: item.categoryId,
             image_url: item.imageUrl,
             image_path: item.imagePath,
+            thumbnail_url: item.thumbnailUrl,
+            thumbnail_path: item.thumbnailPath,
             active: item.active,
             display_order: item.displayOrder
         })
@@ -541,6 +543,8 @@ async function dbUpdateItem(itemId, item) {
             category_id: item.categoryId,
             image_url: item.imageUrl,
             image_path: item.imagePath,
+            thumbnail_url: item.thumbnailUrl,
+            thumbnail_path: item.thumbnailPath,
             active: item.active,
             display_order: item.displayOrder
         })
@@ -820,6 +824,10 @@ async function dbGetGuessTheImageItems(
                         : "(No Translation)",
 
                 url:
+                    gameItem.items.image_url,
+
+                thumbnailUrl:
+                    gameItem.items.thumbnail_url ||
                     gameItem.items.image_url
             };
 
@@ -930,6 +938,10 @@ languageId = 1) {
                         : "(No English)",
 
                 url:
+                    gameItem.items.image_url,
+
+                thumbnailUrl:
+                    gameItem.items.thumbnail_url ||
                     gameItem.items.image_url
 
             };
@@ -966,7 +978,7 @@ async function dbGetImageLibraryItems(
 
     let itemsQuery = db
         .from("items")
-        .select("id, image_url, active, category_id")
+        .select("id, image_url, thumbnail_url, active, category_id")
         .eq("active", true)
         .not("image_url", "is", null)
         .order("display_order", { ascending: true });
@@ -1022,6 +1034,10 @@ async function dbGetImageLibraryItems(
                     : `Item ${item.id}`,
 
                 imageUrl:
+                    item.image_url,
+
+                thumbnailUrl:
+                    item.thumbnail_url ||
                     item.image_url,
 
                 categoryId:
@@ -3642,7 +3658,7 @@ async function dbGetGridLotterySetItems(setId, languageId) {
     const [itemsResult, translationsResult] = await Promise.all([
         db
             .from("items")
-            .select("id, image_url, active")
+            .select("id, image_url, thumbnail_url, active")
             .in("id", itemIds)
             .eq("active", true),
         db
@@ -3670,7 +3686,8 @@ async function dbGetGridLotterySetItems(setId, languageId) {
         return {
             id: itemId,
             name: translation?.text || "(No translation)",
-            url: item.image_url
+            url: item.image_url,
+            thumbnailUrl: item.thumbnail_url || item.image_url
         };
     }).filter(Boolean);
 
