@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claim the Grid Teacher Room | Kids Classroom Games</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="icon" type="image/png" href="../../images/home/kcgfavicon.png">
+    <link rel="stylesheet" href="claimthegrid-teacher.css">
+</head>
+<body>
+    <main>
+        <section id="teacherLobby" class="teacher-lobby" aria-labelledby="teacher-lobby-title">
+            <h1 id="teacher-lobby-title">Teacher Game Room</h1>
+            <p id="teacherGameName" class="game-name"></p>
+            <p class="room-code-label">Room Code</p>
+            <p id="claimGridRoomCode" class="room-code">------</p>
+            <p>Students can scan the QR code or open Claim the Grid and choose <strong>Join a Game</strong>.</p>
+
+            <div
+                id="claimGridQrContainer"
+                class="claim-grid-qr-container"
+                role="button"
+                tabindex="0"
+                aria-label="Enlarge room QR code"
+            >
+                <div id="claimGridRoomQr"></div>
+                <p id="claimGridQrInstruction">Click QR code to enlarge</p>
+            </div>
+
+            <div id="claimGridTeamRosters" class="team-rosters"></div>
+            <p id="claimGridLobbyMessage" class="lobby-message" aria-live="polite">
+                Loading game room...
+            </p>
+            <button id="startClaimGridGameBtn" type="button" disabled>Start Game</button>
+        </section>
+
+        <section id="teacherGame" class="teacher-game hidden" aria-labelledby="teacherQuestionNumber">
+            <div class="game-status-row">
+                <p id="teacherQuestionNumber" class="question-number"></p>
+                <div id="teacherQuestionTimer" class="question-timer" aria-live="polite">--</div>
+            </div>
+            <div id="teacherQuestionContent" class="question-content"></div>
+            <div id="teacherAnswerChoices" class="answer-grid"></div>
+            <p id="teacherGameMessage" class="game-message" aria-live="polite"></p>
+        </section>
+
+        <section id="teacherTerritory" class="teacher-game hidden" aria-labelledby="teacherTerritoryTitle">
+            <div class="game-status-row">
+                <h1 id="teacherTerritoryTitle">Room <span id="activeClaimGridRoomCode">------</span></h1>
+                <div id="teacherTerritoryTimer" class="question-timer" aria-live="polite">--</div>
+            </div>
+            <p>Students answer independently. Every three correct answers unlocks three territory captures.</p>
+            <div id="teacherTerritoryGrid" class="territory-grid"></div>
+            <p id="teacherTerritoryMessage" class="game-message" aria-live="polite"></p>
+            <button id="finishClaimGridGameBtn" class="finish-game-button" type="button">
+                End Game
+            </button>
+        </section>
+    </main>
+
+    <div id="claimGridResultsModal" class="results-modal hidden" role="dialog" aria-modal="true" aria-labelledby="claimGridResultsTitle">
+        <section class="results-dialog">
+            <button id="closeClaimGridResultsBtn" class="results-close" type="button" aria-label="Close final results">×</button>
+            <h1 id="claimGridResultsTitle">Final Results</h1>
+            <p>The largest territories win!</p>
+            <div id="claimGridWinnerList" class="winner-list"></div>
+            <div class="results-actions">
+                <button id="playClaimGridAgainBtn" type="button">Play Again</button>
+                <button id="returnToClaimGridBtn" type="button">Return to Final Board</button>
+            </div>
+            <p id="claimGridReplayMessage" class="game-message" aria-live="polite"></p>
+        </section>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="../../js/qrUtils.js"></script>
+    <script src="../../js/config.js"></script>
+    <script src="../../js/supabase.js"></script>
+    <script src="../../js/database.js"></script>
+    <script src="claimthegrid-teacher.js"></script>
+</body>
+</html>

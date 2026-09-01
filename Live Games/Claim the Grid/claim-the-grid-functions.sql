@@ -52,11 +52,9 @@ begin
             'Choose between 2 and 4 teams.';
     end if;
 
-    if input_question_timer not in (
-        10, 20, 30, 40, 50, 60
-    ) then
+    if input_question_timer not in (3, 5, 7, 10, 15) then
         raise exception
-            'Choose a valid question timer.';
+            'Choose a valid game duration.';
     end if;
 
     if input_team_colors is null
@@ -91,9 +89,9 @@ begin
 
     question_count := jsonb_array_length(input_questions);
 
-    if question_count not between 1 and 50 then
+    if question_count not between 3 and 50 then
         raise exception
-            'A Claim the Grid Set must contain between 1 and 50 questions.';
+            'A Claim the Grid Set must contain between 3 and 50 questions.';
     end if;
 
     if exists (
@@ -126,7 +124,7 @@ begin
         owner_id,
         name,
         team_count,
-        question_timer,
+        game_duration_minutes,
         team_colors
     )
     values (

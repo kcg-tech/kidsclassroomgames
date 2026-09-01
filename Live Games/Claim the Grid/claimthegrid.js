@@ -20,13 +20,31 @@ const libraryMessage = document.getElementById("libraryMessage");
 const savedClaimGridSetSelect = document.getElementById("savedClaimGridSetSelect");
 const savedSetsCount = document.getElementById("savedSetsCount");
 const savedSetsMessage = document.getElementById("savedSetsMessage");
+const editClaimGridSetBtn = document.getElementById("editClaimGridSetBtn");
+const shareClaimGridSetBtn = document.getElementById("shareClaimGridSetBtn");
+const deleteClaimGridSetBtn = document.getElementById("deleteClaimGridSetBtn");
+const createClaimGridRoomBtn = document.getElementById("createClaimGridRoomBtn");
+const continueBtn = document.getElementById("continueBtn");
+const createSavedClaimGridRoomBtn = document.getElementById("createSavedClaimGridRoomBtn");
+const claimGridEntryChoice = document.getElementById("claimGridEntryChoice");
+const openClaimGridSetupBtn = document.getElementById("openClaimGridSetupBtn");
+const savedSetsCard = document.getElementById("savedSetsCard");
 
 const defaultTeamColors = ["#e53935", "#2474e8", "#18a957", "#f2a900"];
 let questionSequence = 0;
 let activeImageSlot = null;
 let imageLibrary = [];
 let libraryLoadRequest = 0;
+let libraryVisibleItemCount = 10;
 let savedClaimGridSets = [];
+let editingClaimGridSetId = null;
+
+function showTeacherSetup() {
+    claimGridEntryChoice.classList.add("hidden");
+    savedSetsCard.classList.remove("hidden");
+    setupForm.classList.remove("hidden");
+    savedSetsCard.scrollIntoView({ behavior: "smooth", block: "start" });
+}
 
 function renderTeamColorControls() {
     const teamCount = Number(teamCountSelect.value);
@@ -42,6 +60,7 @@ function renderTeamColorControls() {
         const input = document.createElement("input");
         input.type = "color";
         input.value = existing[index] || defaultTeamColors[index];
+        input.defaultValue = input.value;
         input.setAttribute("aria-label", `Team ${index + 1} color`);
         label.appendChild(input);
         teamColorControls.appendChild(label);
@@ -166,19 +185,34 @@ function renderLibraryItems() {
 
     libraryItems.innerHTML = "";
     libraryMessage.textContent = filtered.length ? "" : "No matching library images found.";
-    filtered.forEach(item => {
+    filtered
+        .slice(0, libraryVisibleItemCount)
+        .forEach(item => {
         const button = document.createElement("button");
         button.type = "button";
         button.className = "library-item";
-        button.innerHTML = `<img src="${item.imageUrl}" alt=""><span></span>`;
+        button.innerHTML = `<img src="${item.thumbnailUrl || item.imageUrl}" alt="" loading="lazy"><span></span>`;
         button.querySelector("img").alt = item.name;
         button.querySelector("span").textContent = item.name;
         button.addEventListener("click", () => selectLibraryImage(item));
         libraryItems.appendChild(button);
     });
+
+    if (filtered.length > libraryVisibleItemCount) {
+        const showMoreButton = document.createElement("button");
+        showMoreButton.type = "button";
+        showMoreButton.className = "show-more-items-button";
+        showMoreButton.textContent = "Show 10 More";
+        showMoreButton.addEventListener("click", () => {
+            libraryVisibleItemCount += 10;
+            renderLibraryItems();
+        });
+        libraryItems.appendChild(showMoreButton);
+    }
 }
 
 async function refreshLibraryItems() {
+    libraryVisibleItemCount = 10;
     const categoryId = libraryCategory.value;
     const tagIds = selectedTagIds();
     const requestId = ++libraryLoadRequest;
@@ -329,6 +363,10 @@ function renderSavedSets() {
         option.textContent = set.name;
         savedClaimGridSetSelect.appendChild(option);
     });
+
+    editClaimGridSetBtn.disabled = true;
+    shareClaimGridSetBtn.disabled = true;
+    deleteClaimGridSetBtn.disabled = true;
 }
 
 async function loadSavedSets() {
@@ -368,6 +406,8 @@ async function loadSelectedSet() {
     );
     if (!set) return;
 
+    editingClaimGridSetId = null;
+
     savedClaimGridSetSelect.disabled = true;
     savedSetsMessage.textContent = "Loading saved set...";
     const result = await dbGetClaimGridSetDetails(set.id);
@@ -380,11 +420,14 @@ async function loadSelectedSet() {
 
     document.getElementById("gameName").value = set.name;
     teamCountSelect.value = String(set.team_count);
-    document.getElementById("questionTimer").value = String(set.question_timer);
+    document.getElementById("gameDuration").value = String(
+        set.game_duration_minutes || 10
+    );
     renderTeamColorControls();
     Array.from(teamColorControls.querySelectorAll('input[type="color"]'))
         .forEach((input, index) => {
             input.value = set.team_colors[index] || defaultTeamColors[index];
+            input.defaultValue = input.value;
         });
 
     questionList.innerHTML = "";
@@ -430,9 +473,159 @@ async function loadSelectedSet() {
     });
 
     renumberEditor();
-    questionEditor.classList.remove("hidden");
+    questionEditor.classList.add("hidden");
+    continueBtn.textContent = "Show Questions";
+    createSavedClaimGridRoomBtn.classList.remove("hidden");
     savedSetsMessage.textContent = `Loaded “${set.name}”.`;
     setupForm.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function selectedSavedSet() {
+    return savedClaimGridSets.find(
+        row => String(row.id) === savedClaimGridSetSelect.value
+    );
+}
+
+function editSelectedSet() {
+    const set = selectedSavedSet();
+    if (!set) return;
+
+    editingClaimGridSetId = Number(set.id);
+    editClaimGridSetBtn.disabled = true;
+    questionEditor.classList.remove("hidden");
+    savedSetsMessage.textContent =
+        "Make your changes, then click Save Claim the Grid Set.";
+    setupForm.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+async function shareSelectedSet() {
+    const set = selectedSavedSet();
+    if (!set) return;
+
+    shareClaimGridSetBtn.disabled = true;
+    shareClaimGridSetBtn.textContent = "Creating Link...";
+    const result = await dbEnableClaimGridSetSharing(set.id);
+    shareClaimGridSetBtn.disabled = false;
+    shareClaimGridSetBtn.textContent = "Create Share Link";
+
+    if (result.error || !result.data) {
+        savedSetsMessage.textContent =
+            result.error?.message || "The share link could not be created.";
+        return;
+    }
+
+    const shareUrl = new URL(window.location.href);
+    shareUrl.search = "";
+    shareUrl.hash = "";
+    shareUrl.searchParams.set("set", result.data);
+
+    try {
+        await navigator.clipboard.writeText(shareUrl.toString());
+        savedSetsMessage.textContent = "Share link copied.";
+    } catch (error) {
+        window.prompt("Copy this Claim the Grid link:", shareUrl.toString());
+        savedSetsMessage.textContent = "Share link created.";
+    }
+}
+
+async function deleteSelectedSet() {
+    const set = selectedSavedSet();
+    if (!set || !window.confirm(`Delete “${set.name}”?`)) return;
+
+    deleteClaimGridSetBtn.disabled = true;
+    const result = await dbDeleteClaimGridSet(set.id);
+    if (result.error) {
+        savedSetsMessage.textContent =
+            result.error.message || "The saved set could not be deleted.";
+        deleteClaimGridSetBtn.disabled = false;
+        return;
+    }
+
+    editingClaimGridSetId = null;
+    setupForm.reset();
+    savedSetsMessage.textContent = "Claim the Grid Set deleted.";
+    await loadSavedSets();
+}
+
+async function loadSharedSet() {
+    const slug = new URLSearchParams(window.location.search).get("set");
+    if (!slug) return;
+
+    const result = await dbGetSharedClaimGridSet(slug);
+    if (result.error || !result.data) {
+        savedSetsMessage.textContent = "This shared Claim the Grid Set is unavailable.";
+        return;
+    }
+
+    savedClaimGridSets = [result.data.set];
+    renderSavedSets();
+    savedClaimGridSetSelect.value = String(result.data.set.id);
+    await loadSelectedSet();
+    editClaimGridSetBtn.disabled = true;
+    shareClaimGridSetBtn.disabled = true;
+    deleteClaimGridSetBtn.disabled = true;
+    savedSetsMessage.textContent = `Shared set “${result.data.set.name}” loaded.`;
+}
+
+function currentGameValues() {
+    return {
+        name: document.getElementById("gameName").value.trim(),
+        teamCount: Number(teamCountSelect.value),
+        gameDurationMinutes: Number(document.getElementById("gameDuration").value),
+        teamColors: Array.from(
+            teamColorControls.querySelectorAll('input[type="color"]')
+        ).map(input => input.value),
+        questions: collectQuestions(),
+        setId: selectedSavedSet()?.id || null
+    };
+}
+
+async function createGameRoom() {
+    questionMessage.textContent = "";
+    if (!setupForm.reportValidity()) {
+        setupForm.scrollIntoView({ behavior: "smooth", block: "start" });
+        return;
+    }
+    if (!teamColorsAreUnique()) {
+        questionMessage.textContent = "Choose a different color for each team.";
+        return;
+    }
+    if (questionList.children.length < 3) {
+        questionMessage.textContent =
+            "Add at least 3 questions before creating a game room.";
+        return;
+    }
+    if (!validateQuestionContent() || !questionForm.reportValidity()) return;
+    if (!(await getRegularUser())) {
+        questionMessage.textContent =
+            "Log in or create a free account to create a game room.";
+        return;
+    }
+
+    const roomButtons = [createClaimGridRoomBtn, createSavedClaimGridRoomBtn];
+    roomButtons.forEach(button => {
+        button.disabled = true;
+        button.dataset.originalText = button.textContent;
+        button.textContent = "Creating Room...";
+    });
+    const values = currentGameValues();
+    const result = await dbCreateClaimGridSession(values);
+    roomButtons.forEach(button => {
+        button.disabled = false;
+        button.textContent = button.dataset.originalText;
+        delete button.dataset.originalText;
+    });
+
+    if (result.error || !result.data) {
+        questionMessage.textContent =
+            result.error?.message || "The Claim the Grid room could not be created.";
+        return;
+    }
+
+    const session = Array.isArray(result.data) ? result.data[0] : result.data;
+    const lobbyUrl = new URL("claimthegrid-teacher.html", window.location.href);
+    lobbyUrl.searchParams.set("session", session.id);
+    window.location.href = lobbyUrl.toString();
 }
 
 setupForm.addEventListener("submit", event => {
@@ -443,18 +636,21 @@ setupForm.addEventListener("submit", event => {
         setupMessage.textContent = "Choose a different color for each team.";
         return;
     }
-    if (!questionList.children.length) addQuestion();
+    while (questionList.children.length < 3) addQuestion();
     questionEditor.classList.remove("hidden");
     questionEditor.scrollIntoView({ behavior: "smooth", block: "start" });
 });
 
 setupForm.addEventListener("reset", () => {
+    editingClaimGridSetId = null;
     window.setTimeout(() => {
         setupMessage.textContent = "";
         questionMessage.textContent = "";
         questionEditor.classList.add("hidden");
         questionList.innerHTML = "";
         questionSequence = 0;
+        continueBtn.textContent = "Continue to Questions";
+        createSavedClaimGridRoomBtn.classList.add("hidden");
         renderTeamColorControls();
     }, 0);
 });
@@ -491,7 +687,10 @@ libraryModal.addEventListener("click", event => {
     if (event.target === libraryModal) closeLibrary();
 });
 libraryCategory.addEventListener("change", refreshLibraryItems);
-librarySearch.addEventListener("input", renderLibraryItems);
+librarySearch.addEventListener("input", () => {
+    libraryVisibleItemCount = 10;
+    renderLibraryItems();
+});
 
 questionForm.addEventListener("submit", async event => {
     event.preventDefault();
@@ -509,6 +708,11 @@ questionForm.addEventListener("submit", async event => {
         return;
     }
 
+    if (questionList.children.length < 3) {
+        questionMessage.textContent =
+            "Add at least 3 questions before saving this set.";
+        return;
+    }
     if (!validateQuestionContent() || !questionForm.reportValidity()) return;
 
     if (!(await getRegularUser())) {
@@ -520,10 +724,12 @@ questionForm.addEventListener("submit", async event => {
     saveClaimGridSetBtn.disabled = true;
     saveClaimGridSetBtn.textContent = "Saving...";
 
+    const updatingExistingSet = editingClaimGridSetId !== null;
     const result = await dbSaveClaimGridSet({
+        setId: editingClaimGridSetId,
         name: document.getElementById("gameName").value.trim(),
         teamCount: Number(teamCountSelect.value),
-        questionTimer: Number(document.getElementById("questionTimer").value),
+        gameDurationMinutes: Number(document.getElementById("gameDuration").value),
         teamColors: Array.from(
             teamColorControls.querySelectorAll('input[type="color"]')
         ).map(input => input.value),
@@ -540,11 +746,30 @@ questionForm.addEventListener("submit", async event => {
     }
 
     questionMessage.classList.add("success-message");
-    questionMessage.textContent = "Claim the Grid Set saved successfully.";
+    questionMessage.textContent = updatingExistingSet
+        ? "Claim the Grid Set updated successfully."
+        : "Claim the Grid Set saved successfully.";
+    editingClaimGridSetId = null;
     await loadSavedSets();
 });
 
-savedClaimGridSetSelect.addEventListener("change", loadSelectedSet);
+savedClaimGridSetSelect.addEventListener("change", async () => {
+    const hasSelection = Boolean(savedClaimGridSetSelect.value);
+    editClaimGridSetBtn.disabled = !hasSelection;
+    shareClaimGridSetBtn.disabled = !hasSelection;
+    deleteClaimGridSetBtn.disabled = !hasSelection;
+    if (hasSelection) {
+        await loadSelectedSet();
+    } else {
+        setupForm.reset();
+    }
+});
+editClaimGridSetBtn.addEventListener("click", editSelectedSet);
+shareClaimGridSetBtn.addEventListener("click", shareSelectedSet);
+deleteClaimGridSetBtn.addEventListener("click", deleteSelectedSet);
+createClaimGridRoomBtn.addEventListener("click", createGameRoom);
+createSavedClaimGridRoomBtn.addEventListener("click", createGameRoom);
+openClaimGridSetupBtn.addEventListener("click", showTeacherSetup);
 
 async function initializePage() {
     renderTeamColorControls();
@@ -552,6 +777,9 @@ async function initializePage() {
         initializeLibrary(),
         loadSavedSets()
     ]);
+    const hasSharedSet = new URLSearchParams(window.location.search).has("set");
+    if (hasSharedSet) showTeacherSetup();
+    await loadSharedSet();
 }
 
 initializePage();

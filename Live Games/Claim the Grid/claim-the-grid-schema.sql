@@ -8,8 +8,8 @@ create table if not exists public.claim_grid_sets (
     name text not null,
     team_count smallint not null
         check (team_count between 2 and 4),
-    question_timer smallint not null
-        check (question_timer in (10, 20, 30, 40, 50, 60)),
+    game_duration_minutes smallint not null default 10
+        check (game_duration_minutes in (3, 5, 7, 10, 15)),
     team_colors text[] not null,
     is_public boolean not null default false,
     share_slug text,

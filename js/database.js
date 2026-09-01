@@ -3468,21 +3468,29 @@ async function dbGetFreeSavedGameLimit() {
 // CLAIM THE GRID
 
 async function dbSaveClaimGridSet({
+    setId = null,
     name,
     teamCount,
-    questionTimer,
+    gameDurationMinutes,
     teamColors,
     questions
 }) {
+    const functionName = setId === null
+        ? "save_claim_grid_set"
+        : "update_claim_grid_set";
+    const parameters = {
+        input_name: name,
+        input_team_count: teamCount,
+        input_question_timer: gameDurationMinutes,
+        input_team_colors: teamColors,
+        input_questions: questions
+    };
+
+    if (setId !== null) parameters.input_set_id = setId;
+
     const { data, error } = await db.rpc(
-        "save_claim_grid_set",
-        {
-            input_name: name,
-            input_team_count: teamCount,
-            input_question_timer: questionTimer,
-            input_team_colors: teamColors,
-            input_questions: questions
-        }
+        functionName,
+        parameters
     );
 
     if (error) {
@@ -3499,7 +3507,7 @@ async function dbGetMyClaimGridSets() {
     const { data, error } = await db
         .from("claim_grid_sets")
         .select(
-            "id, name, team_count, question_timer, team_colors, created_at, updated_at"
+            "id, name, team_count, game_duration_minutes, team_colors, created_at, updated_at"
         )
         .eq("active", true)
         .order("updated_at", { ascending: false });
@@ -3555,7 +3563,7 @@ async function dbGetClaimGridSetDetails(setId) {
     if (itemIds.length > 0) {
         const { data: items, error: itemError } = await db
             .from("items")
-            .select("id, image_url")
+            .select("id, image_url, thumbnail_url")
             .in("id", itemIds);
 
         if (itemError) {
@@ -3567,6 +3575,7 @@ async function dbGetClaimGridSetDetails(setId) {
         imageItems = (items || []).map(item => ({
             id: item.id,
             imageUrl: item.image_url,
+            thumbnailUrl: item.thumbnail_url || item.image_url,
             name: translations.find(translation =>
                 translation.item_id === item.id &&
                 translation.language_id === 1
@@ -3578,6 +3587,256 @@ async function dbGetClaimGridSetDetails(setId) {
         data: { questions, choices, imageItems },
         error: null
     };
+}
+
+async function dbDeleteClaimGridSet(setId) {
+    const { data, error } = await db.rpc(
+        "delete_claim_grid_set",
+        { input_set_id: setId }
+    );
+
+    if (error) console.error("Could not delete Claim the Grid Set:", error);
+    return { data, error };
+}
+
+async function dbEnableClaimGridSetSharing(setId) {
+    const { data, error } = await db.rpc(
+        "enable_claim_grid_set_sharing",
+        { input_set_id: setId }
+    );
+
+    if (error) console.error("Could not share Claim the Grid Set:", error);
+    return { data, error };
+}
+
+async function dbGetSharedClaimGridSet(slug) {
+    const { data: set, error } = await db
+        .from("claim_grid_sets")
+        .select("id, name, team_count, game_duration_minutes, team_colors")
+        .eq("share_slug", slug)
+        .eq("active", true)
+        .eq("is_public", true)
+        .maybeSingle();
+
+    if (error || !set) {
+        if (error) console.error("Could not load shared Claim the Grid Set:", error);
+        return { data: null, error };
+    }
+
+    const detailResult = await dbGetClaimGridSetDetails(set.id);
+    return {
+        data: detailResult.error ? null : { set, ...detailResult.data },
+        error: detailResult.error
+    };
+}
+
+async function dbCreateClaimGridSession({
+    name,
+    teamCount,
+    gameDurationMinutes,
+    teamColors,
+    questions,
+    setId = null
+}) {
+    const { data, error } = await db.rpc(
+        "create_claim_grid_session",
+        {
+            input_name: name,
+            input_team_count: teamCount,
+            input_question_timer: gameDurationMinutes,
+            input_team_colors: teamColors,
+            input_questions: questions,
+            input_set_id: setId
+        }
+    );
+
+    if (error) console.error("Could not create Claim the Grid room:", error);
+    return { data, error };
+}
+
+async function dbGetClaimGridHostLobby(sessionId) {
+    const { data, error } = await db.rpc(
+        "get_claim_grid_host_lobby",
+        { input_session_id: sessionId }
+    );
+
+    if (error) console.error("Could not load Claim the Grid teacher lobby:", error);
+    return { data, error };
+}
+
+async function dbStartClaimGridSession(sessionId) {
+    const { data, error } = await db.rpc(
+        "start_claim_grid_session",
+        { input_session_id: sessionId }
+    );
+
+    if (error) console.error("Could not start Claim the Grid game:", error);
+    return { data, error };
+}
+
+async function dbJoinClaimGridRoom(roomCode, displayName) {
+    const { data, error } = await db.rpc(
+        "join_claim_grid_room",
+        {
+            input_room_code: roomCode,
+            input_display_name: displayName
+        }
+    );
+
+    if (error) console.error("Could not join Claim the Grid room:", error);
+    return { data, error };
+}
+
+async function dbGetClaimGridPlayerLobby(playerId) {
+    const { data, error } = await db.rpc(
+        "get_claim_grid_player_lobby",
+        { input_player_id: playerId }
+    );
+
+    if (error) console.error("Could not load Claim the Grid player lobby:", error);
+    return { data, error };
+}
+
+async function dbSubmitClaimGridAnswer(playerId, choiceId) {
+    const { data, error } = await db.rpc(
+        "submit_claim_grid_answer",
+        {
+            input_player_id: playerId,
+            input_choice_id: choiceId
+        }
+    );
+
+    if (error) console.error("Could not submit Claim the Grid answer:", error);
+    return { data, error };
+}
+
+async function dbGetClaimGridPlayerAnswerState(playerId) {
+    const { data, error } = await db.rpc(
+        "get_claim_grid_player_answer_state",
+        { input_player_id: playerId }
+    );
+
+    if (error) console.error("Could not load Claim the Grid answer:", error);
+    return { data, error };
+}
+
+async function dbGetClaimGridAnswerProgress(sessionId) {
+    const { data, error } = await db.rpc(
+        "get_claim_grid_answer_progress",
+        { input_session_id: sessionId }
+    );
+
+    if (error) console.error("Could not load Claim the Grid answer progress:", error);
+    return { data, error };
+}
+
+async function dbBeginClaimGridTerritoryPhase(sessionId) {
+    const { data, error } = await db.rpc(
+        "begin_claim_grid_territory_phase",
+        { input_session_id: sessionId }
+    );
+
+    if (error) console.error("Could not begin Claim the Grid territory phase:", error);
+    return { data, error };
+}
+
+async function dbGetClaimGridBoard(sessionId) {
+    const { data, error } = await db.rpc(
+        "get_claim_grid_board",
+        { input_session_id: sessionId }
+    );
+
+    if (error) console.error("Could not load Claim the Grid board:", error);
+    return { data, error };
+}
+
+async function dbSaveClaimGridVotes(playerId, cellIds) {
+    const { data, error } = await db.rpc(
+        "save_claim_grid_votes",
+        {
+            input_player_id: playerId,
+            input_cell_ids: cellIds
+        }
+    );
+
+    if (error) console.error("Could not save Claim the Grid territory choices:", error);
+    return { data, error };
+}
+
+async function dbEndClaimGridQuestionEarly(sessionId) {
+    const { data, error } = await db.rpc(
+        "end_claim_grid_question_early",
+        { input_session_id: sessionId }
+    );
+
+    if (error) console.error("Could not end Claim the Grid question early:", error);
+    return { data, error };
+}
+
+async function dbGetClaimGridQuestionResult(playerId) {
+    const { data, error } = await db.rpc(
+        "get_claim_grid_question_result",
+        { input_player_id: playerId }
+    );
+
+    if (error) console.error("Could not load Claim the Grid question result:", error);
+    return { data, error };
+}
+
+async function dbGetClaimGridPlayerGame(playerId) {
+    const { data, error } = await db.rpc(
+        "get_claim_grid_player_game",
+        { input_player_id: playerId }
+    );
+
+    if (error) console.error("Could not load Claim the Grid player game:", error);
+    return { data, error };
+}
+
+async function dbSubmitClaimGridSelfPacedAnswer(playerId, choiceId) {
+    const { data, error } = await db.rpc(
+        "submit_claim_grid_self_paced_answer",
+        {
+            input_player_id: playerId,
+            input_choice_id: choiceId
+        }
+    );
+
+    if (error) console.error("Could not submit Claim the Grid answer:", error);
+    return { data, error };
+}
+
+async function dbClaimClaimGridTerritory(playerId, cellId) {
+    const { data, error } = await db.rpc(
+        "claim_claim_grid_territory",
+        {
+            input_player_id: playerId,
+            input_cell_id: cellId
+        }
+    );
+
+    if (error) console.error("Could not claim Claim the Grid territory:", error);
+    return { data, error };
+}
+
+async function dbFinishClaimGridSession(sessionId) {
+    const { data, error } = await db.rpc(
+        "finish_claim_grid_session",
+        { input_session_id: sessionId }
+    );
+
+    if (error) console.error("Could not finish Claim the Grid game:", error);
+    return { data, error };
+}
+
+async function dbReplayClaimGridSession(sessionId) {
+    const { data, error } = await db.rpc(
+        "replay_claim_grid_session",
+        { input_session_id: sessionId }
+    );
+
+    if (error) console.error("Could not replay Claim the Grid game:", error);
+    return { data, error };
 }
 
 // GRID LOTTERY

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join Claim the Grid | Kids Classroom Games</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="icon" type="image/png" href="../../images/home/kcgfavicon.png">
+    <link rel="stylesheet" href="claimthegrid-player.css">
+</head>
+<body>
+    <main>
+        <section id="joinCard" class="player-card">
+            <h1>Join Claim the Grid</h1>
+            <form id="joinClaimGridForm">
+                <label for="playerRoomCode">Room Code</label>
+                <input id="playerRoomCode" type="text" maxlength="6" autocomplete="off" required>
+                <label for="playerNickname">Nickname</label>
+                <input id="playerNickname" type="text" maxlength="15" autocomplete="nickname" required>
+                <button id="joinClaimGridBtn" type="submit">Join Game</button>
+            </form>
+            <p id="joinMessage" class="message" aria-live="polite"></p>
+        </section>
+
+        <section id="playerLobby" class="player-card hidden">
+            <h1 id="playerGameName">Claim the Grid</h1>
+            <p>Welcome, <strong id="joinedPlayerName"></strong>!</p>
+            <div id="playerTeamBadge" class="team-badge">
+                Team <span id="joinedTeamNumber"></span>
+            </div>
+            <p id="playerLobbyMessage" class="message">Waiting for the teacher to start.</p>
+        </section>
+
+        <section id="playerGame" class="player-card player-game hidden" aria-labelledby="playerQuestionNumber">
+            <div class="game-status-row">
+                <p id="playerQuestionNumber" class="question-number">Quiz</p>
+                <div id="playerQuestionTimer" class="question-timer" aria-live="polite">--</div>
+            </div>
+            <div id="playerQuestionContent" class="question-content"></div>
+            <div id="playerAnswerChoices" class="answer-grid"></div>
+            <p id="playerGameMessage" class="message" aria-live="polite"></p>
+        </section>
+
+        <section id="playerTerritory" class="player-card player-game hidden" aria-labelledby="playerTerritoryTitle">
+            <div class="game-status-row">
+                <h1 id="playerTerritoryTitle">Claim Territory</h1>
+                <div id="playerTerritoryTimer" class="question-timer" aria-live="polite">--</div>
+            </div>
+            <p id="playerTerritoryInstructions" class="message"></p>
+            <div id="playerTerritoryGrid" class="territory-grid"></div>
+            <p id="playerTerritoryMessage" class="message" aria-live="polite"></p>
+        </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../../js/config.js"></script>
+    <script src="../../js/supabase.js"></script>
+    <script src="../../js/database.js"></script>
+    <script src="claimthegrid-player.js"></script>
+</body>
+</html>

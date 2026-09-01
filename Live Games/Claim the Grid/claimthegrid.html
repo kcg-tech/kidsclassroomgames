@@ -9,7 +9,6 @@
         content="Create a live classroom quiz where teams answer together and claim territories on a shared grid."
     >
     <link rel="icon" type="image/png" href="../../images/home/kcgfavicon.png">
-    <link rel="stylesheet" href="../../gameNavigation.css">
     <link rel="stylesheet" href="../../adStyles.css">
     <link rel="stylesheet" href="claimthegrid.css">
 </head>
@@ -23,17 +22,30 @@
     <div class="kcg-ad-slot" data-ad-placement="claim-grid-top" hidden></div>
 
     <main>
-        <section id="savedSetsCard" class="saved-sets-card">
+        <section id="claimGridEntryChoice" class="entry-choice-card">
+            <h2>How would you like to play?</h2>
+            <div class="entry-choice-actions">
+                <button id="openClaimGridSetupBtn" type="button">Create a Game</button>
+                <a href="claimthegrid-player.html">Join a Game</a>
+            </div>
+        </section>
+
+        <section id="savedSetsCard" class="saved-sets-card hidden">
             <h2>Saved Claim the Grid Sets</h2>
             <label for="savedClaimGridSetSelect">Choose a saved set</label>
             <select id="savedClaimGridSetSelect">
                 <option value="">Choose a saved set</option>
             </select>
+            <div class="saved-set-controls">
+                <button id="editClaimGridSetBtn" type="button" disabled>Edit</button>
+                <button id="shareClaimGridSetBtn" type="button" disabled>Create Share Link</button>
+                <button id="deleteClaimGridSetBtn" type="button" disabled>Delete</button>
+            </div>
             <p id="savedSetsCount"></p>
             <p id="savedSetsMessage" class="setup-message" aria-live="polite"></p>
         </section>
 
-        <form id="claimGridSetup" class="setup-card">
+        <form id="claimGridSetup" class="setup-card hidden">
             <h2>Teacher Setup</h2>
 
             <div class="form-control full-width">
@@ -58,14 +70,13 @@
                 </div>
 
                 <div class="form-control">
-                    <label for="questionTimer">Question Timer</label>
-                    <select id="questionTimer" required>
-                        <option value="10">10 seconds</option>
-                        <option value="20">20 seconds</option>
-                        <option value="30" selected>30 seconds</option>
-                        <option value="40">40 seconds</option>
-                        <option value="50">50 seconds</option>
-                        <option value="60">60 seconds</option>
+                    <label for="gameDuration">Game Duration</label>
+                    <select id="gameDuration" required>
+                        <option value="3">3 minutes</option>
+                        <option value="5">5 minutes</option>
+                        <option value="7">7 minutes</option>
+                        <option value="10" selected>10 minutes</option>
+                        <option value="15">15 minutes</option>
                     </select>
                 </div>
 
@@ -81,7 +92,9 @@
 
             <div class="setup-actions">
                 <button id="continueBtn" type="submit">Continue to Questions</button>
-                <button id="resetBtn" type="reset">Reset</button>
+                <button id="createSavedClaimGridRoomBtn" class="hidden" type="button">
+                    Create Game with This Set
+                </button>
             </div>
         </form>
 
@@ -98,10 +111,14 @@
                     <button id="saveClaimGridSetBtn" type="submit">
                         Save Claim the Grid Set
                     </button>
+                    <button id="createClaimGridRoomBtn" type="button">
+                        Create Game
+                    </button>
                     <button id="backToSetupBtn" class="secondary-button" type="button">Back to Setup</button>
                 </div>
             </form>
         </section>
+
     </main>
 
     <div id="libraryModal" class="library-modal hidden" role="dialog" aria-modal="true" aria-labelledby="libraryTitle">
@@ -135,7 +152,6 @@
     <script src="../../js/database.js"></script>
     <script src="../../js/filters.js"></script>
     <script src="../../js/adUtils.js"></script>
-    <script src="../../js/gameNavigation.js"></script>
     <script src="claimthegrid.js"></script>
 </body>
 </html>
