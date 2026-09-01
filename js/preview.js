@@ -80,7 +80,9 @@ async function updateSelectedItemsPreview(getItemsFunction) {
 
     };
 
-    items.slice(0, visibleCount).forEach(appendItem);
+    items
+        .slice(0, visibleCount)
+        .forEach(item => appendItem(item));
 
     if (items.length > visibleCount) {
         const showMoreButton = document.createElement("button");
@@ -91,7 +93,12 @@ async function updateSelectedItemsPreview(getItemsFunction) {
 
         showMoreButton.addEventListener("click", () => {
             const nextItems = items.slice(visibleCount, visibleCount + 10);
-            nextItems.forEach(item => appendItem(item, showMoreButton));
+            nextItems.forEach(
+                item => appendItem(
+                    item,
+                    showMoreButton
+                )
+            );
             visibleCount += nextItems.length;
             showMoreButton.classList.toggle("hidden", visibleCount >= items.length);
         });
