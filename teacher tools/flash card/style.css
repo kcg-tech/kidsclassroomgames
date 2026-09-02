@@ -67,6 +67,21 @@ header p {
     font-weight: bold;
 }
 
+.duplex-print-instructions {
+    width: min(900px, 92vw);
+    margin: -8px auto 24px;
+    padding: 12px 16px;
+
+    border: 3px solid #ffd27a;
+    border-radius: 14px;
+
+    color: #172b63;
+    background: rgba(255, 249, 232, 0.97);
+
+    text-align: center;
+    line-height: 1.5;
+}
+
 .controls {
     width: min(900px, 92vw);
     margin: 24px auto;

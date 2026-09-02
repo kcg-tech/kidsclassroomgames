@@ -50,6 +50,10 @@ const backLanguageControl =
     document.getElementById(
         "backLanguageControl"
     );
+const duplexPrintInstructions =
+    document.getElementById(
+        "duplexPrintInstructions"
+    );
 
 const backLanguageSelect =
     document.getElementById(
@@ -186,6 +190,10 @@ async function updateFlashcardLoginAccess() {
         backLanguageControl.classList.add(
             "hidden"
         );
+
+        duplexPrintInstructions.classList.add(
+            "hidden"
+        );
     }
 }
 
@@ -194,6 +202,11 @@ cardSides.addEventListener("change", () => {
         cardSides.value === "two-sided";
 
     backLanguageControl.classList.toggle(
+        "hidden",
+        !isTwoSided
+    );
+
+    duplexPrintInstructions.classList.toggle(
         "hidden",
         !isTwoSided
     );
@@ -920,18 +933,11 @@ function drawPdfBackPage(
                 position / layout.cols
             );
 
-        const isPortrait =
-            orientation.value === "portrait";
-
         const col =
-            isPortrait
-                ? layout.cols - 1 - originalCol
-                : originalCol;
+            layout.cols - 1 - originalCol;
 
         const row =
-            isPortrait
-                ? originalRow
-                : layout.rows - 1 - originalRow;
+            originalRow;
 
         const backOffsetX = 0.5;
 
@@ -946,14 +952,6 @@ function drawPdfBackPage(
             margin +
             row * (cardHeight + gap) +
             backOffsetY;
-
-        drawPdfCardBorder(
-            pdf,
-            x,
-            y,
-            cardWidth,
-            cardHeight
-        );
 
         drawPdfCardText(
             pdf,
@@ -1495,6 +1493,12 @@ function restoreFlashcardReturnState() {
         }
 
         backLanguageControl.classList.toggle(
+            "hidden",
+            cardSides.value !==
+                "two-sided"
+        );
+
+        duplexPrintInstructions.classList.toggle(
             "hidden",
             cardSides.value !==
                 "two-sided"
