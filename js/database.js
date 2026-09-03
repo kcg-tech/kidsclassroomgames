@@ -16,6 +16,7 @@ async function dbGetSiteResources() {
                 open_new_tab
             `)
             .eq("active", true)
+            .eq("status", "available")
             .order(
                 "display_order",
                 { ascending: true }

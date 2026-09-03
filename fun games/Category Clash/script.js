@@ -927,7 +927,7 @@ userInputs.addEventListener(
                         );
 
                     const limitMessage =
-                        `You have reached the free limit of ${freeSavedGameLimit} Category Clash boards. Delete one or upgrade to Premium.`;
+                    `You have reached the current limit of ${freeSavedGameLimit} Category Clash boards. Delete one before saving another.`;
 
                     saveBoardMessage.textContent =
                         reachedFreeLimit
@@ -2288,4 +2288,3 @@ db.auth.onAuthStateChange(
 loadBoardOptions();
 updateStartButton();
 updateSaveBoardAccess();
-

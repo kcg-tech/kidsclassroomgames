@@ -54,6 +54,9 @@
 
     <nav aria-label="Legal page navigation">
       <a href="index.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
+      <a href="faq.html">Help</a>
       <a href="account.html">My Account</a>
         <a href="terms.html">
             Terms of Use
@@ -69,7 +72,7 @@
       <h1>Privacy Policy</h1>
 
       <p class="legal-updated">
-        Effective date: August 26, 2026
+        Effective date: September 3, 2026
       </p>
 
       <p>
@@ -89,30 +92,40 @@
         </p>
 
         <ul>
+          <li>Display name</li>
           <li>Email address and account identifier</li>
           <li>Account creation and login information</li>
           <li>Saved game boards, Bingo sets, and preferences</li>
           <li>Account type and access status</li>
         </ul>
 
-        <h3>Multiplayer Bingo participants</h3>
+        <p>
+          Passwords entered into the account forms are sent to
+          Supabase Auth for authentication. Kids Classroom Games does
+          not store readable passwords in its application database.
+          Supabase stores password hashes rather than the original
+          passwords.
+        </p>
+
+        <h3>Live-game participants</h3>
 
         <p>
           Students do not need an account or email address to
-          join a Bingo room. During a game, we temporarily process:
+          join a live-game room. During a game, we temporarily process:
         </p>
 
         <ul>
           <li>The nickname entered by the participant</li>
           <li>An anonymous technical identifier</li>
           <li>Room membership and readiness status</li>
-          <li>Bingo-card selections and marked squares</li>
-          <li>Wins and related game timestamps</li>
+          <li>Answers, game selections, or marked squares</li>
+          <li>Game results and related timestamps</li>
         </ul>
 
         <p>
-          Participants should use a nickname and should not enter
-          a full name or other personal information.
+          Participants should use initials, a teacher-assigned student
+          number, or another classroom nickname and should not enter a
+          full name or other personal information.
         </p>
 
         <h3>Technical information</h3>
@@ -156,9 +169,10 @@
         </p>
 
         <p>
-          Multiplayer participants should use classroom nicknames
-          rather than full names. Teachers should not ask students
-          to enter personal information into game fields.
+          Multiplayer participants should use initials, teacher-assigned
+          student numbers, or classroom nicknames rather than full names.
+          Teachers should not ask students to enter personal information
+          into game fields.
         </p>
 
         <p>
@@ -172,7 +186,7 @@
         <h2>4. Retention and Deletion</h2>
 
         <p>
-          Temporary multiplayer Bingo data is designed to be
+          Temporary live-game data is designed to be
           automatically removed approximately 24 hours after a
           game session ends or expires.
         </p>
@@ -203,7 +217,8 @@
           <li>Supabase for authentication, database, and live-game services</li>
           <li>Cloudflare for domain, security, hosting, and email forwarding</li>
           <li>Resend for account-related email delivery</li>
-          <li>GitHub for source-code management and beta deployment</li>
+          <li>GitHub for source-code management</li>
+          <li>Google for advertising, ad measurement, and consent tools</li>
         </ul>
 
         <p>
@@ -223,9 +238,40 @@
         </p>
 
         <p>
-          Advertising services are not currently enabled. This
-          Privacy Policy will be updated before advertising or
-          advertising cookies are introduced.
+          The website may display advertising provided by Google
+          AdSense. Third-party vendors, including Google, may use
+          cookies, web beacons, IP addresses, or similar technologies
+          to serve, limit, and measure advertisements.
+        </p>
+
+        <p>
+          Google and its advertising partners may use advertising
+          cookies based on visits to this website or other websites.
+          Visitors can manage personalized advertising through
+          <a href="https://adssettings.google.com/" rel="noopener noreferrer">
+            Google Ads Settings
+          </a>. Where consent is required, an appropriate consent
+          message or choice will be provided.
+        </p>
+
+        <p>
+          Dedicated student join pages and live student gameplay pages
+          do not display advertising. Student gameplay information is not
+          used to create advertising profiles. Data processing on these
+          pages is limited to the information reasonably needed to connect
+          participants, maintain and secure the session, and operate the
+          requested game.
+        </p>
+
+        <p>
+          Learn more about how Google uses information from websites
+          that use its services on
+          <a
+            href="https://policies.google.com/technologies/partner-sites"
+            rel="noopener noreferrer"
+          >
+            Google's partner-sites information page
+          </a>.
         </p>
       </section>
 
@@ -317,7 +363,13 @@
       © 2026 Kids Classroom Games. All rights reserved.
     </p>
 
-    <a href="index.html">Return to Home</a>
+    <div class="legal-footer-links">
+      <a href="index.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
+      <a href="faq.html">Help and FAQ</a>
+      <a href="terms.html">Terms of Use</a>
+    </div>
 
   </footer>
 

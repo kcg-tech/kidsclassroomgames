@@ -114,6 +114,18 @@ function createGameNavigation() {
                 Random Pickers
             </a>
 
+            <a href="/about.html">
+                About
+            </a>
+
+            <a href="/contact.html">
+                Contact
+            </a>
+
+            <a href="/faq.html">
+                Help
+            </a>
+
             <a
                 id="game-account-link"
                 href="/account.html"

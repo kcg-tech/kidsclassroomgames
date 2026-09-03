@@ -1313,7 +1313,7 @@ submitBtn.textContent =
                     );
 
                 const limitMessage =
-                    `You have reached the free limit of ${freeSavedGameLimit} Tornado boards. Delete one or upgrade to Premium.`;
+                    `You have reached the current limit of ${freeSavedGameLimit} Tornado boards. Delete one before saving another.`;
 
                 saveBoardMessage.textContent =
                     reachedFreeLimit

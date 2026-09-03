@@ -192,13 +192,74 @@ nav .account-nav-link:hover {
   line-height: 1.15;
 }
 
-.resources-intro > p:last-child {
+.resources-intro > p {
   margin: 15px auto 0;
 
   color: #334155;
   font-size: 18px;
   font-weight: 600;
   line-height: 1.55;
+}
+
+.how-it-works {
+  margin: 20px auto 0;
+}
+
+.how-it-works summary {
+  display: inline-block;
+  padding: 9px 18px;
+  color: white;
+  background: #2563eb;
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #1e40af;
+}
+
+.how-it-works summary::-webkit-details-marker {
+  display: none;
+}
+
+.how-it-works summary:hover {
+  background: #1d4ed8;
+}
+
+.how-it-works summary:focus-visible {
+  outline: 4px solid #fbbf24;
+  outline-offset: 3px;
+}
+
+.how-it-works-content {
+  margin: 20px auto 0;
+  padding: 22px;
+  color: #334155;
+  background: #eff6ff;
+  border: 2px solid #bfdbfe;
+  border-radius: 16px;
+  text-align: left;
+}
+
+.how-it-works-content p {
+  margin: 0 0 14px;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.6;
+}
+
+.how-it-works-content p:last-child {
+  margin-bottom: 0;
+}
+
+.how-it-works-content ul,
+.how-it-works-content ol {
+  margin: 14px 0;
+  padding-left: 24px;
+}
+
+.how-it-works-content li {
+  margin-bottom: 8px;
+  line-height: 1.5;
 }
 
 /* RESOURCE CATEGORIES */
