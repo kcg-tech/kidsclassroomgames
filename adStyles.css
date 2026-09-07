@@ -2,6 +2,12 @@
     display: none !important;
 }
 
+@media print {
+    .kcg-ad-slot {
+        display: none !important;
+    }
+}
+
 .kcg-ad-slot {
     width: min(100%, 970px);
     min-height: 100px;

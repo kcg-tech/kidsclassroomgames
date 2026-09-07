@@ -19,9 +19,10 @@ function initializeKcgAdSlots() {
     document
         .querySelectorAll(".kcg-ad-slot")
         .forEach(slot => {
-            slot.hidden = !showAds;
+            const slotEnabled = showAds && !slot.hasAttribute("data-ad-pending");
+            slot.hidden = !slotEnabled;
 
-            if (showAds) {
+            if (slotEnabled) {
                 slot.setAttribute(
                     "aria-label",
                     "Advertisement"

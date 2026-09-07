@@ -1,0 +1,10 @@
+Noto Sans JP font notice
+
+The bundled NotoSansJP.ttf font is used to render Japanese text in
+generated flash cards. It is distributed under the SIL Open Font
+License, Version 1.1. The full license and copyright notice are in
+OFL.txt in this directory.
+
+The font may be used and embedded in generated educational materials,
+including materials used in commercial teaching. The font file itself
+must not be sold by itself.
