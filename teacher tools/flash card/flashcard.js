@@ -85,6 +85,16 @@ let generatedItems = [];
 let generatedBackItems = [];
 let isFlashcardUserLoggedIn = false;
 
+const PDF_FONT_SIZES = Object.freeze({
+    1: 64,
+    2: 50,
+    4: 36,
+    8: 28,
+    16: 20
+});
+
+const IMAGE_TEXT_AREA_RATIO = 0.30;
+
 flashcardLoginLink.addEventListener(
     "click",
     () => {
@@ -301,7 +311,7 @@ function createPreviewPage(
         document.createElement("div");
 
     page.className =
-        `preview-page ${orientation.value} layout-${cardsPerPage}`;
+        `preview-page preview-side-${side} ${orientation.value} layout-${cardsPerPage}`;
 
     pageGroup.appendChild(pageLabel);
     pageGroup.appendChild(page);
@@ -364,6 +374,141 @@ function createFlashCard(
 
     return card;
 
+}
+
+function fitPreviewCardText(card) {
+    const text =
+        card.querySelector("p");
+
+    if (!text) {
+        return;
+    }
+
+    const page =
+        card.closest(".preview-page");
+
+    const layoutClass = page
+        ? Array.from(page.classList)
+            .find(className =>
+                className.startsWith("layout-")
+            )
+        : "";
+
+    const cardsOnPage =
+        Number(layoutClass?.split("-")[1]);
+
+    const pageWidthMm =
+        page?.classList.contains("landscape")
+            ? 297
+            : 210;
+
+    const previewPixelsPerMm = page
+        ? page.getBoundingClientRect().width /
+            pageWidthMm
+        : 1;
+
+    const startingSize =
+        PDF_FONT_SIZES[cardsOnPage]
+            ? PDF_FONT_SIZES[cardsOnPage] *
+                (25.4 / 72) *
+                previewPixelsPerMm
+            : Number.parseFloat(
+                getComputedStyle(text).fontSize
+            );
+
+    if (!Number.isFinite(startingSize)) {
+        return;
+    }
+
+    const minimumSize =
+        Math.max(
+            6,
+            startingSize * 0.35
+        );
+
+    const isTextOnly =
+        card.classList.contains("text-only");
+
+    const maximumTextHeight =
+        card.clientHeight *
+        (isTextOnly
+            ? 0.9
+            : IMAGE_TEXT_AREA_RATIO);
+
+    const measurement =
+        text.cloneNode(true);
+
+    const textStyle =
+        getComputedStyle(text);
+
+    Object.assign(
+        measurement.style,
+        {
+            position: "fixed",
+            left: "-10000px",
+            top: "0",
+            visibility: "hidden",
+            pointerEvents: "none",
+            display: "block",
+            width: `${text.clientWidth}px`,
+            minHeight: "0",
+            maxHeight: "none",
+            height: "auto",
+            boxSizing: "border-box",
+            whiteSpace: "normal",
+            overflow: "visible",
+            overflowWrap: "anywhere",
+            fontFamily: textStyle.fontFamily,
+            fontWeight: textStyle.fontWeight,
+            lineHeight: "1.1",
+            padding: textStyle.padding,
+            border: "none"
+        }
+    );
+
+    document.body.appendChild(measurement);
+
+    let fontSize = startingSize;
+
+    text.style.fontSize =
+        `${fontSize}px`;
+
+    measurement.style.fontSize =
+        `${fontSize}px`;
+
+    while (
+        fontSize > minimumSize &&
+        (
+            measurement.scrollWidth >
+                measurement.clientWidth + 1 ||
+            measurement.scrollHeight >
+                maximumTextHeight + 1
+        )
+    ) {
+        fontSize -= 0.5;
+
+        measurement.style.fontSize =
+            `${fontSize}px`;
+    }
+
+    text.style.fontSize =
+        `${fontSize}px`;
+
+    measurement.remove();
+}
+
+function fitAllPreviewCardText() {
+    previewPages
+        .querySelectorAll(".flash-card")
+        .forEach(fitPreviewCardText);
+}
+
+function schedulePreviewTextFit() {
+    requestAnimationFrame(() => {
+        requestAnimationFrame(
+            fitAllPreviewCardText
+        );
+    });
 }
 
 function createPreviewSide(
@@ -557,6 +702,9 @@ async function generateFlashCards() {
             "front"
         );
     }
+
+    schedulePreviewTextFit();
+
     generatedCardsContainer.classList.remove(
         "hidden"
     );
@@ -778,7 +926,8 @@ function drawPdfCardText(
     imageArea,
     cardsPerSheet,
     fontName = "helvetica",
-    fontStyle = "bold"
+    fontStyle = "bold",
+    rotationAngle = 0
 
 ) {
 
@@ -807,40 +956,27 @@ function drawPdfCardText(
         fontStyle
     );
 
-    let fontSize = {
-
-        1: 54,
-        2: 42,
-        4: 30,
-        8: 25,
-        16: 18
-
-    }[cardsPerSheet];
-
-    pdf.setFontSize(fontSize);
+    let fontSize =
+        PDF_FONT_SIZES[cardsPerSheet];
 
     const maxTextWidth =
         cardWidth - 6;
 
-    // Try to keep the text on one line
-    while (
+    const maxTextHeight =
+        Math.max(
+            textArea - 6,
+            4
+        );
 
-        fontSize > 8 &&
+    const minimumFontSize = 5;
 
-        pdf.getTextWidth(item.name) > maxTextWidth
+    let lines = [];
+    let lineHeight = 0;
 
-    ) {
-
-        fontSize--;
-
+    while (fontSize >= minimumFontSize) {
         pdf.setFontSize(fontSize);
 
-    }
-
-    // If it still doesn't fit,
-    // wrap it.
-    const lines =
-        pdf.splitTextToSize(
+        lines = pdf.splitTextToSize(
 
             item.name,
 
@@ -848,8 +984,38 @@ function drawPdfCardText(
 
         );
 
-    const lineHeight =
-        fontSize * 0.45;
+        lineHeight =
+            fontSize * 0.45;
+
+        const widestLine =
+            Math.max(
+                ...lines.map(
+                    line =>
+                        pdf.getTextWidth(line)
+                ),
+                0
+            );
+
+        const textHeight =
+            lineHeight * lines.length;
+
+        if (
+            widestLine <= maxTextWidth &&
+            textHeight <= maxTextHeight
+        ) {
+            break;
+        }
+
+        fontSize--;
+    }
+
+    fontSize =
+        Math.max(
+            fontSize,
+            minimumFontSize
+        );
+
+    pdf.setFontSize(fontSize);
 
     const totalHeight =
         lineHeight *
@@ -860,42 +1026,57 @@ function drawPdfCardText(
         totalHeight / 2 +
         lineHeight * 0.8;
 
-    pdf.text(
+    const drawTextBlock = (
+        horizontalOffset = 0
+    ) => {
+        if (!rotationAngle) {
+            pdf.text(
+                lines,
+                x + cardWidth / 2 +
+                    horizontalOffset,
+                startY,
+                {
+                    align: "center"
+                }
+            );
 
-        lines,
-
-        x + cardWidth / 2,
-
-        startY,
-
-        {
-
-            align: "center"
-
+            return;
         }
 
-    );
+        lines.forEach((line, lineIndex) => {
+            const normalBaseline =
+                startY +
+                lineIndex * lineHeight;
+
+            const rotatedBaseline =
+                textY * 2 - normalBaseline;
+
+            const lineWidth =
+                pdf.getTextWidth(line);
+
+            // With a 180-degree PDF rotation, text extends left
+            // from its insertion point. Starting half a line-width
+            // to the right keeps the rotated line centered in its card.
+            pdf.text(
+                line,
+                x + cardWidth / 2 +
+                    lineWidth / 2 +
+                    horizontalOffset,
+                rotatedBaseline,
+                {
+                    angle: rotationAngle
+                }
+            );
+        });
+    };
+
+    drawTextBlock();
 
     if (fontName === "NotoSansJP") {
         const boldOffset = 0.14;
 
-        pdf.text(
-            lines,
-            x + cardWidth / 2 - boldOffset,
-            startY,
-            {
-                align: "center"
-            }
-        );
-
-        pdf.text(
-            lines,
-            x + cardWidth / 2 + boldOffset,
-            startY,
-            {
-                align: "center"
-            }
-        );
+        drawTextBlock(-boldOffset);
+        drawTextBlock(boldOffset);
     }
 
 
@@ -933,25 +1114,27 @@ function drawPdfBackPage(
                 position / layout.cols
             );
 
-        const col =
-            layout.cols - 1 - originalCol;
+        const isLandscape =
+            orientation.value === "landscape";
 
-        const row =
-            originalRow;
+        // Portrait keeps the existing mirrored-column placement.
+        // Landscape keeps columns aligned but reverses rows so the
+        // backs land correctly after the sheet is flipped.
+        const col = isLandscape
+            ? originalCol
+            : layout.cols - 1 - originalCol;
 
-        const backOffsetX = 0.5;
+        const row = isLandscape
+            ? layout.rows - 1 - originalRow
+            : originalRow;
 
         const x =
             margin +
-            col * (cardWidth + gap) +
-            backOffsetX;
-
-        const backOffsetY = 2;
+            col * (cardWidth + gap);
 
         const y =
             margin +
-            row * (cardHeight + gap) +
-            backOffsetY;
+            row * (cardHeight + gap);
 
         drawPdfCardText(
             pdf,
@@ -961,10 +1144,24 @@ function drawPdfBackPage(
             cardWidth,
             cardHeight,
             0,
-            cardsPerSheet
+            cardsPerSheet,
+            "helvetica",
+            "bold",
+            isLandscape ? 180 : 0
         );
     }
 }
+
+let previewResizeTimer;
+
+window.addEventListener("resize", () => {
+    clearTimeout(previewResizeTimer);
+
+    previewResizeTimer = setTimeout(
+        fitAllPreviewCardText,
+        120
+    );
+});
 
 async function addJapaneseFont(pdf) {
     const response =
@@ -1200,7 +1397,8 @@ async function downloadPdf() {
             hasText
                 ? (
                     hasImage
-                        ? cardHeight * 0.20
+                        ? cardHeight *
+                            IMAGE_TEXT_AREA_RATIO
                         : cardHeight
                 )
                 : 0;

@@ -357,13 +357,48 @@ header p {
 .flash-card p{
 
     width:100%;
+    box-sizing:border-box;
     margin:0;
     padding:var(--text-padding);
     border-top:2px solid #333;
     text-align:center;
     font-size:var(--text-size);
+    line-height:1.1;
     font-weight:bold;
     flex-shrink: 0;
+    max-height:35%;
+    overflow:hidden;
+    overflow-wrap:anywhere;
+
+}
+
+.preview-side-front .flash-card:not(.text-only) p{
+
+    min-height:30%;
+    max-height:30%;
+    flex-basis:30%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+}
+
+.preview-side-back .flash-card{
+
+    border:none;
+    border-radius:0;
+
+}
+
+.preview-side-back .flash-card p{
+
+    border-top:none;
+
+}
+
+.preview-page.landscape.preview-side-back .flash-card p{
+
+    transform:rotate(180deg);
 
 }
 
@@ -388,6 +423,9 @@ header p {
     font-size:var(--word-only-size);
 
     line-height:1.1;
+    max-height:90%;
+    overflow:hidden;
+    overflow-wrap:anywhere;
 
 }
 
@@ -436,7 +474,7 @@ header p {
 
     gap:10mm;
 
-    --text-size:32px;
+    --text-size:40px;
 
     --word-only-size:72px;
 
@@ -456,7 +494,7 @@ header p {
 
     gap:8mm;
 
-    --text-size:24px;
+    --text-size:30px;
 
     --word-only-size:54px;
 
@@ -475,7 +513,7 @@ header p {
 
     gap:6mm;
 
-    --text-size:18px;
+    --text-size:22px;
 
     --word-only-size:42px;
 
@@ -495,7 +533,7 @@ header p {
 
     gap:4mm;
 
-    --text-size:14px;
+    --text-size:17px;
 
     --word-only-size:28px;
 
@@ -514,7 +552,7 @@ header p {
 
     gap:2mm;
 
-    --text-size:10px;
+    --text-size:12px;
 
     --word-only-size:18px;
 
